@@ -1,0 +1,115 @@
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:ilp_file_codec/ilp_codec.dart';
+
+enum LayerLayout {
+  all,
+  left,
+  right,
+}
+
+class CanvasLayer {
+  final LayerLayout layout;
+  bool tapped = false;
+  ILPLayer? left, right;
+
+  Rect? get leftRect => left == null ? _rect(right) : _rect(left);
+
+  Rect? get rightRect => right == null ? _rect(left) : _rect(right);
+  final void Function(LayerLayout clicked, CanvasLayer layer) onTap;
+
+  bool get isNotEmpty => left != null || right != null;
+
+  CanvasLayer({
+    required this.layout,
+    required this.onTap,
+    this.left,
+    this.right,
+  }) : assert(left != null || right != null);
+
+  Rect? _rect(ILPLayer? layer) {
+    return layer == null
+        ? null
+        : Rect.fromLTWH(
+            layer.x.toDouble(),
+            layer.y.toDouble(),
+            layer.width.toDouble(),
+            layer.height.toDouble(),
+          );
+  }
+}
+
+final _debugStyle = BoxDecoration(color: Colors.blue.withOpacity(0.3));
+
+class ILPCanvas extends StatefulWidget {
+  final double scale;
+  final LayerLayout layout;
+  final List<CanvasLayer> layers;
+  final double offsetX, offsetY;
+  final bool debug;
+
+  const ILPCanvas({
+    super.key,
+    required this.layout,
+    required this.scale,
+    required this.layers,
+    this.offsetX = 0,
+    this.offsetY = 0,
+    this.debug = false,
+  });
+
+  @override
+  State<ILPCanvas> createState() => _ILPCanvasState();
+}
+
+class _ILPCanvasState extends State<ILPCanvas> {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        ...widget.layers.where((l) => l.isNotEmpty).map(_widget),
+        if (widget.debug)
+          ...widget.layers
+              .where((l) => l.tapped==false)
+              .map((e) {
+            final rect = e.leftRect ?? e.rightRect;
+            return Positioned(
+              left: widget.offsetX + rect!.left * widget.scale,
+              top: widget.offsetY + rect.top * widget.scale,
+              width: rect.width * widget.scale,
+              height: rect.height * widget.scale,
+              child: IgnorePointer(child: Container(decoration: _debugStyle)),
+            );
+          }),
+      ],
+    );
+  }
+
+  Widget _widget(CanvasLayer layer) {
+    ILPLayer? ilpLayer;
+    Rect rect;
+    final isLeft = widget.layout == LayerLayout.left;
+    ilpLayer = isLeft ? layer.left : layer.right;
+    rect = (isLeft ? layer.leftRect : layer.rightRect)!;
+
+    return Positioned(
+        left: widget.offsetX + rect.left * widget.scale,
+        top: widget.offsetY + rect.top * widget.scale,
+        width: rect.width * widget.scale,
+        height: rect.height * widget.scale,
+        child: GestureDetector(
+          onTap: () => layer.onTap(widget.layout, layer),
+          behavior: HitTestBehavior.opaque,
+          child: ilpLayer != null
+              ? Image.memory(
+                  ilpLayer.content as Uint8List,
+                  fit: BoxFit.fill,
+                  filterQuality: FilterQuality.high,
+                  isAntiAlias: true,
+                )
+              : SizedBox(),
+        ));
+  }
+}
