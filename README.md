@@ -26,7 +26,7 @@
 
   The ilp file codec package, **clone from [ilp_file_codec](https://github.com/whimsy-ai/ilp_file_codec)**
 
-### Application Store Links
+## Application Store Links
 
 * [Microsoft Store](https://www.microsoft.com/store/productid/9N99R98Z0QR3)
 
@@ -38,4 +38,4 @@
 
 * Apple iOS,macOS version
 
-### [License](./LICENSE)
+## [License](./LICENSE)
