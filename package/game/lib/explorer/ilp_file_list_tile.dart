@@ -168,7 +168,6 @@ class ILPFileListTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InfoTable(
-                space: 14,
                 rows: [
                   (UI.file.tr, path.basename(file.file.path)),
                   (UI.ilpVersion.tr, file.version.toString()),

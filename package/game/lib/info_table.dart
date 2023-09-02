@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class InfoTable extends StatelessWidget {
   final List<(String, dynamic)> rows;
-  final double space;
+  final double firstColumnWidth;
   final double runSpace;
   final TextStyle? style;
 
   const InfoTable({
     super.key,
     required this.rows,
-    this.space = 12,
+    this.firstColumnWidth = 100,
     this.runSpace = 0,
     this.style,
   });
@@ -21,7 +21,9 @@ class InfoTable extends StatelessWidget {
     return DefaultTextStyle(
       style: style,
       child: Table(
-        defaultColumnWidth: IntrinsicColumnWidth(),
+        columnWidths: {
+          0: FixedColumnWidth(firstColumnWidth),
+        },
         children: rows
             .map((e) => TableRow(
                   children: [
@@ -29,34 +31,18 @@ class InfoTable extends StatelessWidget {
                       padding: EdgeInsets.symmetric(vertical: runSpace / 2),
                       child: Text(e.$1.toString()),
                     ),
-                    SizedBox(width: space),
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: runSpace / 2),
-                      child: Text(e.$2.toString()),
+                      child: Text(
+                        e.$2.toString(),
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ))
             .toList(),
       ),
-      // child: Wrap(
-      //   spacing: space,
-      //   children: [
-      //     Column(
-      //       crossAxisAlignment: CrossAxisAlignment.start,
-      //       children: rows.map((e) => Text(e.$1)).toList(),
-      //     ),
-      //     Column(
-      //       crossAxisAlignment: CrossAxisAlignment.start,
-      //       children: rows
-      //           .map((e) => Text(
-      //                 e.$2.toString(),
-      //                 softWrap: true,
-      //                 overflow: TextOverflow.ellipsis,
-      //               ))
-      //           .toList(),
-      //     ),
-      //   ],
-      // ),
     );
   }
 }

@@ -137,7 +137,6 @@ class _GameBarState extends State<GameBar> {
                       SizedBox(
                         width: 200,
                         child: InfoTable(
-                          space: 10,
                           runSpace: 4,
                           rows: [
                             (UI.seed.tr, widget.controller.seed),

@@ -102,6 +102,10 @@ class SteamFileIcon extends StatelessWidget {
                                               ]),
                                               style: TextStyle(fontSize: 12),
                                             ),
+                                            Text(
+                                              '${UI.ilpVersion.tr} ${file.version}',
+                                              style: TextStyle(fontSize: 12),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -153,7 +157,6 @@ class SteamFileListTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InfoTable(
-          space: 14,
           rows: [
             (UI.ilpVersion.tr, file.version.toString()),
             (UI.imageLength.tr, file.infos.length.toString()),

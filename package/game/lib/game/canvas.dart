@@ -260,10 +260,10 @@ class ILPCanvas extends StatelessWidget {
     } else if (layer is LabelLayer) {
       final rect = layer.rect(layout);
       return Positioned(
-        left: offsetX + (rect.left - rect.width / 2) * scale,
-        top: offsetY + (rect.top - rect.width / 2) * scale,
-        width: rect.width * scale,
-        height: rect.height * scale,
+        left: offsetX + rect.left * scale - rect.height / 2,
+        top: offsetY + rect.top * scale - rect.height / 2,
+        width: rect.width,
+        height: rect.height,
         child: child,
       );
     }

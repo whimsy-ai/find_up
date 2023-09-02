@@ -15,7 +15,7 @@ import '../../../utils/has_flag.dart';
 import '../../../utils/steam_tags.dart';
 
 class SteamFile implements ExplorerFile {
-  TagOrientation? orientation;
+  TagShape? shape;
   TagStyle? style;
   TagAgeRating? ageRating;
 
@@ -59,7 +59,7 @@ class SteamFile implements ExplorerFile {
     this.voteDown = 0,
     this.ageRating,
     this.style,
-    this.orientation,
+    this.shape,
   }) {
     unlock = infos.map((e) => getIlpInfoUnlock(e)).toList().sum / infos.length;
   }
@@ -131,5 +131,4 @@ class SteamFile implements ExplorerFile {
     await SteamClient.instance.unsubscribe(id);
     load();
   }
-
 }

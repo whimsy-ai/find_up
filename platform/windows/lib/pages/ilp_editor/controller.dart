@@ -93,6 +93,8 @@ class ILPEditorController extends GetxController {
     _configs.insert(newIndex, _configs.removeAt(oldIndex));
   }
 
+  final Map<String, String> infoNameCaches = {};
+
   Future<Uint8List> toBytes() async {
     for (var config in _configs) {
       if (config.config == null) {
@@ -113,20 +115,21 @@ class ILPEditorController extends GetxController {
 
     /// 强制重新加载所有文件
     ilp.configs.clear();
-    ilp.configs
-        .addAll(_configs.map((file) => ILPInfoConfig.fromFileSync(file.file)));
-    return ilp
-        .toBytes(
+    ilp.configs.addAll(_configs.map((file) {
+      final info = ILPInfoConfig.fromFileSync(file.file);
+      if (infoNameCaches.containsKey(file.file)) {
+        info.name = infoNameCaches[file.file]!;
+      }
+      return info;
+    }));
+    return ilp.toBytes(
       author: author,
       name: name,
       description: desc,
       links: _linksString(),
       coverFilePath: _cover,
       version: version,
-    )
-        .then((ilp) {
-      return ilp;
-    });
+    );
   }
 
   save() async {
@@ -230,11 +233,11 @@ class ILPEditorController extends GetxController {
   editInfoConfig(ILPInfoFile file) async {
     final formKey = GlobalKey<FormState>();
     final info = file.config!;
-    String name = info.name;
+    String name = infoNameCaches[file.file] ?? info.name;
 
     check() {
       if (formKey.currentState!.validate()) {
-        info.name = name;
+        infoNameCaches[file.file] = name;
         update(['layers']);
         Get.back();
       }
@@ -389,7 +392,7 @@ class ILPEditorController extends GetxController {
     final tags = await SteamTagsDialog.show(
       age: _steamFile?.ageRating,
       style: _steamFile?.style,
-      orientation: _steamFile?.orientation,
+      shape: _steamFile?.shape,
     );
     if (tags == null) return;
     GlobalProgressIndicatorDialog.show(WindowsUI.steamUploading.tr);

@@ -53,7 +53,6 @@ class AssetFileListTile extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               InfoTable(
-                                space: 14,
                                 rows: [
                                   (UI.ilpVersion.tr, file.version.toString()),
                                   (

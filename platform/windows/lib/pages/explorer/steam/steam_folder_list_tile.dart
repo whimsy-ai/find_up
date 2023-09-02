@@ -233,7 +233,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
               onDeleted: () => controller.ageRating = null,
             ),
 
-            /// orientation
+            /// 形状
             Chip(
               backgroundColor: Colors.grey,
               avatar: Icon(Icons.filter_alt_rounded, color: Colors.white),
@@ -242,23 +242,23 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(WindowsUI.orientation.tr),
+                    Text(WindowsUI.shape.tr),
                     SizedBox(width: 10),
                     SizedBox(
                       height: 24,
                       child: DropdownButton(
                         isDense: true,
-                        value: controller.orientation,
+                        value: controller.shape,
                         enableFeedback: false,
                         focusColor: Colors.transparent,
                         padding: EdgeInsets.zero,
                         underline: SizedBox.shrink(),
                         elevation: 0,
-                        onChanged: (v) => controller.orientation = v,
+                        onChanged: (v) => controller.shape = v,
                         itemHeight: kMinInteractiveDimension,
                         dropdownColor: Theme.of(context).colorScheme.primary,
                         items: tagToMenuItems(
-                          TagOrientation.values,
+                          TagShape.values,
                           style: _itemStyle,
                         ),
                       ),
@@ -266,7 +266,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                   ],
                 ),
               ),
-              onDeleted: () => controller.orientation = null,
+              onDeleted: () => controller.shape = null,
             ),
           ],
         ),

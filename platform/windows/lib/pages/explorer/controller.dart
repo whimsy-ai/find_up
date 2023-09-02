@@ -32,7 +32,7 @@ class ILPExplorerController extends GetxController
 
   TagStyle? _style;
   TagAgeRating? _ageRating;
-  TagOrientation? _orientation;
+  TagShape? _shape;
 
 
   TagStyle? get style => _style;
@@ -54,10 +54,10 @@ class ILPExplorerController extends GetxController
     reload();
   }
 
-  TagOrientation? get orientation => _orientation;
+  TagShape? get shape => _shape;
 
-  set orientation(TagOrientation? value) {
-    _orientation = value;
+  set shape(TagShape? value) {
+    _shape = value;
     currentPage = 1;
     update(['editor']);
     reload();
@@ -131,7 +131,7 @@ class ILPExplorerController extends GetxController
         showToast(UI.folderNotExists.trArgs([folderPath]));
         return;
       }
-      final files = dir.listSync(recursive: true).where((file) {
+      final files = dir.listSync(recursive: false).where((file) {
         var filter = true;
 
         if (search != null) {
@@ -186,7 +186,7 @@ class ILPExplorerController extends GetxController
       voteType: voteType,
       tags: {
         if (style != null) style!.value,
-        if (orientation != null) orientation!.value,
+        if (shape != null) shape!.value,
         if (ageRating != null) ageRating!.value,
       },
     );

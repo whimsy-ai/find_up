@@ -264,12 +264,11 @@ extension SteamClientEx on SteamClient {
 
                 /// get tags
                 late TagStyle style;
-                late TagOrientation orientation;
+                late TagShape shape;
                 late TagAgeRating ageRating;
                 {
                   final styles = TagStyle.values.map((e) => e.value);
-                  final orientations =
-                      TagOrientation.values.map((e) => e.value);
+                  final shapes = TagShape.values.map((e) => e.value);
                   final ages = TagAgeRating.values.map((e) => e.value);
 
                   final tags = steamUgc.getQueryUgcNumTags(result.handle, 0);
@@ -288,8 +287,8 @@ extension SteamClientEx on SteamClient {
                       style = TagStyle.values
                           .firstWhere((element) => element.value == tagString);
                     }
-                    if (orientations.contains(tagString)) {
-                      orientation = TagOrientation.values
+                    if (shapes.contains(tagString)) {
+                      shape = TagShape.values
                           .firstWhere((element) => element.value == tagString);
                     }
                     if (ages.contains(tagString)) {
@@ -303,7 +302,7 @@ extension SteamClientEx on SteamClient {
                   fileSize: detail.fileSize,
                   style: style,
                   ageRating: ageRating,
-                  orientation: orientation,
+                  shape: shape,
                   id: detail.publishedFileId,
                   name: detail.title.toDartString(),
                   voteUp: detail.votesUp,
@@ -364,7 +363,7 @@ extension SteamClientEx on SteamClient {
     registerCallResult<RemoteStorageUnsubscribePublishedFileResult>(
       asyncCallId: steamUgc.unsubscribeItem(id),
       cb: (r, f) {
-        print('unsubscribeItem $id ${r.result}');
+        print('unsubscribe ugc item $id ${r.result}');
         complete.complete(r.result);
       },
     );

@@ -10,14 +10,14 @@ enum TagStyle {
   const TagStyle(this.value);
 }
 
-enum TagOrientation {
+enum TagShape {
   landscape('Landscape'),
   portrait('Portrait'),
   square('Square');
 
   final String value;
 
-  const TagOrientation(this.value);
+  const TagShape(this.value);
 }
 
 enum TagAgeRating {

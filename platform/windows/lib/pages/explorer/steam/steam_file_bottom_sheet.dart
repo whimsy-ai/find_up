@@ -139,7 +139,7 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                           Chip(label: Text(widget.file.style!.value.tr)),
                           Chip(
                               label: Text(
-                                  '${WindowsUI.orientation.tr}: ${widget.file.orientation!.value.tr}')),
+                                  '${WindowsUI.shape.tr}: ${widget.file.shape!.value.tr}')),
                           Chip(
                               label: Text(
                                   '${WindowsUI.ageRating.tr}: ${widget.file.ageRating!.value.tr}')),
@@ -147,12 +147,12 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                       ),
                     ),
                   ),
-                  /// name
+                  /// 主题
                   ListTile(
                     title: Text(UI.ilpName.tr),
                     subtitle: Text(widget.file.name),
                   ),
-                  /// author
+                  /// 作者
                   ListTile(
                     title: Text(WindowsUI.steamAuthorInfo.tr),
                     trailing: Icon(Icons.chevron_right_rounded),
@@ -169,7 +169,7 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                       );
                     },
                   ),
-                  /// open in steam
+                  /// 在steam打开这个文件页面
                   ListTile(
                     title: Text(WindowsUI.openInSteam.tr),
                     trailing: Icon(Icons.chevron_right_rounded),
@@ -182,7 +182,7 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                       );
                     },
                   ),
-                  /// other files
+                  /// 作者其它文件
                   ListTile(
                     title: Text(WindowsUI.steamAuthorOtherFiles.tr),
                     trailing: Icon(Icons.chevron_right_rounded),
@@ -192,6 +192,11 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                       controller.currentPage = 1;
                       controller.reload();
                     },
+                  ),
+                  /// version
+                  ListTile(
+                    title: Text(UI.ilpVersion.tr),
+                    subtitle: Text(widget.file.version.toString()),
                   ),
                   /// desc
                   ListTile(
@@ -290,7 +295,6 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                       fontSize: 12,
                       color: Colors.grey,
                     ),
-                    space: 14,
                     rows: [
                       (UI.resolution.tr, '${info.width} x ${info.height}'),
                       (UI.layerCount.tr, info.contentLayerIdList.length),

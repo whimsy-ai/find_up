@@ -36,7 +36,7 @@ import 'utils/update_window_title.dart';
 
 final steamAppId = [2550370];
 
-runMain(List<String> args) async {
+Future runMain(List<String> args) async {
   if (env.isSteam) {
     if (!steamAppId.contains(SteamClient.instance.steamUtils.getAppId())) {
       return exit(-1);

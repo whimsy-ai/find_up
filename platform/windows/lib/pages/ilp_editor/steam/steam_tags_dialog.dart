@@ -7,7 +7,7 @@ import '../../../utils/steam_tags.dart';
 import '../../../utils/tag_to_menu_items.dart';
 
 class SteamTagsDialog extends StatelessWidget {
-  final _orientation = Rxn<TagOrientation>(),
+  final _shape = Rxn<TagShape>(),
       _style = Rxn<TagStyle>(),
       _age = Rxn<TagAgeRating>();
   final _form = GlobalKey<FormState>();
@@ -15,22 +15,22 @@ class SteamTagsDialog extends StatelessWidget {
 
   SteamTagsDialog._({
     super.key,
-    TagOrientation? orientation,
+    TagShape? shape,
     TagStyle? style,
     TagAgeRating? age,
   }) {
-    _orientation.value = orientation;
+    _shape.value = shape;
     _style.value = style;
     _age.value = age;
   }
 
   static Future<Set<String>?> show({
-    TagOrientation? orientation,
+    TagShape? shape,
     TagStyle? style,
     TagAgeRating? age,
   }) =>
       Get.dialog<Set<String>>(SteamTagsDialog._(
-        orientation: orientation,
+        shape: shape,
         style: style,
         age: age,
       ));
@@ -45,33 +45,33 @@ class SteamTagsDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             /// 形状
-            FormField<TagOrientation>(
-              initialValue: _orientation.value,
-              onSaved: (v) => _orientation.value,
+            FormField<TagShape>(
+              initialValue: _shape.value,
+              onSaved: (v) => _shape.value,
               validator: (val) {
-                if (_orientation.value == null) return UI.contentCannotEmpty.tr;
+                if (_shape.value == null) return UI.contentCannotEmpty.tr;
                 return null;
               },
               builder: (state) => Obx(
                 () => Column(
                   children: [
                     ListTile(
-                      title: Text(WindowsUI.orientation.tr),
+                      title: Text(WindowsUI.shape.tr),
                       trailing: DropdownButton(
-                        value: _orientation.value,
-                        onChanged: (val) => _orientation.value = val,
+                        value: _shape.value,
+                        onChanged: (val) => _shape.value = val,
                         items: [
                           DropdownMenuItem(
-                            value: TagOrientation.landscape,
-                            child: Text(WindowsUI.oLandscape.tr),
+                            value: TagShape.landscape,
+                            child: Text(WindowsUI.landscape.tr),
                           ),
                           DropdownMenuItem(
-                            value: TagOrientation.portrait,
-                            child: Text(WindowsUI.oPortrait.tr),
+                            value: TagShape.portrait,
+                            child: Text(WindowsUI.portrait.tr),
                           ),
                           DropdownMenuItem(
-                            value: TagOrientation.square,
-                            child: Text(WindowsUI.oSquare.tr),
+                            value: TagShape.square,
+                            child: Text(WindowsUI.square.tr),
                           ),
                         ],
                       ),
@@ -185,11 +185,11 @@ class SteamTagsDialog extends StatelessWidget {
               final tags = _tags.toSet();
               tags
                 ..removeAll(TagStyle.values.map((e) => e.value))
-                ..removeAll(TagOrientation.values.map((e) => e.value))
+                ..removeAll(TagShape.values.map((e) => e.value))
                 ..removeAll(TagAgeRating.values.map((e) => e.value))
                 ..addAll({
                   _style.value!.value,
-                  _orientation.value!.value,
+                  _shape.value!.value,
                   _age.value!.value,
                 });
               Get.back(result: tags);

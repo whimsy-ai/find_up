@@ -1,8 +1,8 @@
 name: mobile
-description: A new Flutter project.
+description: Find Up!
 publish_to: 'none'
 
-version: 1.0.2+5
+version: 1.0.3+6
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
