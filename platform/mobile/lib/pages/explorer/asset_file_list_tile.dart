@@ -37,6 +37,7 @@ class AssetFileListTile extends StatelessWidget {
                   onTap: onTap,
                   child: Row(
                     children: [
+                      SizedBox(width: 10),
                       SizedBox(
                         width: 90,
                         height: 90,

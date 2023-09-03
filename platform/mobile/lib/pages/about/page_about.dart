@@ -26,7 +26,7 @@ class PageAbout extends StatelessWidget {
                       UI.findUp.tr,
                       style: TextStyle(fontSize: 24),
                     ),
-                    subtitle: Text('v ${packageInfo.version}'),
+                    subtitle: Text('v ${packageInfo.version}.${packageInfo.buildNumber}'),
                     trailing: TextButton(
                       onPressed: () => launchUrlString(
                           'https://github.com/whimsy-ai/find_up'),

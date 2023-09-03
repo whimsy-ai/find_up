@@ -39,13 +39,13 @@ void main() async {
       'build',
       'appbundle',
       '--target=./lib/main_prod.dart',
-      '--release',
       '--verbose',
     ],
     runInShell: true,
     workingDirectory: Directory.current.path,
   );
   if (res.exitCode != 0) throw res.stderr;
+  print('appbundle 完成');
 
   res = await Process.run(
     'flutter',
@@ -60,6 +60,7 @@ void main() async {
     workingDirectory: Directory.current.path,
   );
   if (res.exitCode != 0) throw res.stderr;
+  print('apk 完成');
 
   print('成功, 位置$buildPath');
 }
