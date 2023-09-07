@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/bytes_size.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/game/unlock_progress_bar.dart';
@@ -12,7 +13,6 @@ import 'package:game/ui.dart';
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:steamworks/steamworks.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../ui.dart';
 import '../../../utils/steam_ex.dart';
@@ -24,8 +24,9 @@ class SteamFileBottomSheet extends StatefulWidget {
 
   const SteamFileBottomSheet._({super.key, required this.file});
 
-  static Future show(SteamFile file) => Get.bottomSheet(
-        SteamFileBottomSheet._(file: file),
+  static Future show(SteamFile file) => showModalBottomSheet(
+        context: Get.context!,
+        builder: (context) => SteamFileBottomSheet._(file: file),
       );
 
   @override
@@ -74,6 +75,7 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Colors.transparent,
       child: GetBuilder<ILPExplorerController>(
         id: 'bottomSheet',
         builder: (controller) => Column(
@@ -159,7 +161,7 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                   ListTile(
                     title: Text(WindowsUI.steamAuthorInfo.tr),
                     subtitle: Text(WindowsUI.openInSteam.tr),
-                    trailing: Icon(Icons.chevron_right_rounded),
+                    trailing: FaIcon(FontAwesomeIcons.steam),
                     onTap: () {
                       SteamClient.instance.openUrl(
                           'steam://url/SteamIDPage/${widget.file.steamIdOwner}');
@@ -168,9 +170,9 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
 
                   /// 在steam打开这个文件页面
                   ListTile(
-                    title: Text(WindowsUI.openInSteam.tr),
+                    title: Text(UI.fileInfo.tr),
                     subtitle: Text(WindowsUI.openInSteam.tr),
-                    trailing: Icon(Icons.chevron_right_rounded),
+                    trailing: FaIcon(FontAwesomeIcons.steam),
                     onTap: () {
                       SteamClient.instance.openUrl(
                           'steam://url/CommunityFilePage/${widget.file.id}');

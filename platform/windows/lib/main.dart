@@ -112,7 +112,7 @@ class MyApp extends StatelessWidget {
           scrollBehavior: MyCustomScrollBehavior(),
           title: UI.findUp.tr,
           theme: ThemeData(
-            useMaterial3: false,
+            useMaterial3: true,
             colorScheme: lightColorScheme ?? _defaultLightColorScheme,
             inputDecorationTheme: InputDecorationTheme(
               border: OutlineInputBorder(),

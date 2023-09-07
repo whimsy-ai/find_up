@@ -61,7 +61,7 @@ ilpEditorTipsDialog({bool force = false}) async {
       TextButton(
         child: Text(WindowsUI.exportLogoExamplePSD.tr),
         onPressed: () async {
-          final psd = File(assetPath(paths: ['ilp', 'logo_example.psd']));
+          final psd = File(assetPath(paths: ['logo_example.psd']));
           final FileSaveLocation? file = await getSaveLocation(
             suggestedName: 'logo_example.psd',
             acceptedTypeGroups: [
@@ -70,7 +70,19 @@ ilpEditorTipsDialog({bool force = false}) async {
           );
           if (file != null) {
             await File(file.path).writeAsBytes(await psd.readAsBytes());
-            launchUrlString(file.path);
+            final sure = await Get.dialog(
+              AlertDialog(
+                title: Text(WindowsUI.exportFinish.tr),
+                actions: [
+                  TextButton(
+                      onPressed: () => Get.back(), child: Text(UI.back.tr)),
+                  ElevatedButton(
+                      onPressed: () => Get.back(result: true),
+                      child: Text(UI.open.tr)),
+                ],
+              ),
+            );
+            if (sure == true) launchUrlString(file.path);
           }
         },
       ),

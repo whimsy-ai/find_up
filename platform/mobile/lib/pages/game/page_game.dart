@@ -131,7 +131,7 @@ class PageGame extends GetView<GameController> {
                     scaleEvent: (original) {
                       // -2 是纵向分割线的宽度
                       return Offset(
-                        (original.dx - 2) / 2,
+                        original.dx - (Get.width / 2) - 2,
                         original.dy,
                       );
                     },

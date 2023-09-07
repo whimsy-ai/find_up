@@ -87,7 +87,9 @@ class WindowsUI implements Translations {
       openInSteam = 'openInSteam',
       fileSize = 'file_ize',
       exportLogoExamplePSD = 'exportLogoExamplePSD',
-      openInBrowser = 'openInBrowser';
+      openInBrowser = 'openInBrowser',
+      exportFinish = 'export_finish',
+      openPSD = 'open_psd';
 
   @override
   Map<String, Map<String, String>> get keys => {
@@ -188,6 +190,8 @@ class WindowsUI implements Translations {
           fileSize: 'File size',
           exportLogoExamplePSD: 'Export the example .psd file',
           openInBrowser: 'Open in browser',
+          exportFinish: 'Saved the .psd file',
+          openPSD: 'Open the psd file?',
         },
         'zh_CN': {
           ...UI.keys['zh_CN']!,
@@ -277,7 +281,9 @@ class WindowsUI implements Translations {
           openInSteam: '在Steam中打开',
           fileSize: '文件大小',
           exportLogoExamplePSD: '导出PSD范例文件',
-          openInBrowser: '在浏览器里打开',
+          openInBrowser: '在浏览器中打开',
+          exportFinish: '已保存PSD文件',
+          openPSD: '是否打开PSD文件？',
         },
       };
 }
