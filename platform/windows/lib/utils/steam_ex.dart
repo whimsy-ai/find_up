@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:ffi/ffi.dart';
 import 'package:ilp_file_codec/protobuf/ilp.pbserver.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../pages/explorer/steam/steam_file.dart';
 import 'steam_tags.dart';
@@ -369,17 +370,14 @@ extension SteamClientEx on SteamClient {
     );
     return complete.future;
   }
-}
 
-class SteamFiles {
-  final int current, total;
-  final List<SteamFile> files;
-  final EResult result;
-
-  SteamFiles({
-    required this.current,
-    required this.total,
-    required this.files,
-    required this.result,
-  });
+  openUrl(String url, [mode = EActivateGameOverlayToWebPageMode.default_]) {
+    launchUrlString(url);
+    return;
+    // todo, bug
+    // steamFriends.activateGameOverlayToWebPage(
+    //   url.toNativeUtf8(),
+    //   mode,
+    // );
+  }
 }

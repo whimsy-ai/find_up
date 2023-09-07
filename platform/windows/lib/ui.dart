@@ -85,7 +85,9 @@ class WindowsUI implements Translations {
       customTags = 'customTags',
       tags = 'tags',
       openInSteam = 'openInSteam',
-      fileSize = 'file_ize';
+      fileSize = 'file_ize',
+      exportLogoExamplePSD = 'exportLogoExamplePSD',
+      openInBrowser = 'openInBrowser';
 
   @override
   Map<String, Map<String, String>> get keys => {
@@ -184,6 +186,8 @@ class WindowsUI implements Translations {
           tags: 'Tags',
           openInSteam: 'Open in steam',
           fileSize: 'File size',
+          exportLogoExamplePSD: 'Export the example .psd file',
+          openInBrowser: 'Open in browser',
         },
         'zh_CN': {
           ...UI.keys['zh_CN']!,
@@ -272,6 +276,8 @@ class WindowsUI implements Translations {
           tags: '标签',
           openInSteam: '在Steam中打开',
           fileSize: '文件大小',
+          exportLogoExamplePSD: '导出PSD范例文件',
+          openInBrowser: '在浏览器里打开',
         },
       };
 }

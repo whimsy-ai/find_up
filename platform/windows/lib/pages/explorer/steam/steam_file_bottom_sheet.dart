@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:game/bytes_size.dart';
@@ -13,8 +12,10 @@ import 'package:game/ui.dart';
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../ui.dart';
+import '../../../utils/steam_ex.dart';
 import '../controller.dart';
 import 'steam_file.dart';
 
@@ -147,41 +148,35 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                       ),
                     ),
                   ),
+
                   /// 主题
                   ListTile(
                     title: Text(UI.ilpName.tr),
                     subtitle: Text(widget.file.name),
                   ),
-                  /// 作者
+
+                  /// 打开作者的Steam页面
                   ListTile(
                     title: Text(WindowsUI.steamAuthorInfo.tr),
+                    subtitle: Text(WindowsUI.openInSteam.tr),
                     trailing: Icon(Icons.chevron_right_rounded),
-                    subtitle: Text(WindowsUI.steamOpenAuthorInfoPage.tr),
                     onTap: () {
-                      // final url =
-                      //     'https://steamcommunity.com/profiles/${file.steamIdOwner}/myworkshopfiles/?appid=${SteamClient.instance.steamUtils.getAppId()}&sort=score&view=imagewall';
-                      final url =
-                          'https://steamcommunity.com/profiles/${widget.file.steamIdOwner}';
-                      SteamClient.instance.steamFriends
-                          .activateGameOverlayToWebPage(
-                        url.toNativeUtf8(),
-                        EActivateGameOverlayToWebPageMode.default_,
-                      );
+                      SteamClient.instance.openUrl(
+                          'steam://url/SteamIDPage/${widget.file.steamIdOwner}');
                     },
                   ),
+
                   /// 在steam打开这个文件页面
                   ListTile(
                     title: Text(WindowsUI.openInSteam.tr),
+                    subtitle: Text(WindowsUI.openInSteam.tr),
                     trailing: Icon(Icons.chevron_right_rounded),
                     onTap: () {
-                      SteamClient.instance.steamFriends
-                          .activateGameOverlayToWebPage(
-                        'https://steamcommunity.com/sharedfiles/filedetails/?id=${widget.file.id}'
-                            .toNativeUtf8(),
-                        EActivateGameOverlayToWebPageMode.default_,
-                      );
+                      SteamClient.instance.openUrl(
+                          'steam://url/CommunityFilePage/${widget.file.id}');
                     },
                   ),
+
                   /// 作者其它文件
                   ListTile(
                     title: Text(WindowsUI.steamAuthorOtherFiles.tr),
@@ -193,11 +188,13 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                       controller.reload();
                     },
                   ),
+
                   /// version
                   ListTile(
                     title: Text(UI.ilpVersion.tr),
                     subtitle: Text(widget.file.version.toString()),
                   ),
+
                   /// desc
                   ListTile(
                     title: Text(UI.ilpDesc.tr),
@@ -205,11 +202,13 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                         ? widget.file.description!
                         : UI.empty.tr),
                   ),
+
                   /// desc
                   ListTile(
                     title: Text(WindowsUI.fileSize.tr),
                     subtitle: Text(bytesSize(widget.file.fileSize, 2)),
                   ),
+
                   /// image length
                   ListTile(
                     title: Text(

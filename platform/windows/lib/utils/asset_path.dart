@@ -19,6 +19,7 @@ String assetPath({String? package, List<String>? paths}) {
     ]);
   }
   if (paths != null) {
+    if (paths.first == 'assets') paths.removeAt(0);
     nPath.addAll(paths);
   }
   return path.joinAll(nPath);

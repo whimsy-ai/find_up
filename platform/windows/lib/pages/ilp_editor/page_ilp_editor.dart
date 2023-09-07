@@ -13,6 +13,7 @@ import 'package:steamworks/steamworks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../ui.dart';
+import '../../utils/steam_ex.dart';
 import '../explorer/select_steam_file_dialog.dart';
 import 'controller.dart';
 import 'ilp_editor_tips_dialog.dart';
@@ -227,12 +228,8 @@ class PageILPEditor extends GetView<ILPEditorController> {
                             child: GestureDetector(
                               onTap: () {
                                 print('open agreement');
-                                SteamClient.instance.steamFriends
-                                    .activateGameOverlayToWebPage(
-                                  'https://steamcommunity.com/sharedfiles/workshoplegalagreement'
-                                      .toNativeUtf8(),
-                                  EActivateGameOverlayToWebPageMode.default_,
-                                );
+                                SteamClient.instance.openUrl(
+                                    'https://steamcommunity.com/sharedfiles/workshoplegalagreement');
                               },
                               child: Text(
                                 WindowsUI.agreementName.tr,

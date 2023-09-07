@@ -1,9 +1,18 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:get/utils.dart';
+import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
 import 'canvas.dart';
+
+typedef DragAndScaleBuilder = Widget Function(
+  BuildContext context, {
+  required double scale,
+  required double minScale,
+  required double maxScale,
+  required double x,
+  required double y,
+});
 
 class DragAndScaleWidget extends StatefulWidget {
   final ILPLayer layer;
@@ -12,13 +21,17 @@ class DragAndScaleWidget extends StatefulWidget {
   final double scaleStep;
   final double minScale;
   final double maxScale;
+  final DragAndScaleBuilder builder;
+  final Offset Function(Offset original)? scaleEvent;
 
   const DragAndScaleWidget({
     super.key,
     required this.layer,
     required this.layers,
+    required this.builder,
+    required this.minScale,
+    this.scaleEvent,
     this.scaleStep = 0.05,
-    this.minScale = 0.2,
     this.maxScale = 4.0,
     this.debug = false,
   });
@@ -28,13 +41,12 @@ class DragAndScaleWidget extends StatefulWidget {
 }
 
 class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
-  late Rect _moveBounds,
-      _real = Rect.fromLTWH(
-        0,
-        0,
-        widget.layer.width.toDouble(),
-        widget.layer.height.toDouble(),
-      );
+  late Rect _real = Rect.fromLTWH(
+    0,
+    0,
+    widget.layer.width.toDouble(),
+    widget.layer.height.toDouble(),
+  );
   Offset _eventPosition = Offset.zero;
   double _offsetX = 0, _offsetY = 0, _scale = 1;
 
@@ -51,21 +63,21 @@ class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
         widget.layer.width.toDouble(),
         widget.layer.height.toDouble(),
       );
-      _shift(Offset.zero);
       _scaleOffset();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.layers.isEmpty) return SizedBox.expand();
-    Widget child = Row(
-      children: [
-        _halfWidget(LayerLayout.left),
-        VerticalDivider(width: 2),
-        _halfWidget(LayerLayout.right),
-      ],
+    Widget child = widget.builder(
+      context,
+      scale: _scale,
+      minScale: widget.minScale,
+      maxScale: widget.maxScale,
+      x: _offsetX,
+      y: _offsetY,
     );
+
     return GetPlatform.isMobile
         ? GestureDetector(
             behavior: HitTestBehavior.opaque,
@@ -74,32 +86,32 @@ class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
             onDoubleTap: reset,
             child: child,
           )
-        : child;
+        : _forMouse(child);
   }
 
-  Widget _halfWidget(LayerLayout layout) {
-    return Expanded(
-      child: LayoutBuilder(
-        builder: (context, constrains) {
-          _moveBounds = Rect.fromLTWH(
-            50,
-            50,
-            constrains.biggest.width - 100,
-            constrains.biggest.height - 100,
-          );
-          Widget child = ILPCanvas(
-            layout: layout,
-            scale: _scale,
-            layers: widget.layers,
-            offsetX: _offsetX,
-            offsetY: _offsetY,
-            debug: widget.debug,
-          );
-          return GetPlatform.isMobile ? child : _forMouse(child);
-        },
-      ),
-    );
-  }
+  // Widget _halfWidget(LayerLayout layout) {
+  //   return Expanded(
+  //     child: LayoutBuilder(
+  //       builder: (context, constrains) {
+  //         _moveBounds = Rect.fromLTWH(
+  //           50,
+  //           50,
+  //           constrains.biggest.width - 100,
+  //           constrains.biggest.height - 100,
+  //         );
+  //         Widget child = ILPCanvas(
+  //           layout: layout,
+  //           scale: _scale,
+  //           layers: widget.layers,
+  //           offsetX: _offsetX,
+  //           offsetY: _offsetY,
+  //           debug: widget.debug,
+  //         );
+  //         return GetPlatform.isMobile ? child : _forMouse(child);
+  //       },
+  //     ),
+  //   );
+  // }
 
   /// 桌面平台
   Widget _forMouse(Widget child) {
@@ -107,10 +119,13 @@ class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
       /// 滚轮缩放
       onPointerSignal: (event) {
         if (event is PointerScrollEvent) {
-          _eventPosition = event.localPosition;
+          final half = Get.width / 2;
+          final pos = event.localPosition;
+          _eventPosition = widget.scaleEvent?.call(event.localPosition) ??
+              event.localPosition;
           final isZoomIn = event.scrollDelta.dy > 0;
-          _scale = (_scale + (isZoomIn ? widget.scaleStep : -widget.scaleStep))
-              .clamp(widget.minScale, widget.maxScale);
+          final step = widget.scaleStep * (isZoomIn ? 1 : -1);
+          _scale = (_scale + step).clamp(widget.minScale, widget.maxScale);
           _scaleOffset();
         }
       },
@@ -134,19 +149,22 @@ class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
     // print('onScaleUpdate ${details.pointerCount}');
     _offsetX += details.focalPointDelta.dx;
     _offsetY += details.focalPointDelta.dy;
+
+    /// 单指移动，包括鼠标
     if (details.pointerCount == 1) {
-      // print('移动');
+      _eventPosition = details.focalPoint;
+      // print('鼠标移动');
       final newRect = _real.shift(details.focalPointDelta);
 
-      /// 不超出范围就移动内容
-      if (_moveBounds.overlaps(newRect)) {
-        setState(() {
-          _real = newRect;
-          _shift(details.focalPointDelta);
-        });
-      }
-    } else if (details.pointerCount == 2) {
-      _eventPosition = details.localFocalPoint;
+      setState(() {
+        _real = newRect;
+      });
+    }
+
+    /// 双指缩放
+    else if (details.pointerCount == 2) {
+      _eventPosition = widget.scaleEvent?.call(details.localFocalPoint) ??
+          details.localFocalPoint;
       if (GetPlatform.isMobile) {
         /// todo
       }
@@ -177,6 +195,4 @@ class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
       );
     });
   }
-
-  void _shift(Offset delta) {}
 }

@@ -34,11 +34,11 @@ import 'utils/asset_path.dart';
 import 'utils/sound.dart';
 import 'utils/update_window_title.dart';
 
-final steamAppId = [2550370];
+const steamAppId = 2550370;
 
 Future runMain(List<String> args) async {
   if (env.isSteam) {
-    if (!steamAppId.contains(SteamClient.instance.steamUtils.getAppId())) {
+    if (steamAppId != SteamClient.instance.steamUtils.getAppId()) {
       return exit(-1);
     }
   }

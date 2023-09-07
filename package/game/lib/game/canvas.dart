@@ -191,8 +191,8 @@ class ILPCanvas extends StatelessWidget {
     required this.layout,
     required this.scale,
     required this.layers,
-    this.offsetX = 0,
-    this.offsetY = 0,
+    required this.offsetX,
+    required this.offsetY,
     this.debug = false,
   });
 

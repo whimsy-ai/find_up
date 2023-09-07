@@ -135,6 +135,7 @@ class GameController extends GetxController {
   final Duration? countdown;
   final bool allowDebug, allowPause;
   bool _debug = false;
+  bool get isDebug => _debug;
 
   bool get test => _debug;
 
@@ -169,36 +170,40 @@ class GameController extends GetxController {
   }
 
   bool get isStarted => _core.isStarted;
+  bool get isStopped => _core.isStopped;
 
   final _tappedLayerIdList = <String>[];
 
-  Widget get body => Stack(children: [
-        GetBuilder<GameController>(
-          id: 'game',
-          tag: Get.arguments['tag'],
-          builder: (c) => Opacity(
-            opacity: _core.isStarted || _core.isStopped ? 1 : 0,
-            child: layer == null
-                ? Center(
-                    child: SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  )
-                : DragAndScaleWidget(
-                    layer: c.layer!,
-                    layers: c.layers,
-                    debug: test,
-                  ),
-          ),
-        ),
-        GetBuilder<GameController>(
-          id: 'bar',
-          tag: Get.arguments['tag'],
-          builder: (c) => GameBar(controller: c),
-        ),
-      ]);
+
+
+  // Widget _halfWidget(
+  //   LayerLayout layout,
+  //   double scale,
+  //   double x,
+  //   double y,
+  //   bool debug,
+  // ) {
+  //   return Expanded(
+  //     child: LayoutBuilder(
+  //       builder: (context, constrains) {
+  //         _moveBounds = Rect.fromLTWH(
+  //           50,
+  //           50,
+  //           constrains.biggest.width - 100,
+  //           constrains.biggest.height - 100,
+  //         );
+  //         return ILPCanvas(
+  //           layout: layout,
+  //           scale: scale,
+  //           layers: layers,
+  //           offsetX: x,
+  //           offsetY: y,
+  //           debug: debug,
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 
   late Future ready;
 

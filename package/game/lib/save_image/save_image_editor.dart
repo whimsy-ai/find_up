@@ -7,15 +7,15 @@ import 'package:ilp_file_codec/ilp_codec.dart';
 
 import '../data.dart';
 import '../game/animated_unlock_progress_bar.dart';
+import '../game/drag_and_scale_widget.dart';
 import '../get_ilp_info_unlock.dart';
 import '../ui.dart';
 import 'save_image_controller.dart';
 
 class SaveImageEditor extends GetView<SaveImageController> {
-  final Rx<Offset> _offset = Offset.zero.obs;
   final void Function(Uint8List bytes) onSave;
 
-  SaveImageEditor({super.key, required this.onSave});
+  const SaveImageEditor({super.key, required this.onSave});
 
   @override
   Widget build(BuildContext context) {
@@ -69,42 +69,60 @@ class SaveImageEditor extends GetView<SaveImageController> {
                         itemCount: controller.layers.length,
                       ),
                     ),
-                    // Expanded(
-                    //   child: ListView.separated(
-                    //     separatorBuilder: (_, i) => Divider(height: 1),
-                    //     itemBuilder: (_, i) => _LayerListTile(
-                    //       layer: controller
-                    //           .layers[controller.layers.keys.elementAt(i)]!,
-                    //     ),
-                    //     itemCount: controller.layers.length,
-                    //     shrinkWrap: true,
-                    //   ),
-                    // ),
                   ],
                 );
               }),
         ),
         Expanded(
-            child: Stack(
-          children: [
-            Obx(
-              () => Positioned.fill(
-                left: _offset.value.dx,
-                top: _offset.value.dy,
-                child: GetBuilder<SaveImageController>(
-                  id: 'canvas',
-                  builder: (controller) => GestureDetector(
-                    onDoubleTap: () => _offset.value = Offset.zero,
-                    onPanUpdate: (details) {
-                      _offset.value += details.delta;
-                    },
-                    child: CustomPaint(painter: _Painter(controller)),
+          child: DragAndScaleWidget(
+            layer: controller.layer,
+            layers: [],
+            minScale: controller.minScale,
+            builder: (
+              context, {
+              required scale,
+              required minScale,
+              required maxScale,
+              required x,
+              required y,
+            }) =>
+                Stack(
+              children: [
+                Positioned.fill(
+                  left: x,
+                  top: y,
+                  child: GetBuilder<SaveImageController>(
+                    id: 'canvas',
+                    builder: (controller) => CustomPaint(
+                      painter: _Painter(controller, scale),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        )),
+          ),
+        ),
+        // Expanded(
+        //     child: Stack(
+        //   children: [
+        //     Obx(
+        //       () => Positioned.fill(
+        //         left: _offset.value.dx,
+        //         top: _offset.value.dy,
+        //         child: GetBuilder<SaveImageController>(
+        //           id: 'canvas',
+        //           builder: (controller) => GestureDetector(
+        //             onDoubleTap: () => _offset.value = Offset.zero,
+        //             onPanUpdate: (details) {
+        //               _offset.value += details.delta;
+        //             },
+        //             child: CustomPaint(painter: _Painter(controller)),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ],
+        // )),
       ],
     );
   }
@@ -112,7 +130,7 @@ class SaveImageEditor extends GetView<SaveImageController> {
   void _saveToFile() async {
     ui.PictureRecorder recorder = ui.PictureRecorder();
     Canvas canvas = Canvas(recorder);
-    var painter = _Painter(controller);
+    var painter = _Painter(controller, 1);
 
     final size = Size(
         controller.layer.width.toDouble(), controller.layer.height.toDouble());
@@ -191,12 +209,14 @@ class _LayerIcon extends GetView<SaveImageController> {
 // }
 
 class _Painter extends CustomPainter {
+  final double scale;
   final SaveImageController controller;
 
-  _Painter(this.controller);
+  _Painter(this.controller, this.scale);
 
   @override
   void paint(Canvas canvas, Size size) {
+    canvas.scale(scale);
     controller.canvasLayer.forEach((key, value) {
       paintImage(
         canvas: canvas,

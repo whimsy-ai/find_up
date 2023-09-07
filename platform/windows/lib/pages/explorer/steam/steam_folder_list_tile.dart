@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:steamworks/steamworks.dart';
 
 import '../../../ui.dart';
+import '../../../utils/steam_ex.dart';
 import '../../../utils/steam_tags.dart';
 import '../../../utils/tag_to_menu_items.dart';
 import '../controller.dart';
@@ -28,11 +29,8 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
         children: [
           InkWell(
             onTap: () {
-              SteamClient.instance.steamFriends.activateGameOverlayToWebPage(
-                'https://steamcommunity.com/app/${SteamClient.instance.steamUtils.getAppId()}/workshop/'
-                    .toNativeUtf8(),
-                EActivateGameOverlayToWebPageMode.default_,
-              );
+              SteamClient.instance.openUrl(
+                  'https://steamcommunity.com/app/${SteamClient.instance.steamUtils.getAppId()}/workshop/');
             },
             child: Padding(
               padding: EdgeInsets.all(8.0),

@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:game/data.dart';
 import 'package:game/ui.dart';
@@ -5,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../ui.dart';
+import '../../utils/asset_path.dart';
 
 ilpEditorTipsDialog({bool force = false}) async {
   if (!force && !Data.showILPEditorTip) return;
@@ -54,6 +58,22 @@ ilpEditorTipsDialog({bool force = false}) async {
       ),
     ),
     actions: [
+      TextButton(
+        child: Text(WindowsUI.exportLogoExamplePSD.tr),
+        onPressed: () async {
+          final psd = File(assetPath(paths: ['ilp', 'logo_example.psd']));
+          final FileSaveLocation? file = await getSaveLocation(
+            suggestedName: 'logo_example.psd',
+            acceptedTypeGroups: [
+              XTypeGroup(label: 'PSD', extensions: ['.psd']),
+            ],
+          );
+          if (file != null) {
+            await File(file.path).writeAsBytes(await psd.readAsBytes());
+            launchUrlString(file.path);
+          }
+        },
+      ),
       if (!force)
         Obx(() => FilterChip(
               label: Text(UI.dontShowAgain.tr),

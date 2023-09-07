@@ -9,6 +9,10 @@ class SaveImageController extends GetxController {
   Offset offset = Offset.zero;
   final ILPInfo info;
   final ILPLayer layer;
+  late final minScale = layer.width > layer.height
+      ? Get.width / 2 / layer.width
+      : Get.height / 2 / layer.height;
+  final maxScale = 4;
 
   final layers = <String, ILPLayer>{};
 

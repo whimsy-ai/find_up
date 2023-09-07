@@ -10,9 +10,22 @@ import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:path/path.dart' as path;
 import 'package:steamworks/steamworks.dart';
 
-import '../../../utils/steam_ex.dart';
 import '../../../utils/has_flag.dart';
+import '../../../utils/steam_ex.dart';
 import '../../../utils/steam_tags.dart';
+
+class SteamFiles {
+  final int current, total;
+  final List<SteamFile> files;
+  final EResult result;
+
+  SteamFiles({
+    required this.current,
+    required this.total,
+    required this.files,
+    required this.result,
+  });
+}
 
 class SteamFile implements ExplorerFile {
   TagShape? shape;

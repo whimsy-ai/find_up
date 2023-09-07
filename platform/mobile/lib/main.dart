@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
 import 'package:game/game/controller.dart';
 import 'package:game/save_image/save_image_controller.dart';
@@ -125,12 +126,13 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Stack(
           children: [
             Positioned(
-              right: 0,
-              bottom: 0,
+              right: 10,
+              bottom: 10,
               child: Text(
                 [
                   'version ${packageInfo.version}',
-                  '${constrains.maxWidth} x ${constrains.maxHeight}',
+                  if (env.isDev)
+                    '${constrains.maxWidth} x ${constrains.maxHeight}',
                 ].join('\n'),
                 style: TextStyle(color: Colors.grey),
               ),

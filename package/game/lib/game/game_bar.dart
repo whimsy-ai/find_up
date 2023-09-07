@@ -12,8 +12,13 @@ import 'page_game_entry.dart';
 
 class GameBar extends StatefulWidget {
   final GameController controller;
+  final TextStyle? textStyle;
 
-  GameBar({super.key, required this.controller});
+  const GameBar({
+    super.key,
+    required this.controller,
+    this.textStyle,
+  });
 
   @override
   State<GameBar> createState() => _GameBarState();
@@ -150,6 +155,9 @@ class _GameBarState extends State<GameBar> {
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.black54,
+                          ).copyWith(
+                            fontSize: widget.textStyle?.fontSize,
+                            color: widget.textStyle?.color,
                           ),
                         ),
                       ),

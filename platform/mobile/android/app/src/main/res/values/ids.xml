@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_id">128206441582</string>
+    <string name="app_id" translatable="false">128206441582</string>
 </resources>

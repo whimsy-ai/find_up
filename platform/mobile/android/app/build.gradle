@@ -85,4 +85,6 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.google.android.play:integrity:1.2.0'
+    implementation "com.google.android.gms:play-services-games:${gms_library_version}"
+    implementation "com.google.android.gms:play-services-auth:${gms_library_version}"
 }

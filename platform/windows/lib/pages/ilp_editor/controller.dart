@@ -136,7 +136,9 @@ class ILPEditorController extends GetxController {
     final String fileName =
         '${DateTime.now().millisecondsSinceEpoch}_v$version.ilp';
     final FileSaveLocation? file =
-        await getSaveLocation(suggestedName: fileName);
+        await getSaveLocation(suggestedName: fileName, acceptedTypeGroups: [
+      XTypeGroup(label: 'ILP', extensions: ['.ilp']),
+    ]);
     if (file == null) return;
     Get.dialog(
       AlertDialog(title: Text(UI.saving.tr)),
@@ -434,10 +436,8 @@ class ILPEditorController extends GetxController {
         actions: [
           TextButton(
             onPressed: () {
-              SteamClient.instance.steamFriends.activateGameOverlayToWebPage(
-                'steam://url/CommunityFilePage/$itemId'.toNativeUtf8(),
-                EActivateGameOverlayToWebPageMode.default_,
-              );
+              SteamClient.instance
+                  .openUrl('steam://url/CommunityFilePage/$itemId');
             },
             child: Text(WindowsUI.viewFileInSteam.tr),
           ),

@@ -62,7 +62,7 @@ abstract class UI {
       timeLeft = 'time_left',
       finish = 'finish',
       help = 'help',
-      contactDeveloper = 'contact_developer',
+      contactMe = 'contact_me',
       saved = 'saved',
       saving = 'saving',
       contentCannotEmpty = 'contentCannotEmpty',
@@ -76,7 +76,12 @@ abstract class UI {
       vote = 'vote',
       downloading = 'downloading',
       fileSize = 'file_size',
-      unfound = 'unfound';
+      unfound = 'unfound',
+      android = 'android',
+      msStore = 'ms_store',
+      appStore = 'app_store',
+      steam = 'steam',
+      steamWorkShop = 'steam_workshop';
 
   static Map<String, Map<String, String>> get keys {
     return {
@@ -153,7 +158,7 @@ abstract class UI {
         finish: 'Finish',
         help: 'Help',
         builtIn: 'Built-in',
-        contactDeveloper: 'Contact the developer',
+        contactMe: 'Contact Developer',
         saved: 'Saved to',
         saving: 'Saving to file',
         contentCannotEmpty: 'Content cannot be empty',
@@ -166,6 +171,11 @@ abstract class UI {
         downloading: 'Downloading',
         fileSize: 'File size',
         unfound: 'Unfound',
+        android: 'Android',
+        msStore: 'Microsoft Store',
+        appStore: 'App Store',
+        steam: 'Steam',
+        steamWorkShop: 'Support Steam workshop'
       },
       'zh_CN': {
         findUp: '找起来！',
@@ -241,7 +251,7 @@ abstract class UI {
         finish: '已完成',
         help: '帮助',
         builtIn: '内置',
-        contactDeveloper: '开发者的联系信息',
+        contactMe: '联系开发者',
         saved: '已保存到',
         saving: '正在保存',
         contentCannotEmpty: '内容不能为空',
@@ -253,6 +263,11 @@ abstract class UI {
         downloading: '正在下载',
         fileSize: '文件大小',
         unfound: '未找到的',
+        android: '安卓',
+        msStore: '微软商店',
+        appStore: '应用商店',
+        steam: 'Steam',
+        steamWorkShop: '支持 Steam创意工坊 功能',
       }
     };
   }
