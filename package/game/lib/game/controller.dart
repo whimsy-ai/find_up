@@ -135,6 +135,7 @@ class GameController extends GetxController {
   final Duration? countdown;
   final bool allowDebug, allowPause;
   bool _debug = false;
+
   bool get isDebug => _debug;
 
   bool get test => _debug;
@@ -170,11 +171,10 @@ class GameController extends GetxController {
   }
 
   bool get isStarted => _core.isStarted;
+
   bool get isStopped => _core.isStopped;
 
   final _tappedLayerIdList = <String>[];
-
-
 
   // Widget _halfWidget(
   //   LayerLayout layout,
@@ -251,7 +251,9 @@ class GameController extends GetxController {
     update(['bar', 'game']);
   }
 
-  reStart() {
+  reStart() async {
+    pause();
+    await Future.delayed(Duration(milliseconds: 100));
     _clicks = 0;
     _time = Duration.zero;
     _core.reset();

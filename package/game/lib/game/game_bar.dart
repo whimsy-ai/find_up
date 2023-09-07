@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:collection/collection.dart';
 
 import '../build_flavor.dart';
 import '../explorer/ilp_info_bottom_sheet.dart';
@@ -86,16 +87,10 @@ class _GameBarState extends State<GameBar> {
           child: Container(
             margin: EdgeInsets.all(10),
             clipBehavior: Clip.antiAlias,
+            padding: EdgeInsets.zero,
             decoration: BoxDecoration(
-              color: Colors.white,
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary,
-                  Colors.white,
-                ],
-                stops: [0.11, 0.11],
-              ),
-              borderRadius: BorderRadius.all(Radius.circular(40)),
+              borderRadius:
+                  BorderRadius.all(Radius.circular(kRadialReactionRadius)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black45,
@@ -121,127 +116,20 @@ class _GameBarState extends State<GameBar> {
                     ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.all(4),
-                  child: Wrap(
-                    spacing: 10,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      InkWell(
-                        child: Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Icon(
-                            Icons.chevron_left_rounded,
-                            color: Colors.white,
-                          ),
-                        ),
-                        onTap: () => Get.back(),
-                      ),
-
-                      /// 信息
-                      SizedBox(
-                        width: 200,
-                        child: InfoTable(
-                          runSpace: GetPlatform.isMobile ? 0 : 4,
-                          rows: [
-                            (UI.seed.tr, widget.controller.seed),
-                            (UI.clicks.tr, widget.controller.clicks),
-                            if (widget.controller.timeMode == TimeMode.up)
-                              (UI.usedTime.tr, widget.controller.time),
-                            if (widget.controller.timeMode == TimeMode.down)
-                              (UI.timeLeft.tr, widget.controller.time),
-                            (UI.unfound.tr, widget.controller.unTappedLayers),
-                          ],
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black54,
-                          ).copyWith(
-                            fontSize: widget.textStyle?.fontSize,
-                            color: widget.textStyle?.color,
-                          ),
-                        ),
-                      ),
-
-                      /// 暂停
-                      if (widget.controller.allowPause)
-                        InkWell(
-                          onTap: () => widget.controller.isStarted
-                              ? widget.controller.pause()
-                              : widget.controller.resume(),
-                          child: Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(
-                              widget.controller.isStarted
-                                  ? Icons.pause_circle_outline_rounded
-                                  : Icons.play_circle_outline_outlined,
-                            ),
-                          ),
-                        ),
-
-                      /// 刷新
-                      InkWell(
-                        child: Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Icon(Icons.refresh),
-                        ),
-                        onTap: () => widget.controller.reStart(),
-                      ),
-
-                      /// debug
-                      if (env.isDev || widget.controller.allowDebug)
-                        InkWell(
-                          child: Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(
-                              widget.controller.test
-                                  ? Icons.bug_report_rounded
-                                  : Icons.bug_report_outlined,
-                            ),
-                          ),
-                          onTap: () {
-                            widget.controller.test = !widget.controller.test;
-                          },
-                        ),
-
-                      /// 是否允许拖动
-                      InkWell(
-                        onTap: () {
-                          _drag.value = !_drag.value;
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.all(8),
-                          child: FaIcon(
-                            FontAwesomeIcons.arrowsUpDownLeftRight,
-                            size: 18,
-                            color: _drag.value ? Colors.black : Colors.black12,
-                          ),
-                        ),
-                      ),
-
-                      /// 信息按钮
-                      InkWell(
-                        child: Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Icon(Icons.info_outline),
-                        ),
-                        onTap: () async {
-                          final isStarted = widget.controller.isStarted;
-                          widget.controller.pause();
-                          await ILPInfoBottomSheet.show(
-                            ilp: widget.controller.ilp,
-                            currentInfo: widget.controller.info!,
-                            onTapPlay: (index) {
-                              /// 退出当前游戏才能再次打开游戏
-                              Get.back(closeOverlays: true);
-                              PageGameEntry.play(widget.controller.ilp,
-                                  index: index);
-                            },
-                          );
-                          if (isStarted) widget.controller.resume();
-                        },
-                      ),
-                    ],
+                Table(
+                  textDirection: TextDirection.ltr,
+                  defaultColumnWidth: IntrinsicColumnWidth(),
+                  border: TableBorder.all(
+                    width: 0,
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(kRadialReactionRadius)),
                   ),
+                  children: [
+                    TableRow(
+                      children: _list(),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -249,5 +137,151 @@ class _GameBarState extends State<GameBar> {
         ),
       ),
     );
+  }
+
+  List<Widget> _list() {
+    final list = <Widget>[];
+    <Widget>[
+      InkWell(
+        child: Container(
+          color: Theme.of(context).colorScheme.primary,
+          child: Icon(
+            Icons.chevron_left_rounded,
+            color: Colors.white,
+          ),
+        ),
+        onTap: () => Get.back(),
+      ),
+
+      /// 信息
+      SizedBox(
+        width: 180,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: GetPlatform.isMobile ? 2 : 4),
+          child: InfoTable(
+            runSpace: GetPlatform.isMobile ? 0 : 4,
+            rows: [
+              (UI.seed.tr, widget.controller.seed),
+              (UI.clicks.tr, widget.controller.clicks),
+              if (widget.controller.timeMode == TimeMode.up)
+                (UI.usedTime.tr, widget.controller.time),
+              if (widget.controller.timeMode == TimeMode.down)
+                (UI.timeLeft.tr, widget.controller.time),
+              (UI.unfound.tr, widget.controller.unTappedLayers),
+            ],
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.black54,
+            ).copyWith(
+              fontSize: widget.textStyle?.fontSize,
+              color: widget.textStyle?.color,
+            ),
+          ),
+        ),
+      ),
+
+      /// 暂停
+      if (widget.controller.allowPause)
+        InkWell(
+          onTap: () => widget.controller.isStarted
+              ? widget.controller.pause()
+              : widget.controller.resume(),
+          child: Icon(
+            widget.controller.isStarted
+                ? Icons.pause_circle_outline_rounded
+                : Icons.play_circle_outline_outlined,
+          ),
+        ),
+
+      /// 刷新
+      InkWell(
+        onTap: () => widget.controller.reStart(),
+        child: Icon(Icons.refresh),
+      ),
+
+      /// debug
+      if (env.isDev || widget.controller.allowDebug)
+        InkWell(
+          child: Icon(
+            widget.controller.test
+                ? Icons.bug_report_rounded
+                : Icons.bug_report_outlined,
+          ),
+          onTap: () {
+            widget.controller.test = !widget.controller.test;
+          },
+        ),
+
+      /// 是否允许拖动
+      InkWell(
+        onTap: () {
+          _drag.value = !_drag.value;
+        },
+        child: Center(
+          child: FaIcon(
+            FontAwesomeIcons.arrowsUpDownLeftRight,
+            size: 18,
+            color: _drag.value ? Colors.black : Colors.black26,
+          ),
+        ),
+      ),
+
+      /// 信息按钮
+      InkWell(
+        child: Icon(Icons.info_outline),
+        onTap: () async {
+          final isStarted = widget.controller.isStarted;
+          widget.controller.pause();
+          await ILPInfoBottomSheet.show(
+            ilp: widget.controller.ilp,
+            currentInfo: widget.controller.info!,
+            onTapPlay: (index) {
+              /// 退出当前游戏才能再次打开游戏
+              Get.back(closeOverlays: true);
+              PageGameEntry.play(widget.controller.ilp, index: index);
+            },
+          );
+          if (isStarted) widget.controller.resume();
+        },
+      ),
+    ].forEachIndexed((index, e) {
+      final isInfoTable = e is SizedBox;
+      if (index == 0) {
+        e = SizedBox(width: kToolbarHeight, child: e);
+      }
+      if (e is InkWell) {
+        e = SizedBox(width: 50, child: e);
+      }
+      if (index > 0) {
+        e = ColoredBox(color: Colors.white, child: e);
+      }
+      if (isInfoTable) {
+        e = TableCell(child: e);
+      } else {
+        e = TableCell(
+          verticalAlignment: TableCellVerticalAlignment.fill,
+          child: e,
+        );
+      }
+      list.add(e);
+      list.add(TableCell(
+        verticalAlignment: TableCellVerticalAlignment.fill,
+        child: ColoredBox(
+          color: Colors.white,
+          child: SizedBox(
+            width: 10,
+            child: index > 0 ? VerticalDivider() : null,
+          ),
+        ),
+      ));
+    });
+    list
+      ..removeAt(list.length - 1)
+      ..add(TableCell(
+        verticalAlignment: TableCellVerticalAlignment.fill,
+        child: ColoredBox(color: Colors.white, child: SizedBox(width: 10)),
+      ));
+
+    return list;
   }
 }
