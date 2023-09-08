@@ -49,10 +49,8 @@ class AboutCard extends StatelessWidget {
             trailing: Icon(Icons.link),
             title: Text(UI.msStore.tr),
             onTap: () {
-              final lan = Data.locale.toString().replaceAll('_', '-');
-              final name = lan.contains('zh') ? '找起来' : 'find_up';
               launchUrlString(
-                  'https://www.microsoft.com/$lan/p/$name/9n99r98z0qr3');
+                  'https://www.microsoft.com/store/productid/9N99R98Z0QR3?ocid=pdpshare');
             },
           ),
           Divider(),
