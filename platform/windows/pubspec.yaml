@@ -24,7 +24,7 @@ msix_config:
 dependencies:
   flutter:
     sdk: flutter
-  get: ^4.6.5
+  get: ^4.6.6
   intl: any
   window_manager: ^0.3.6
   ilp_file_codec:
@@ -43,9 +43,9 @@ dependencies:
     sdk: flutter
   confetti: ^0.7.0
   desktop_drop: ^0.4.3
-  dynamic_color: ^1.6.6
+  dynamic_color: ^1.6.7
   windows_single_instance: ^1.0.0
-  msix: ^3.16.1
+  msix: ^3.16.2
   chinese_font_library: ^1.0.2
   package_info_plus: ^4.1.0
   steamworks: ^0.4.4

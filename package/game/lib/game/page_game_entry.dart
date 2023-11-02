@@ -19,7 +19,6 @@ class PageGameEntry{
       'allowDebug': allowDebug,
       'allowPause': allowPause,
       'timeMode': timeMode,
-      'tag': DateTime.now().toString(),
     })!;
   }
 
@@ -36,6 +35,5 @@ class PageGameEntry{
         'allowDebug': allowDebug,
         'allowPause': allowPause,
         'timeMode': timeMode,
-        'tag': DateTime.now().toString(),
       })!;
 }

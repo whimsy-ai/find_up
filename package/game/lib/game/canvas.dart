@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
+import 'mask_widget.dart';
+
 enum LayerLayout {
   all,
   left,
@@ -185,6 +187,8 @@ class ILPCanvas extends StatelessWidget {
   final double offsetX, offsetY;
   final bool debug;
   late final isLeft = layout == LayerLayout.left;
+  final MaskData? mask;
+  late final Rect _first = layers.first.rect(layout)!;
 
   ILPCanvas({
     super.key,
@@ -194,6 +198,7 @@ class ILPCanvas extends StatelessWidget {
     required this.offsetX,
     required this.offsetY,
     this.debug = false,
+    this.mask,
   });
 
   @override
@@ -221,6 +226,21 @@ class ILPCanvas extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           ...(layers.map((l) => _layerWrapper(context, l))).nonNulls,
+          if (mask != null)
+            Positioned.fromRect(
+              rect: Rect.fromLTWH(
+                offsetX + _first.left * scale,
+                offsetY + _first.top * scale,
+                _first.width * scale,
+                _first.height * scale,
+              ),
+              child: CustomPaint(
+                painter: MaskPainter(
+                  data: mask!,
+                  scale: scale,
+                ),
+              ),
+            ),
           if (debug)
             ...layers
                 .whereType<ILPCanvasLayer>()

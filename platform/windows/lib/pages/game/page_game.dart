@@ -13,10 +13,8 @@ import 'package:get/get.dart';
 import 'game_helper.dart';
 
 class PageGame extends GetView<GameController> {
-  @override
-  final String tag;
 
-  PageGame({super.key, required this.tag}) {
+  PageGame({super.key}) {
     controller.onFinish = _onFinish;
   }
 
@@ -83,11 +81,15 @@ class PageGame extends GetView<GameController> {
       controller.start();
     }
     return Scaffold(
-      body:
-      Stack(children: [
+      floatingActionButton: FloatingActionButton(
+        child: Text('Mask'),
+        onPressed: () {
+          controller.mask ? controller.disableMask() : controller.enableMask();
+        },
+      ),
+      body: Stack(children: [
         GetBuilder<GameController>(
           id: 'game',
-          tag: Get.arguments['tag'],
           builder: (c) => Opacity(
             opacity: controller.isStarted || controller.isStopped ? 1 : 0,
             child: controller.layer == null
@@ -133,6 +135,7 @@ class PageGame extends GetView<GameController> {
                               offsetX: x,
                               offsetY: y,
                               debug: controller.isDebug,
+                              mask: controller.maskData,
                             ),
                           ),
                           VerticalDivider(width: 2),
@@ -144,6 +147,7 @@ class PageGame extends GetView<GameController> {
                               offsetX: x,
                               offsetY: y,
                               debug: controller.isDebug,
+                              mask: controller.maskData,
                             ),
                           ),
                         ],
@@ -154,7 +158,6 @@ class PageGame extends GetView<GameController> {
         ),
         GetBuilder<GameController>(
           id: 'bar',
-          tag: Get.arguments['tag'],
           builder: (c) => GameBar(controller: c),
         ),
       ]),

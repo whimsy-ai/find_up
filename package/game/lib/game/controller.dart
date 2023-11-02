@@ -1,16 +1,16 @@
 import 'dart:async';
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
-import '../core.dart';
 import '../data.dart';
 import '../get_ilp_info_unlock.dart';
 import '../sound.dart';
 import 'canvas.dart';
-import 'game_bar.dart';
+import 'mask_widget.dart';
 
 class Action {
   final Future<void> Function(Duration frameTime) onFixedUpdate;
@@ -38,15 +38,6 @@ class GameCore {
 
   GameCoreState get state => _state;
   DateTime? startTime, stopTime, pauseTime;
-  static Duration _fixedDuration = Duration(milliseconds: 50);
-
-  static int get fixedIntervalMS => _fixedDuration.inMilliseconds;
-
-  static set fixedIntervalMS(int val) {
-    _fixedDuration = Duration(milliseconds: val);
-  }
-
-  Timer? _fixedUpdateTimer;
 
   bool get isStarted => _state == GameCoreState.started;
 
@@ -58,8 +49,12 @@ class GameCore {
 
   Future<void> _loop() async {
     update(DateTime.now().difference(_frameTime));
-    _fixedUpdateTimer = Timer(_fixedDuration, _loop);
     _frameTime = DateTime.now();
+    if (isStarted) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        _loop();
+      });
+    }
   }
 
   void start() {
@@ -73,13 +68,11 @@ class GameCore {
     if (_state != GameCoreState.started) return;
     _state = GameCoreState.stopped;
     stopTime = DateTime.now();
-    _fixedUpdateTimer?.cancel();
   }
 
   void pause() {
     if (_state == GameCoreState.started) {
       pauseTime = DateTime.now();
-      _fixedUpdateTimer?.cancel();
       _state = GameCoreState.paused;
     }
   }
@@ -95,7 +88,6 @@ class GameCore {
   void reset() {
     _state = GameCoreState.notStart;
     startTime = stopTime = pauseTime = null;
-    _fixedUpdateTimer?.cancel();
   }
 }
 
@@ -145,13 +137,52 @@ class GameController extends GetxController {
     update(['bar', 'game']);
   }
 
+  late math.Random _random;
+
   late final GameCore _core = GameCore(_onFixedUpdate);
 
   late int index;
-  late int _seed = Random().nextInt(65535);
+  late int _seed = math.Random().nextInt(65535);
   ILPHeader? _header;
   ILPInfo? info;
   ILPLayer? layer;
+  bool _mask = false;
+  double _maskLerp = 0;
+  MaskData? _maskData, _toMaskData;
+
+  bool get mask => _mask;
+
+  MaskData? get maskData =>
+      _mask ? MaskData.lerp(_maskData!, _toMaskData!, _maskLerp) : null;
+
+  enableMask() {
+    _mask = true;
+    _maskData = MaskData(
+      center: Offset.zero,
+      radius: layer!.width / 4,
+      color: Colors.black,
+    );
+    _nextMaskData();
+    update(['game']);
+  }
+
+  disableMask() {
+    _maskData = _toMaskData = null;
+    _mask = false;
+    update(['game']);
+  }
+
+  _nextMaskData() {
+    var dx = _maskData!.center.dx, dy = _maskData!.center.dy;
+    final xLarge = _random.nextBool();
+    dx = (xLarge ? layer!.width : _random.nextInt(layer!.width)).toDouble();
+    dy = (xLarge ? _random.nextInt(layer!.height) : layer!.height).toDouble();
+    _toMaskData = MaskData(
+      center: Offset(dx, dy),
+      color: Colors.black,
+      radius: _maskData!.radius,
+    );
+  }
 
   int get clicks => _clicks;
   int _clicks = 0;
@@ -216,7 +247,6 @@ class GameController extends GetxController {
     this.sound,
     this.countdown,
   }) {
-    print('GameController tag ${Get.arguments['tag']}');
     if (timeMode == TimeMode.down) assert(countdown != null);
     ready = Future.wait([
       ilp.header,
@@ -231,7 +261,7 @@ class GameController extends GetxController {
 
   start() async {
     await ready;
-    randomLayers();
+    _randomLayers();
     _core.start();
     update(['bar', 'game']);
   }
@@ -258,13 +288,14 @@ class GameController extends GetxController {
     _time = Duration.zero;
     _core.reset();
     start();
+    if (_mask) enableMask();
   }
 
-  randomLayers({int? index, int? seed}) async {
-    _seed = seed ?? Random().nextInt(65535);
+  _randomLayers({int? index, int? seed}) async {
+    _seed = seed ?? math.Random().nextInt(65535);
     info = await ilp.info(index ?? this.index);
     layers.clear();
-    final random = Random(_seed);
+    _random = math.Random(_seed);
     int layerIndex = 0;
     loop(List<ILPLayer> layers, {isGroup = false}) {
       final List<ILPLayer> contents = [];
@@ -277,20 +308,20 @@ class GameController extends GetxController {
       }
       if (contents.isNotEmpty) {
         if (isGroup) {
-          final isShow = random.nextBool();
+          final isShow = _random.nextBool();
           if (isShow) {
-            final layer = contents[random.nextInt(contents.length)];
+            final layer = contents[_random.nextInt(contents.length)];
             ILPLayer? otherLayer;
 
             /// if show other side layer
             /// 如果另外一边也要显示内容
-            if (random.nextBool()) {
+            if (_random.nextBool()) {
               contents.remove(layer);
               if (contents.isNotEmpty) {
-                otherLayer = contents[random.nextInt(contents.length)];
+                otherLayer = contents[_random.nextInt(contents.length)];
               }
             }
-            final leftSide = random.nextBool();
+            final leftSide = _random.nextBool();
             final canvasLayer = ILPCanvasLayer(
               name: '$layerIndex',
               layout: leftSide ? LayerLayout.left : LayerLayout.right,
@@ -302,9 +333,9 @@ class GameController extends GetxController {
           }
         } else {
           for (var layer in contents) {
-            final isShow = random.nextBool();
+            final isShow = _random.nextBool();
             if (isShow) {
-              final leftSide = random.nextBool();
+              final leftSide = _random.nextBool();
               final canvasLayer = ILPCanvasLayer(
                 name: '$layerIndex',
                 layout: leftSide ? LayerLayout.left : LayerLayout.right,
@@ -382,6 +413,15 @@ class GameController extends GetxController {
   Future<void> _onFixedUpdate(Duration lastFrame) async {
     _time += lastFrame;
     update(['bar']);
+    if (_mask) {
+      _maskLerp += lastFrame.inMilliseconds / 1000 * 0.5;
+      update(['game']);
+      if (_maskLerp > 1) {
+        _maskLerp = 0;
+        _maskData = _toMaskData;
+        _nextMaskData();
+      }
+    }
   }
 
   int get unTappedLayers => layers
@@ -390,4 +430,11 @@ class GameController extends GetxController {
       .length;
 
   int get allLayers => layers.whereType<ILPCanvasLayer>().length - 1;
+
+  @override
+  void onClose() {
+    // print('GameController onClose');
+    _core.stop();
+    super.onClose();
+  }
 }

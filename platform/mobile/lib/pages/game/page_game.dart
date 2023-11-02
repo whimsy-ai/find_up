@@ -11,10 +11,8 @@ import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
 class PageGame extends GetView<GameController> {
-  @override
-  final String tag;
 
-  PageGame({super.key, required this.tag}) {
+  PageGame({super.key}) {
     controller.onFinish = _onFinish;
   }
 
@@ -110,7 +108,6 @@ class PageGame extends GetView<GameController> {
       body: Stack(children: [
         GetBuilder<GameController>(
           id: 'game',
-          tag: Get.arguments['tag'],
           builder: (c) => Opacity(
             opacity: controller.isStarted || controller.isStopped ? 1 : 0,
             child: controller.layer == null
@@ -174,7 +171,6 @@ class PageGame extends GetView<GameController> {
         ),
         GetBuilder<GameController>(
           id: 'bar',
-          tag: Get.arguments['tag'],
           builder: (c) => GameBar(
             controller: c,
             textStyle: TextStyle(fontSize: 12),

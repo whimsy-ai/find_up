@@ -139,7 +139,7 @@ class MyApp extends StatelessWidget {
             ),
             GetPage(
               name: '/game',
-              page: () => PageGame(tag: Get.arguments['tag']),
+              page: () => PageGame(),
               popGesture: false,
               preventDuplicates: true,
               binding: BindingsBuilder(() {
@@ -152,7 +152,6 @@ class MyApp extends StatelessWidget {
                     allowDebug: Get.arguments['allowDebug'],
                     sound: Sound.instance,
                   ),
-                  tag: Get.arguments['tag'],
                 );
               }),
             ),
