@@ -1,4 +1,3 @@
-import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:game/ui.dart';
 import 'package:get/get.dart';

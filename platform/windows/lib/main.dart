@@ -118,14 +118,14 @@ class MyApp extends StatelessWidget {
               border: OutlineInputBorder(),
             ),
             // fontFamily: 'Source',
-          ).useSystemChineseFont(),
+          ).useSystemChineseFont((lightColorScheme ?? _defaultLightColorScheme).brightness),
           darkTheme: ThemeData(
             useMaterial3: true,
             colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
             inputDecorationTheme: InputDecorationTheme(
               border: OutlineInputBorder(),
             ),
-          ).useSystemChineseFont(),
+          ).useSystemChineseFont((darkColorScheme ?? _defaultDarkColorScheme).brightness),
           transitionDuration: Duration.zero,
           initialRoute: '/',
           getPages: [

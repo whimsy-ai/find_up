@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import 'data.dart';
 import 'ui.dart';
 
 class AboutCard extends StatelessWidget {
