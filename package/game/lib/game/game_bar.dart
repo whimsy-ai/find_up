@@ -204,12 +204,14 @@ class _GameBarState extends State<GameBar> {
 
       /// 输入种子
       InkWell(
-        child: Tooltip(message: UI.gameBarChangeSeed.tr, child: Icon(Icons.keyboard_outlined)),
+        child: Tooltip(
+            message: UI.gameBarChangeSeed.tr,
+            child: Icon(Icons.keyboard_outlined)),
         onTap: () async {
           widget.controller.pause();
           var seed = widget.controller.seed;
           final sure = await Get.dialog(AlertDialog(
-            title: Text('输入种子'),
+            title: Text(UI.inputTheSeed.tr),
             content: TextField(
               controller: TextEditingController(text: seed.toString()),
               keyboardType: TextInputType.phone,
@@ -258,7 +260,7 @@ class _GameBarState extends State<GameBar> {
               widget.controller.allLayers - widget.controller.unTappedLayers;
           if (foundLayers > 0) {
             final sure = await Get.dialog(AlertDialog(
-              title: Text('已经找到了 $foundLayers 个图层，确认刷新？'),
+              title: Text(UI.restartConfirm.trArgs([foundLayers.toString()])),
               actions: [
                 TextButton(
                     onPressed: () => Get.back(), child: Text(UI.cancel.tr)),

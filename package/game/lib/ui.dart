@@ -88,7 +88,9 @@ abstract class UI {
       gameBarDrag = 'gameBarDrag',
       gameBarInfo = 'gameBarInfo',
       gameBarTip = 'gameBarTip',
-      showATip = 'showATip';
+      showATip = 'showATip',
+      inputTheSeed = 'inputTheSeed',
+      restartConfirm = 'restartConfirm';
 
   static Map<String, Map<String, String>> get keys {
     return {
@@ -190,6 +192,8 @@ abstract class UI {
         gameBarInfo: 'Information',
         gameBarTip: 'Display a prompt',
         showATip: 'A prompt has been displayed',
+        inputTheSeed: 'Input the seed',
+        restartConfirm: 'Already found %s of layers, confirm generate a random seed and start a new game?'
       },
       'zh_CN': {
         findUp: '找起来！',
@@ -289,6 +293,8 @@ abstract class UI {
         gameBarInfo: '图片信息',
         gameBarTip: '显示一个提示',
         showATip: '已经显示一个提示',
+        inputTheSeed: '输入种子',
+        restartConfirm: '已经找到了 %s 个图层，确认生成随机种子开始新的游戏？'
       }
     };
   }

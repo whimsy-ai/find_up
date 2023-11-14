@@ -2,7 +2,7 @@ name: windows
 description: Find Up!.
 publish_to: 'none'
 
-version: 1.0.10+1
+version: 1.0.11
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
@@ -66,7 +66,6 @@ flutter_launcher_icons:
 #  android: "launcher_icon"
 #  ios: true
   image_path: "icon.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
 #  web:
 #    generate: true
 #    image_path: "path/to/image.png"

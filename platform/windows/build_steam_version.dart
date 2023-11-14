@@ -11,14 +11,15 @@ final buildPath = path.join(
 );
 
 void main() async {
-  print('开始构建Steam版本');
-  print('当前文件夹 ${Directory.current.path}');
+  print('执行flutter clean');
   await Process.run(
     'flutter',
     ['clean'],
     runInShell: true,
     workingDirectory: Directory.current.path,
   );
+  print('开始构建Steam版本');
+  print('当前文件夹 ${Directory.current.path}');
   final res = await Process.run(
     'flutter',
     [
@@ -27,11 +28,12 @@ void main() async {
       '--target=./lib/main_steam_prod.dart',
     ],
     runInShell: true,
-    workingDirectory: Directory.current.path,
+    includeParentEnvironment: true,
   );
   if (res.exitCode == 0) {
     /// 复制Steam文件到打包目录
     await copyFile('./steam_api64.dll', buildPath);
+    await copyFile('./steam_appid.txt', buildPath);
     // await copyFile('./steam_appid.txt', buildPath);
   } else {
     throw res.stderr;
