@@ -81,7 +81,14 @@ abstract class UI {
       msStore = 'ms_store',
       appStore = 'app_store',
       steam = 'steam',
-      steamWorkShop = 'steam_workshop';
+      steamWorkShop = 'steam_workshop',
+      gameBarChangeSeed = 'gameBarChangeSeed',
+      gameBarPause = 'gameBarPause',
+      gameBarRestart = 'gameBarRestart',
+      gameBarDrag = 'gameBarDrag',
+      gameBarInfo = 'gameBarInfo',
+      gameBarTip = 'gameBarTip',
+      showATip = 'showATip';
 
   static Map<String, Map<String, String>> get keys {
     return {
@@ -175,7 +182,14 @@ abstract class UI {
         msStore: 'Microsoft Store',
         appStore: 'App Store',
         steam: 'Steam',
-        steamWorkShop: 'Support Steam workshop'
+        steamWorkShop: 'Support Steam workshop',
+        gameBarChangeSeed: 'Change Seed',
+        gameBarPause: 'Pause / Resume',
+        gameBarRestart: 'Random the seed and restart the game',
+        gameBarDrag: 'Enable / disable the drag game bar function',
+        gameBarInfo: 'Information',
+        gameBarTip: 'Display a prompt',
+        showATip: 'A prompt has been displayed',
       },
       'zh_CN': {
         findUp: '找起来！',
@@ -268,6 +282,13 @@ abstract class UI {
         appStore: '应用商店',
         steam: 'Steam',
         steamWorkShop: '支持 Steam创意工坊 功能',
+        gameBarChangeSeed: '修改种子',
+        gameBarPause: '暂停 / 继续',
+        gameBarRestart: '随机种子，重新开始',
+        gameBarDrag: '是否允许拖动游戏栏',
+        gameBarInfo: '图片信息',
+        gameBarTip: '显示一个提示',
+        showATip: '已经显示一个提示',
       }
     };
   }

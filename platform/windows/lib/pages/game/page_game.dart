@@ -9,13 +9,16 @@ import 'package:game/game/game_bar.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:oktoast/oktoast.dart';
 
 import 'game_helper.dart';
 
 class PageGame extends GetView<GameController> {
-
   PageGame({super.key}) {
     controller.onFinish = _onFinish;
+    controller.tipLayer.listen((v) {
+      if (v != null) showToast(UI.showATip.tr);
+    });
   }
 
   void _onFinish({
@@ -38,6 +41,7 @@ class PageGame extends GetView<GameController> {
           ],
         ),
         actions: [
+          /// 导出图片
           TextButton(
             onPressed: () => Get.toNamed(
               '/save',
@@ -45,6 +49,8 @@ class PageGame extends GetView<GameController> {
             ),
             child: Text(UI.saveImage.tr),
           ),
+
+          /// 再玩一次
           TextButton(
             onPressed: () {
               Get.back();
@@ -52,16 +58,20 @@ class PageGame extends GetView<GameController> {
             },
             child: Text(UI.playAgain.tr),
           ),
+
+          /// 返回
           TextButton(
             onPressed: () => Get.back(closeOverlays: true),
             child: Text(UI.back.tr),
           ),
+
+          /// 玩下一张图片
           if (nextIndex != null)
             ElevatedButton(
-              onPressed: () {
-                Get.back();
-                PageGameEntry.next(controller.ilp, index: nextIndex);
-              },
+              onPressed: () => PageGameEntry.replace(
+                controller.ilp,
+                index: nextIndex,
+              ),
               child: Text(UI.playNext.tr),
             ),
         ],
@@ -81,12 +91,6 @@ class PageGame extends GetView<GameController> {
       controller.start();
     }
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Text('Mask'),
-        onPressed: () {
-          controller.mask ? controller.disableMask() : controller.enableMask();
-        },
-      ),
       body: Stack(children: [
         GetBuilder<GameController>(
           id: 'game',
@@ -130,24 +134,14 @@ class PageGame extends GetView<GameController> {
                           Expanded(
                             child: ILPCanvas(
                               layout: LayerLayout.left,
-                              scale: scale,
-                              layers: controller.layers,
-                              offsetX: x,
-                              offsetY: y,
                               debug: controller.isDebug,
-                              mask: controller.maskData,
                             ),
                           ),
                           VerticalDivider(width: 2),
                           Expanded(
                             child: ILPCanvas(
                               layout: LayerLayout.right,
-                              scale: scale,
-                              layers: controller.layers,
-                              offsetX: x,
-                              offsetY: y,
                               debug: controller.isDebug,
-                              mask: controller.maskData,
                             ),
                           ),
                         ],

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
@@ -10,7 +11,6 @@ import '../data.dart';
 import '../get_ilp_info_unlock.dart';
 import '../sound.dart';
 import 'canvas.dart';
-import 'mask_widget.dart';
 
 class Action {
   final Future<void> Function(Duration frameTime) onFixedUpdate;
@@ -20,6 +20,13 @@ class Action {
   void update(Duration frameTime) {
     onFixedUpdate(frameTime);
   }
+}
+
+enum TimeMode { up, down }
+
+enum GameMode {
+  normal,
+  hard,
 }
 
 enum GameCoreState {
@@ -58,7 +65,6 @@ class GameCore {
   }
 
   void start() {
-    if (_state != GameCoreState.notStart) return;
     _state = GameCoreState.started;
     _frameTime = DateTime.now();
     _loop();
@@ -90,8 +96,6 @@ class GameCore {
     startTime = stopTime = pauseTime = null;
   }
 }
-
-enum TimeMode { up, down }
 
 class GameCoreTimer extends Action {
   final TimeMode mode;
@@ -146,43 +150,6 @@ class GameController extends GetxController {
   ILPHeader? _header;
   ILPInfo? info;
   ILPLayer? layer;
-  bool _mask = false;
-  double _maskLerp = 0;
-  MaskData? _maskData, _toMaskData;
-
-  bool get mask => _mask;
-
-  MaskData? get maskData =>
-      _mask ? MaskData.lerp(_maskData!, _toMaskData!, _maskLerp) : null;
-
-  enableMask() {
-    _mask = true;
-    _maskData = MaskData(
-      center: Offset.zero,
-      radius: layer!.width / 4,
-      color: Colors.black,
-    );
-    _nextMaskData();
-    update(['game']);
-  }
-
-  disableMask() {
-    _maskData = _toMaskData = null;
-    _mask = false;
-    update(['game']);
-  }
-
-  _nextMaskData() {
-    var dx = _maskData!.center.dx, dy = _maskData!.center.dy;
-    final xLarge = _random.nextBool();
-    dx = (xLarge ? layer!.width : _random.nextInt(layer!.width)).toDouble();
-    dy = (xLarge ? _random.nextInt(layer!.height) : layer!.height).toDouble();
-    _toMaskData = MaskData(
-      center: Offset(dx, dy),
-      color: Colors.black,
-      radius: _maskData!.radius,
-    );
-  }
 
   int get clicks => _clicks;
   int _clicks = 0;
@@ -236,8 +203,6 @@ class GameController extends GetxController {
   //   );
   // }
 
-  late Future ready;
-
   GameController({
     required this.ilp,
     required this.index,
@@ -248,20 +213,25 @@ class GameController extends GetxController {
     this.countdown,
   }) {
     if (timeMode == TimeMode.down) assert(countdown != null);
-    ready = Future.wait([
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    print('onInit');
+  }
+
+  start({int? index, int? seed}) async {
+    await Future.wait([
       ilp.header,
-      ilp.info(index),
-      ilp.layer(index),
+      ilp.info(index ?? this.index),
+      ilp.layer(index ?? this.index),
     ]).then((list) {
       _header = list.first as ILPHeader;
       info = list[1] as ILPInfo;
       layer = list.last as ILPLayer;
     });
-  }
-
-  start() async {
-    await ready;
-    _randomLayers();
+    _randomLayers(seed: seed);
     _core.start();
     update(['bar', 'game']);
   }
@@ -287,8 +257,7 @@ class GameController extends GetxController {
     _clicks = 0;
     _time = Duration.zero;
     _core.reset();
-    start();
-    if (_mask) enableMask();
+    start(index: index);
   }
 
   _randomLayers({int? index, int? seed}) async {
@@ -378,21 +347,24 @@ class GameController extends GetxController {
       sound?.wrong();
     }
 
-    /// 未被点击过的可变图层
+    /// 未被点击过的图层
     else {
       sound?.correct();
       layer.tappedSide = clicked;
+      layer.highlight = false;
+      tipLayer.value = null;
+
       layers.add(LabelLayer(index: _clicks, position: tapPosition));
 
       /// 点击了左边
       if (clicked == LayerLayout.left) {
-        print('点击了左边');
+        // print('点击了左边');
         if (layer.left != null) _tappedLayerIdList.add(layer.left!.id);
       }
 
       /// 点击了右边
       else if (clicked == LayerLayout.right) {
-        print('点击了右边');
+        // print('点击了右边');
         if (layer.right != null) _tappedLayerIdList.add(layer.right!.id);
       }
     }
@@ -413,15 +385,6 @@ class GameController extends GetxController {
   Future<void> _onFixedUpdate(Duration lastFrame) async {
     _time += lastFrame;
     update(['bar']);
-    if (_mask) {
-      _maskLerp += lastFrame.inMilliseconds / 1000 * 0.5;
-      update(['game']);
-      if (_maskLerp > 1) {
-        _maskLerp = 0;
-        _maskData = _toMaskData;
-        _nextMaskData();
-      }
-    }
   }
 
   int get unTappedLayers => layers
@@ -430,6 +393,21 @@ class GameController extends GetxController {
       .length;
 
   int get allLayers => layers.whereType<ILPCanvasLayer>().length - 1;
+
+  var scale = 1.0, offsetX = 0.0, offsetY = 0.0;
+
+  late final tipLayer = Rxn<ILPCanvasLayer>()..listen((v) {});
+
+  showTip() {
+    if (unTappedLayers > 0 == false) return;
+    final layer = layers
+        .whereType<ILPCanvasLayer>()
+        .firstWhereOrNull((element) => !element.tapped);
+    if (layer == null) return;
+    layer.highlight = true;
+    tipLayer.value = layer;
+    update(['game']);
+  }
 
   @override
   void onClose() {

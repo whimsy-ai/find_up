@@ -6,6 +6,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/ui.dart';
+import 'package:game/utils/textfield_number_formatter.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:steamworks/steamworks.dart';
@@ -118,10 +119,9 @@ class PageILPEditor extends GetView<ILPEditorController> {
                               }
                               return null;
                             },
+                            keyboardType: TextInputType.phone,
                             inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'[1-9][0-9]*'),
-                              ),
+                              NumberFormatter,
                             ],
                           ),
                         ),

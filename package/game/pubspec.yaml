@@ -14,6 +14,7 @@ dependencies:
   dio_cache_interceptor: ^3.4.2
   flutter:
     sdk: flutter
+  flutter_animate: ^4.2.0+1
   font_awesome_flutter: ^10.5.0
   gesture_x_detector: ^1.1.1
   get: ^4.6.5

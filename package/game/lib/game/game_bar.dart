@@ -1,8 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game/utils/textfield_number_formatter.dart';
 import 'package:get/get.dart';
-import 'package:collection/collection.dart';
 
 import '../build_flavor.dart';
 import '../explorer/ilp_info_bottom_sheet.dart';
@@ -116,20 +117,22 @@ class _GameBarState extends State<GameBar> {
                     ),
                   ),
                 ),
-                Table(
-                  textDirection: TextDirection.ltr,
-                  defaultColumnWidth: IntrinsicColumnWidth(),
-                  border: TableBorder.all(
-                    width: 0,
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(kRadialReactionRadius)),
-                  ),
-                  children: [
-                    TableRow(
-                      children: _list(),
+                Material(
+                  child: Table(
+                    textDirection: TextDirection.ltr,
+                    defaultColumnWidth: IntrinsicColumnWidth(),
+                    border: TableBorder.all(
+                      width: 0,
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(kRadialReactionRadius)),
                     ),
-                  ],
+                    children: [
+                      TableRow(
+                        children: _list(),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -145,9 +148,12 @@ class _GameBarState extends State<GameBar> {
       InkWell(
         child: Container(
           color: Theme.of(context).colorScheme.primary,
-          child: Icon(
-            Icons.chevron_left_rounded,
-            color: Colors.white,
+          child: Tooltip(
+            message: UI.back.tr,
+            child: Icon(
+              Icons.chevron_left_rounded,
+              color: Colors.white,
+            ),
           ),
         ),
         onTap: () => Get.back(),
@@ -186,17 +192,85 @@ class _GameBarState extends State<GameBar> {
           onTap: () => widget.controller.isStarted
               ? widget.controller.pause()
               : widget.controller.resume(),
-          child: Icon(
-            widget.controller.isStarted
-                ? Icons.pause_circle_outline_rounded
-                : Icons.play_circle_outline_outlined,
+          child: Tooltip(
+            message: UI.gameBarPause.tr,
+            child: Icon(
+              widget.controller.isStarted
+                  ? Icons.pause_circle_outline_rounded
+                  : Icons.play_circle_outline_outlined,
+            ),
           ),
         ),
 
+      /// 输入种子
+      InkWell(
+        child: Tooltip(message: UI.gameBarChangeSeed.tr, child: Icon(Icons.keyboard_outlined)),
+        onTap: () async {
+          widget.controller.pause();
+          var seed = widget.controller.seed;
+          final sure = await Get.dialog(AlertDialog(
+            title: Text('输入种子'),
+            content: TextField(
+              controller: TextEditingController(text: seed.toString()),
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                NumberFormatter,
+              ],
+              onChanged: (v) {
+                try {
+                  seed = int.parse(v);
+                } on Exception catch (e) {}
+              },
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Get.back(), child: Text(UI.cancel.tr)),
+              ElevatedButton(
+                  onPressed: () => Get.back(result: true),
+                  child: Text(UI.confirm.tr)),
+            ],
+          ));
+          if (sure != true || seed == widget.controller.seed) {
+            widget.controller.resume();
+            return;
+          }
+          await widget.controller.start(seed: seed);
+        },
+      ),
+
+      /// 提示
+      InkWell(
+        onTap: () => widget.controller.showTip(),
+        child: Tooltip(
+          message: UI.gameBarTip.tr,
+          child: Icon(Icons.tips_and_updates_outlined),
+        ),
+      ),
+
       /// 刷新
       InkWell(
-        onTap: () => widget.controller.reStart(),
-        child: Icon(Icons.refresh),
+        child: Tooltip(
+          message: UI.gameBarRestart.tr,
+          child: Icon(Icons.refresh),
+        ),
+        onTap: () async {
+          final foundLayers =
+              widget.controller.allLayers - widget.controller.unTappedLayers;
+          if (foundLayers > 0) {
+            final sure = await Get.dialog(AlertDialog(
+              title: Text('已经找到了 $foundLayers 个图层，确认刷新？'),
+              actions: [
+                TextButton(
+                    onPressed: () => Get.back(), child: Text(UI.cancel.tr)),
+                ElevatedButton(
+                    onPressed: () => Get.back(result: true),
+                    child: Text(UI.confirm.tr)),
+              ],
+            ));
+            if (sure != true) return;
+          }
+          widget.controller.reStart();
+        },
       ),
 
       /// debug
@@ -217,29 +291,34 @@ class _GameBarState extends State<GameBar> {
         onTap: () {
           _drag.value = !_drag.value;
         },
-        child: Center(
-          child: FaIcon(
-            FontAwesomeIcons.arrowsUpDownLeftRight,
-            size: 18,
-            color: _drag.value ? Colors.black : Colors.black26,
+        child: Tooltip(
+          message: UI.gameBarDrag.tr,
+          child: Center(
+            child: FaIcon(
+              FontAwesomeIcons.arrowsUpDownLeftRight,
+              size: 18,
+              color: _drag.value ? Colors.black : Colors.black26,
+            ),
           ),
         ),
       ),
 
       /// 信息按钮
       InkWell(
-        child: Icon(Icons.info_outline),
+        child: Tooltip(
+          message: UI.gameBarInfo.tr,
+          child: Icon(Icons.info_outline),
+        ),
         onTap: () async {
           final isStarted = widget.controller.isStarted;
           widget.controller.pause();
           await ILPInfoBottomSheet.show(
             ilp: widget.controller.ilp,
             currentInfo: widget.controller.info!,
-            onTapPlay: (index) {
-              /// 退出当前游戏才能再次打开游戏
-              Get.back(closeOverlays: true);
-              PageGameEntry.play(widget.controller.ilp, index: index);
-            },
+            onTapPlay: (index) => PageGameEntry.replace(
+              widget.controller.ilp,
+              index: index,
+            ),
           );
           if (isStarted) widget.controller.resume();
         },

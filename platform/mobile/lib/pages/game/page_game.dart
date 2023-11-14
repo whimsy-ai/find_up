@@ -9,11 +9,14 @@ import 'package:game/game/game_bar.dart';
 import 'package:game/ui.dart';
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
+import 'package:oktoast/oktoast.dart';
 
 class PageGame extends GetView<GameController> {
-
   PageGame({super.key}) {
     controller.onFinish = _onFinish;
+    controller.tipLayer.listen((p0) {
+      showToast(UI.showATip.tr);
+    });
   }
 
   static Future play(
@@ -30,7 +33,6 @@ class PageGame extends GetView<GameController> {
       'allowDebug': allowDebug,
       'allowPause': allowPause,
       'timeMode': timeMode,
-      'tag': DateTime.now().toString(),
     })!;
   }
 
@@ -47,7 +49,6 @@ class PageGame extends GetView<GameController> {
         'allowDebug': allowDebug,
         'allowPause': allowPause,
         'timeMode': timeMode,
-        'tag': DateTime.now().toString(),
       })!;
 
   void _onFinish({
@@ -145,10 +146,6 @@ class PageGame extends GetView<GameController> {
                           Expanded(
                             child: ILPCanvas(
                               layout: LayerLayout.left,
-                              scale: scale,
-                              layers: controller.layers,
-                              offsetX: x,
-                              offsetY: y,
                               debug: controller.isDebug,
                             ),
                           ),
@@ -156,10 +153,6 @@ class PageGame extends GetView<GameController> {
                           Expanded(
                             child: ILPCanvas(
                               layout: LayerLayout.right,
-                              scale: scale,
-                              layers: controller.layers,
-                              offsetX: x,
-                              offsetY: y,
                               debug: controller.isDebug,
                             ),
                           ),

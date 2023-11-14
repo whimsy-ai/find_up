@@ -28,6 +28,7 @@ linter:
     prefer_const_constructors: false
     prefer_const_literals_to_create_immutables: false
     use_key_in_widget_constructors: false
+    empty_catches: false
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

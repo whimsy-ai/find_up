@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:game/game/mask_widget.dart';
 import 'package:window_manager/window_manager.dart';
 
 class PageTest extends StatefulWidget {
@@ -93,19 +92,6 @@ class _PageTestState extends State<PageTest> with WindowListener {
           Expanded(
             child: Stack(
               children: [
-                LayoutBuilder(builder: (context, constraints) {
-                  return Mask(
-                    scale: _scale,
-                    data: MaskData(
-                      color: Colors.black.withOpacity(_opacity),
-                      radius: 70,
-                      center: Offset(
-                        constraints.maxWidth / 2 + _x,
-                        constraints.maxHeight / 2 + _y,
-                      ),
-                    ),
-                  );
-                }),
               ],
             ),
           ),

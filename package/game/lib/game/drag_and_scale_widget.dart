@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:game/game/controller.dart';
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
@@ -41,6 +42,7 @@ class DragAndScaleWidget extends StatefulWidget {
 }
 
 class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
+  final controller = Get.find<GameController>();
   late Rect _real = Rect.fromLTWH(
     0,
     0,
@@ -48,7 +50,25 @@ class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
     widget.layer.height.toDouble(),
   );
   Offset _eventPosition = Offset.zero;
-  double _offsetX = 0, _offsetY = 0, _scale = 1;
+
+
+  double get _offsetX => controller.offsetX;
+
+  set _offsetX(double value) {
+    controller.offsetX = value;
+  }
+
+  double get _offsetY => controller.offsetY;
+
+  set _offsetY(double value) {
+    controller.offsetY = value;
+  }
+
+  double get _scale => controller.scale;
+
+  set _scale(double value) {
+    controller.scale = value;
+  }
 
   /// for scale delta
   double _lastScale = 1;
