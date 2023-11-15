@@ -13,7 +13,7 @@ msix_config:
   identity_name: 49786gzlock.18476445307EC
   publisher: CN=823366A9-ECB6-42AB-BC60-76E199592B6F
   store: true
-  msix_version: 1.0.10.0
+  msix_version: 1.0.11.0
   logo_path: icon.png
   capabilities: internetClient
   languages: zh-cn, en-us
