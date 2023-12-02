@@ -10,7 +10,7 @@ environment:
 msix_config:
   display_name: Find Up!
   publisher_display_name: gzlock
-  identity_name: 49786gzlock.18476445307EC
+  identity_name: ^3.16.7
   publisher: CN=823366A9-ECB6-42AB-BC60-76E199592B6F
   store: true
   msix_version: 1.0.11.0
@@ -26,40 +26,40 @@ dependencies:
     sdk: flutter
   get: ^4.6.6
   intl: any
-  window_manager: ^0.3.6
+  window_manager: ^0.3.7
   ilp_file_codec:
     path: ../../package/ilp_file_codec
   game:
     path: ../../package/game
-  oktoast: ^3.3.1
+  oktoast: ^3.4.0
   file_selector: ^1.0.1
-  shared_preferences: ^2.2.1
+  shared_preferences: ^2.2.2
   path: ^1.8.3
   path_provider: ^2.1.1
-  url_launcher: ^6.1.14
-  image: ^4.0.17
+  url_launcher: ^6.2.1
+  image: ^4.1.3
   touchable: ^1.0.2
   flutter_localizations:
     sdk: flutter
   confetti: ^0.7.0
-  desktop_drop: ^0.4.3
-  dynamic_color: ^1.6.7
+  desktop_drop: ^0.4.4
+  dynamic_color: ^1.6.8
   windows_single_instance: ^1.0.0
-  msix: ^3.16.2
-  chinese_font_library: ^1.0.2
-  package_info_plus: ^4.1.0
-  steamworks: ^0.4.4
+  msix: ^3.16.7
+  chinese_font_library: ^1.1.0
+  package_info_plus: ^5.0.1
+  steamworks: ^0.4.5
   ffi: ^2.1.0
-  flutter_svg: ^2.0.7
+  flutter_svg: ^2.0.9
   dotted_line: ^3.2.2
-  font_awesome_flutter: ^10.5.0
-  flutter_animate: ^4.2.0+1
+  font_awesome_flutter: ^10.6.0
+  flutter_animate: ^4.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^2.0.3
+  flutter_lints: ^3.0.1
   flutter_launcher_icons: ^0.13.1
 
 flutter_launcher_icons:

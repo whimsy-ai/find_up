@@ -82,7 +82,7 @@ extension SteamClientEx on SteamClient {
       tag.ref.strings[index] = element.toNativeUtf8();
     });
     tag.ref.numStrings = tags.length;
-    final setTags = steamUgc.setItemTags(handle, tag);
+    final setTags = steamUgc.setItemTags(handle, tag, false);
     print('set tags $setTags $tags');
 
     if (title != null) {
