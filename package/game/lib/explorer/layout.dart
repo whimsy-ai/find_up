@@ -1,1 +1,0 @@
-enum ExplorerLayout { list, grid }

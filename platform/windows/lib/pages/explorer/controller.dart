@@ -2,13 +2,11 @@ import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
 import 'package:game/explorer/file.dart';
 import 'package:game/explorer/i_controller.dart';
 import 'package:game/explorer/ilp_file.dart';
-import 'package:game/explorer/layout.dart';
 import 'package:game/ui.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
@@ -43,7 +41,7 @@ class ILPExplorerController extends GetxController
     reload();
   }
 
-  TagAgeRating? _ageRating = Data.isAdult ? null :TagAgeRating.everyone;
+  TagAgeRating? _ageRating = Data.isAdult ? null : TagAgeRating.everyone;
 
   TagAgeRating? get ageRating => _ageRating;
 
@@ -90,18 +88,6 @@ class ILPExplorerController extends GetxController
     update(['editor']);
     reload();
   }
-
-  @override
-  ExplorerLayout get layout => _layout;
-
-  set layout(ExplorerLayout val) {
-    _layout = val;
-    Data.explorerListMode = val == ExplorerLayout.list;
-    update(['files']);
-  }
-
-  ExplorerLayout _layout =
-      Data.explorerListMode ? ExplorerLayout.list : ExplorerLayout.grid;
 
   @override
   List<(String, String)> get folders => _folders.toList();
@@ -205,8 +191,12 @@ class ILPExplorerController extends GetxController
     if (currentPage <= 0) currentPage = 1;
     files.clear();
     update(['files']);
-    final userId = mode == ExplorerMode.selectSteamFile ? SteamClient.instance.userId : this.userId;
-    final sort = mode == ExplorerMode.selectSteamFile ? SteamFileSort.publishTime : this.sort;
+    final userId = mode == ExplorerMode.selectSteamFile
+        ? SteamClient.instance.userId
+        : this.userId;
+    final sort = mode == ExplorerMode.selectSteamFile
+        ? SteamFileSort.publishTime
+        : this.sort;
     final res = await SteamClient.instance.getAllItems(
       page: currentPage,
       userId: userId,

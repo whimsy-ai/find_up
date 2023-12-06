@@ -2,7 +2,7 @@ name: windows
 description: Find Up!.
 publish_to: 'none'
 
-version: 1.0.11
+version: 1.0.12
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
@@ -10,10 +10,10 @@ environment:
 msix_config:
   display_name: Find Up!
   publisher_display_name: gzlock
-  identity_name: ^3.16.7
+  identity_name: 49786gzlock.18476445307EC
   publisher: CN=823366A9-ECB6-42AB-BC60-76E199592B6F
   store: true
-  msix_version: 1.0.11.0
+  msix_version: 1.0.12.0
   logo_path: icon.png
   capabilities: internetClient
   languages: zh-cn, en-us
@@ -54,7 +54,7 @@ dependencies:
   dotted_line: ^3.2.2
   font_awesome_flutter: ^10.6.0
   flutter_animate: ^4.3.0
-  logger: ^1.1.0
+  flutter_staggered_grid_view: ^0.7.0
 
 dev_dependencies:
   flutter_test:

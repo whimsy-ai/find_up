@@ -18,7 +18,7 @@ class SteamLooper {
 
   SteamLooper._({required this.interval}) {
     try {
-      SteamClient.init();
+      SteamClient.init(appId: 2550370);
     } catch (e) {
       exit(-1);
     }

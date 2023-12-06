@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:game/explorer/grid_delegate.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:game/explorer/ilp_file.dart';
 import 'package:game/explorer/ilp_file_list_tile.dart';
-import 'package:game/explorer/layout.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/ui.dart';
 import 'package:get/get.dart';
@@ -86,21 +85,6 @@ class PageILPExplorer extends GetView<ILPExplorerController> {
                           spacing: 10,
                           children: [
                             Text(UI.fileList.tr),
-                            Tooltip(
-                              message: UI.layout.tr,
-                              child: TextButton(
-                                  onPressed: () {
-                                    controller.layout =
-                                        controller.layout == ExplorerLayout.list
-                                            ? ExplorerLayout.grid
-                                            : ExplorerLayout.list;
-                                  },
-                                  child: Icon(
-                                    controller.layout == ExplorerLayout.list
-                                        ? Icons.grid_view_rounded
-                                        : Icons.format_list_bulleted_rounded,
-                                  )),
-                            ),
                             Tooltip(
                               message: UI.reload.tr,
                               child: TextButton(
@@ -214,10 +198,7 @@ class PageILPExplorer extends GetView<ILPExplorerController> {
                               ),
                             );
                           }
-
-                          return controller.layout == ExplorerLayout.list
-                              ? _fileList()
-                              : _fileGrid();
+                          return _fileNewList();
                         }),
                       ),
                     ],
@@ -229,44 +210,31 @@ class PageILPExplorer extends GetView<ILPExplorerController> {
     );
   }
 
-  Widget _fileList() => ListView.separated(
+  Widget _fileNewList() => MasonryGridView.extent(
         itemCount: controller.files.length,
-        separatorBuilder: (_, i) => Divider(height: 1),
-        itemBuilder: (_, i) {
+        maxCrossAxisExtent: 200,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+        itemBuilder: (context, i) {
           final file = controller.files[i];
+          Widget child;
           if (file is ILPFile) {
-            return ILPFileListTile(
-              file: file,
-              onTap: () => _play(file),
-            );
+            child = ILPFileGridTile(file: file);
+          } else {
+            child = SteamFileGirdTile(file: file as SteamFile);
           }
-          return SteamFileListTile(
-            file: file as SteamFile,
-            onTap: () => _steamFile(file),
-          );
-        },
-      );
-
-  Widget _fileGrid() => GridView.builder(
-        padding: EdgeInsets.all(10),
-        itemCount: controller.files.length,
-        gridDelegate: SliverGridDelegateWithFixedSize(
-          width: 200,
-          height: 200,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        itemBuilder: (_, i) {
-          final file = controller.files[i];
-          if (file is ILPFile) {
-            return ILPFileIcon(
-              file: file,
-              onTap: () => _play(file),
-            );
-          }
-          return SteamFileIcon(
-            file: file as SteamFile,
-            onTap: () => _steamFile(file),
+          return Card(
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () {
+                if (file is ILPFile) {
+                  _play(file);
+                } else {
+                  _steamFile(file as SteamFile);
+                }
+              },
+              child: child,
+            ),
           );
         },
       );

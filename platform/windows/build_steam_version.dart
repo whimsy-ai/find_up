@@ -6,6 +6,7 @@ final buildPath = path.join(
   Directory.current.path,
   'build',
   'windows',
+  'x64',
   'runner',
   'Release',
 );
@@ -32,8 +33,7 @@ void main() async {
   );
   if (res.exitCode == 0) {
     /// 复制Steam文件到打包目录
-    await copyFile('./steam_api64.dll', buildPath);
-    await copyFile('./steam_appid.txt', buildPath);
+    await copyFile('steam_api64.dll', buildPath);
     // await copyFile('./steam_appid.txt', buildPath);
   } else {
     throw res.stderr;

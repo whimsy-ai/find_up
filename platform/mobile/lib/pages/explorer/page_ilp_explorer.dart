@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
 
@@ -46,14 +47,21 @@ class PageILPExplorer extends StatelessWidget {
               flex: 3,
               child: GetBuilder<ExplorerController>(
                 id: 'files',
-                builder: (controller) => ListView.builder(
-                  // separatorBuilder: (_, i) => Divider(height: 1),
-                  itemCount: controller.files.length,
-                  itemBuilder: (_, i) => AssetFileListTile(
-                    file: controller.files[i] as AssetILPFile,
-                    onTap: () => _tap(controller.files[i] as AssetILPFile),
-                  ),
-                ),
+                builder: (controller) => MasonryGridView.extent(
+                    itemCount: controller.files.length,
+                    maxCrossAxisExtent: 200,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                    itemBuilder: (context, i) {
+                      final file = controller.files[i] as AssetILPFile;
+                      return Card(
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: () => _tap(file),
+                          child: AssetFileListTile(file: file),
+                        ),
+                      );
+                    }),
               ),
             ),
           ],

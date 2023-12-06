@@ -29,15 +29,6 @@ abstract class Data {
     _signAndSave();
   }
 
-  static bool _explorerListMode = false;
-
-  static bool get explorerListMode => _explorerListMode;
-
-  static set explorerListMode(val) {
-    _explorerListMode = val;
-    _signAndSave();
-  }
-
   static bool _gameHelper = false;
 
   static bool get showGameHelper => _gameHelper;
@@ -66,7 +57,6 @@ abstract class Data {
       _folders.addAll(_core.getStringList(_foldersKey)!);
     }
     _showILPEditorTip = _core.getBool(_showILPEditorTipKey) ?? true;
-    _explorerListMode = _core.getBool(_explorerListModeKey) ?? false;
     _gameHelper = _core.getBool(_gameHelperKey) ?? true;
     _isAdult = _core.getBool(_adultKey) ?? false;
     _layers.listen(_rxListener);
@@ -82,6 +72,7 @@ abstract class Data {
     _folders.clear();
     _showILPEditorTip = true;
     _gameHelper = true;
+    _isAdult = false;
     await _core.clear();
   }
 
@@ -103,7 +94,6 @@ abstract class Data {
     _core.setStringList(_layersKey, _layers.toList());
     _core.setStringList(_foldersKey, _folders.toList());
     _core.setBool(_showILPEditorTipKey, _showILPEditorTip);
-    _core.setBool(_explorerListModeKey, _explorerListMode);
     _core.setBool(_gameHelperKey, _gameHelper);
     _core.setBool(_adultKey, _isAdult);
   }

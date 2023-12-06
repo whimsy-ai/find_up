@@ -164,7 +164,7 @@ class WindowsUI implements Translations {
           uploadAgreement: 'By uploading file, you agree to ',
           agreementName: 'the workshop terms of service',
           selectSteamFileToUpdate: 'Select steam file to update',
-          steamMyFiles: 'My steam files',
+          steamMyFiles: 'My files',
           or: 'Or',
           dragToMove: 'Press and hold to move the image',
           clickToFind: 'Click to find out the difference',

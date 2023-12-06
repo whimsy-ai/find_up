@@ -129,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
               bottom: 10,
               child: Text(
                 [
-                  'version ${packageInfo.version}',
+                  'version ${packageInfo.version}_${packageInfo.buildNumber}',
                   if (env.isDev)
                     '${constrains.maxWidth} x ${constrains.maxHeight}',
                 ].join('\n'),

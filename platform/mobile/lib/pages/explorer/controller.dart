@@ -3,10 +3,8 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:game/build_flavor.dart';
-import 'package:game/data.dart';
 import 'package:game/explorer/file.dart';
 import 'package:game/explorer/i_controller.dart';
-import 'package:game/explorer/layout.dart';
 import 'package:game/ui.dart';
 import 'package:get/get.dart';
 
@@ -33,21 +31,9 @@ class ExplorerController extends GetxController implements IExplorerController {
   @override
   String get currentPath => _currentPath;
 
-  @override
-  ExplorerLayout get layout => _layout;
-
   ExplorerController() {
     openFolder(0);
   }
-
-  set layout(ExplorerLayout val) {
-    _layout = val;
-    Data.explorerListMode = val == ExplorerLayout.list;
-    update(['files']);
-  }
-
-  ExplorerLayout _layout =
-      Data.explorerListMode ? ExplorerLayout.list : ExplorerLayout.grid;
 
   @override
   openFolder(int index) async {

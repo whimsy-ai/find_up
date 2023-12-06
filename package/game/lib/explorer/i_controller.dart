@@ -1,5 +1,4 @@
 import 'file.dart';
-import 'layout.dart';
 
 abstract class IExplorerController {
   List<(String, String)> get folders;
@@ -13,6 +12,4 @@ abstract class IExplorerController {
   openFolder(int index);
 
   reload();
-
-  ExplorerLayout get layout;
 }

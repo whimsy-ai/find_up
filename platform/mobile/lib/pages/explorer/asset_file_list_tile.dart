@@ -12,97 +12,65 @@ import 'asset_ilp_file.dart';
 
 class AssetFileListTile extends StatelessWidget {
   final AssetILPFile file;
-  final void Function() onTap;
 
-  const AssetFileListTile({super.key, required this.file, required this.onTap});
+  AssetFileListTile({super.key, required this.file}) {
+    file.load();
+  }
 
   @override
   Widget build(BuildContext context) {
-    file.load();
     return Obx(() {
       final ilp = file.ilp;
       if (ilp == null) {
         return ListTile(title: Text(UI.loading.tr));
       }
-      return Table(
-        columnWidths: {
-          0: FlexColumnWidth(1),
-          1: FixedColumnWidth(85),
-        },
+      return Column(
         children: [
-          TableRow(
+          Image.memory(
+            file.cover,
+            fit: BoxFit.contain,
+          ),
+          Row(
             children: [
-              TableCell(
-                child: InkWell(
-                  onTap: onTap,
-                  child: Row(
-                    children: [
-                      SizedBox(width: 10),
-                      SizedBox(
-                        width: 90,
-                        height: 90,
-                        child: Image.memory(
-                          file.cover,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      Expanded(
-                        child: ListTile(
-                          visualDensity: VisualDensity(vertical: 4),
-                          title: Text(file.name),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              InfoTable(
-                                rows: [
-                                  (UI.ilpVersion.tr, file.version.toString()),
-                                  (
-                                    UI.imageLength.tr,
-                                    file.infoLength.toString()
-                                  ),
-                                ],
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.black54),
-                              ),
-                              AnimatedUnlockProgressBar(
-                                width: 300,
-                                from: 0,
-                                to: file.unlock,
-                                text: UI.unlock.tr,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    file.name,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
               ),
-              TableCell(
-                verticalAlignment: TableCellVerticalAlignment.fill,
-                child: _infoButton(file: file, ilp: ilp, color: Colors.black45),
-              ),
+              _infoButton(file: file, ilp: file.ilp!),
             ],
+          ),
+          AnimatedUnlockProgressBar(
+            from: 0,
+            to: file.unlock,
+            text: UI.unlock.tr,
           ),
         ],
       );
     });
   }
-
-  Widget _infoButton({
-    required ExplorerFile file,
-    required ILP ilp,
-    Color color = Colors.white,
-  }) =>
-      InkWell(
-        child: Icon(Icons.info_outline_rounded, color: color),
-        onTap: () => ILPInfoBottomSheet.show(
-          file: file,
-          ilp: ilp,
-          onTapPlay: (int index) => PageGameEntry.play(
-            ilp,
-            index: index,
-          ),
-        ),
-      );
 }
+
+Widget _infoButton({
+  required ExplorerFile file,
+  required ILP ilp,
+  Color color = Colors.black38,
+}) =>
+    InkWell(
+      child: Padding(
+        padding: EdgeInsets.all(8),
+        child: Icon(Icons.info_outline_rounded, color: color),
+      ),
+      onTap: () => ILPInfoBottomSheet.show(
+        file: file,
+        ilp: ilp,
+        onTapPlay: (int index) => PageGameEntry.play(
+          ilp,
+          index: index,
+        ),
+      ),
+    );

@@ -124,8 +124,8 @@ class PageGame extends GetView<GameController> {
                     layers: c.layers,
                     debug: controller.test,
                     minScale: controller.layer!.width > controller.layer!.height
-                        ? Get.width / 3 / controller.layer!.width
-                        : Get.height / 2 / controller.layer!.height,
+                        ? Get.width / 1.5 / controller.layer!.width
+                        : Get.height / 1.5 / controller.layer!.height,
                     scaleEvent: (original) {
                       // -2 是纵向分割线的宽度
                       return Offset(
