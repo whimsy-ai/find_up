@@ -280,7 +280,7 @@ class MyHomePage extends StatelessWidget {
                 child: Text(
                   'Steam Version\n'
                   'App ${SteamClient.instance.steamUtils.getAppId()}\n'
-                  // 'user ${SteamClient.instance.steamUser.getSteamId()}\n'
+                  // 'user ${SteamClient.instance.userId}\n'
                   '${constrains.maxWidth} x ${constrains.maxHeight}',
                   textAlign: TextAlign.right,
                   style: TextStyle(

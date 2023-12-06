@@ -73,6 +73,7 @@ abstract class UI {
       search = 'search',
       sort = 'sort',
       updateTime = 'update_time',
+      publishTime = 'publish_time',
       vote = 'vote',
       downloading = 'downloading',
       fileSize = 'file_size',
@@ -90,7 +91,9 @@ abstract class UI {
       gameBarTip = 'gameBarTip',
       showATip = 'showATip',
       inputTheSeed = 'inputTheSeed',
-      restartConfirm = 'restartConfirm';
+      restartConfirm = 'restartConfirm',
+      adultAgreementTitle = 'adultAgreementTitle',
+      adultAgreementContent = 'adultAgreementContent';
 
   static Map<String, Map<String, String>> get keys {
     return {
@@ -175,7 +178,8 @@ abstract class UI {
         error: 'Error',
         search: 'Search',
         sort: 'Sort',
-        updateTime: 'Last update time',
+        updateTime: 'Update time',
+        publishTime: 'Publish time',
         vote: 'Vote up',
         downloading: 'Downloading',
         fileSize: 'File size',
@@ -193,7 +197,10 @@ abstract class UI {
         gameBarTip: 'Display a prompt',
         showATip: 'A prompt has been displayed',
         inputTheSeed: 'Input the seed',
-        restartConfirm: 'Already found %s of layers, confirm generate a random seed and start a new game?'
+        restartConfirm:
+            'Already found %s of layers, confirm generate a random seed and start a new game?',
+        adultAgreementTitle: 'Please make sure you\'re 18 or older!',
+        adultAgreementContent: 'The Steam workshop may contain content that can only be viewed by adults',
       },
       'zh_CN': {
         findUp: '找起来！',
@@ -276,7 +283,8 @@ abstract class UI {
         url: '网址',
         search: '搜索',
         sort: '排序',
-        updateTime: '最后更新时间',
+        updateTime: '更新时间',
+        publishTime: '发布时间',
         vote: '点赞量',
         downloading: '正在下载',
         fileSize: '文件大小',
@@ -294,7 +302,9 @@ abstract class UI {
         gameBarTip: '显示一个提示',
         showATip: '已经显示一个提示',
         inputTheSeed: '输入种子',
-        restartConfirm: '已经找到了 %s 个图层，确认生成随机种子开始新的游戏？'
+        restartConfirm: '已经找到了 %s 个图层，确认生成随机种子开始新的游戏？',
+        adultAgreementTitle: '请确定您已年满18周岁',
+        adultAgreementContent: 'Steam创意工坊包含全球玩家的共创内容，其中可能涉及只有成年人才能观看的内容。',
       }
     };
   }

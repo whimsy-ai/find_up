@@ -10,6 +10,7 @@ const _showILPEditorTipKey = 'show_ilp_editor_tip';
 const _explorerListModeKey = 'explorer_list_mode';
 const _localeKey = 'locale';
 const _gameHelperKey = 'game_helper';
+const _adultKey = 'adult';
 
 abstract class Data {
   static late SharedPreferences _core;
@@ -46,6 +47,15 @@ abstract class Data {
     _signAndSave();
   }
 
+  static bool _isAdult = false;
+
+  static bool get isAdult => _isAdult;
+
+  static set isAdult(bool value) {
+    _isAdult = value;
+    _signAndSave();
+  }
+
   static Future init() async {
     print('存储路径 ${(await getApplicationSupportDirectory()).path}');
     _core = await SharedPreferences.getInstance();
@@ -58,6 +68,7 @@ abstract class Data {
     _showILPEditorTip = _core.getBool(_showILPEditorTipKey) ?? true;
     _explorerListMode = _core.getBool(_explorerListModeKey) ?? false;
     _gameHelper = _core.getBool(_gameHelperKey) ?? true;
+    _isAdult = _core.getBool(_adultKey) ?? false;
     _layers.listen(_rxListener);
     _folders.listen(_rxListener);
   }
@@ -94,6 +105,7 @@ abstract class Data {
     _core.setBool(_showILPEditorTipKey, _showILPEditorTip);
     _core.setBool(_explorerListModeKey, _explorerListMode);
     _core.setBool(_gameHelperKey, _gameHelper);
+    _core.setBool(_adultKey, _isAdult);
   }
 
   static Locale get locale {

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:game/info_table.dart';
 import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
-import 'controller.dart';
-import 'steam/steam_file.dart';
+import '../../explorer/controller.dart';
+import '../../explorer/steam/steam_file.dart';
 
+final _format = DateFormat('yyyy-MM-dd hh:mm:ss');
 class SelectSteamFileDialog extends StatelessWidget {
   static Future<SteamFile?>? show() async {
     Get.put(ILPExplorerController(ExplorerMode.selectSteamFile));
@@ -40,21 +42,26 @@ class SelectSteamFileDialog extends StatelessWidget {
             ],
           ),
           content: SizedBox(
-            width: 300,
+            width: 500,
             height: 500,
             child: ListView.separated(
               shrinkWrap: true,
-              separatorBuilder: (_, i) => Divider(),
+              separatorBuilder: (_, i) => Divider(height: 1),
               itemBuilder: (_, i) {
                 final file = controller.files[i] as SteamFile;
                 return ListTile(
-                  leading: Image.network(file.cover),
+                  style: ListTileStyle.list,
+                  dense: true,
+                  leading: Image.network(file.cover,width: 80),
                   title: Text(file.name),
                   subtitle: InfoTable(
+                    firstColumnWidth: 120,
                     rows: [
                       ('id', file.id),
-                      (UI.ilpVersion.tr, file.version.toString()),
-                      (UI.layerCount.tr, file.infos.length.toString()),
+                      (UI.ilpVersion.tr, file.version),
+                      (UI.imageLength.tr, file.infos.length),
+                      (UI.publishTime.tr, _format.format(file.publishTime)),
+                      (UI.updateTime.tr, _format.format(file.updateTime)),
                     ],
                     style: TextStyle(
                       fontSize: 12,

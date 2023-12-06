@@ -10,7 +10,6 @@ import '../../../utils/tag_to_menu_items.dart';
 import '../controller.dart';
 
 class SteamFolderListTile extends GetView<ILPExplorerController> {
-  final myUserId = SteamClient.instance.steamUser.getSteamId();
   final _controller = ExpansionTileController();
 
   late final _expand = controller.currentPath == 'steam';
@@ -53,6 +52,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
           // direction: Axis.vertical,
           children: [
             ChoiceChip(
+              showCheckmark: false,
               backgroundColor: Colors.grey,
               selectedColor: primary,
               avatar: controller.subscribed
@@ -78,9 +78,10 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
               },
             ),
             ChoiceChip(
+              showCheckmark: false,
               backgroundColor: Colors.grey,
               selectedColor: primary,
-              avatar: controller.userId == myUserId
+              avatar: controller.userId == SteamClient.instance.userId
                   ? Icon(
                       Icons.radio_button_checked_rounded,
                       color: onPrimary,
@@ -93,10 +94,10 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                 WindowsUI.steamMyFiles.tr,
                 style: TextStyle(color: onPrimary, fontSize: 14),
               ),
-              selected: controller.userId == myUserId,
+              selected: controller.userId == SteamClient.instance.userId,
               onSelected: (val) {
                 controller.subscribed = false;
-                controller.userId = val ? myUserId : null;
+                controller.userId = val ? SteamClient.instance.userId : null;
                 controller.update(['folders']);
                 controller.currentPage = 1;
                 controller.reload();
@@ -116,10 +117,10 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                     SizedBox(width: 10),
                     SizedBox(
                       height: 24,
-                      child: DropdownButton(
+                      child: DropdownButton<SteamFileSort>(
                         isDense: true,
                         enableFeedback: false,
-                        value: controller.voteType,
+                        value: controller.sort,
                         focusColor: Colors.transparent,
                         hint: Text(UI.sort.tr),
                         padding: EdgeInsets.zero,
@@ -127,7 +128,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                         elevation: 0,
                         onChanged: (v) {
                           if (v != null) {
-                            controller.voteType = v;
+                            controller.sort = v;
                             controller.update(['folders']);
                             controller.currentPage = 1;
                             controller.reload();
@@ -137,14 +138,21 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                         dropdownColor: Theme.of(context).colorScheme.primary,
                         items: [
                           DropdownMenuItem(
-                            value: 0,
+                            value: SteamFileSort.updateTime,
                             child: Text(
                               UI.updateTime.tr,
                               style: _itemStyle,
                             ),
                           ),
                           DropdownMenuItem(
-                            value: 1,
+                            value: SteamFileSort.publishTime,
+                            child: Text(
+                              UI.publishTime.tr,
+                              style: _itemStyle,
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: SteamFileSort.vote,
                             child: Text(
                               UI.vote.tr,
                               style: _itemStyle,
@@ -156,6 +164,43 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                   ],
                 ),
               ),
+            ),
+
+
+            /// age
+            Chip(
+              backgroundColor: Colors.grey,
+              avatar: Icon(Icons.filter_alt_rounded, color: Colors.white),
+              label: DefaultTextStyle(
+                style: TextStyle(color: Colors.white),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(WindowsUI.ageRating.tr),
+                    SizedBox(width: 10),
+                    SizedBox(
+                      height: 24,
+                      child: DropdownButton(
+                        isDense: true,
+                        value: controller.ageRating,
+                        enableFeedback: false,
+                        focusColor: Colors.transparent,
+                        padding: EdgeInsets.zero,
+                        underline: SizedBox.shrink(),
+                        elevation: 0,
+                        onChanged: (v) => controller.ageRating = v,
+                        itemHeight: kMinInteractiveDimension,
+                        dropdownColor: Theme.of(context).colorScheme.primary,
+                        items: tagToMenuItems(
+                          TagAgeRating.values,
+                          style: _itemStyle,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              onDeleted: () => controller.ageRating = null,
             ),
 
             /// style
@@ -192,42 +237,6 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                 ),
               ),
               onDeleted: () => controller.style = null,
-            ),
-
-            /// age
-            Chip(
-              backgroundColor: Colors.grey,
-              avatar: Icon(Icons.filter_alt_rounded, color: Colors.white),
-              label: DefaultTextStyle(
-                style: TextStyle(color: Colors.white),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(WindowsUI.ageRating.tr),
-                    SizedBox(width: 10),
-                    SizedBox(
-                      height: 24,
-                      child: DropdownButton(
-                        isDense: true,
-                        value: controller.ageRating,
-                        enableFeedback: false,
-                        focusColor: Colors.transparent,
-                        padding: EdgeInsets.zero,
-                        underline: SizedBox.shrink(),
-                        elevation: 0,
-                        onChanged: (v) => controller.ageRating = v,
-                        itemHeight: kMinInteractiveDimension,
-                        dropdownColor: Theme.of(context).colorScheme.primary,
-                        items: tagToMenuItems(
-                          TagAgeRating.values,
-                          style: _itemStyle,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              onDeleted: () => controller.ageRating = null,
             ),
 
             /// 形状

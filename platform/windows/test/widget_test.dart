@@ -7,7 +7,10 @@ void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     SteamLooper.init().start();
 
-    final list = await SteamClient.instance.getAllItems(page: 1);
+    final list = await SteamClient.instance.getAllItems(
+      page: 1,
+      sort: SteamFileSort.updateTime,
+    );
 
     print('list ${list.files.length}');
 

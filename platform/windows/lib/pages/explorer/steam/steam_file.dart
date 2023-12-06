@@ -45,6 +45,9 @@ class SteamFile implements ExplorerFile {
   @override
   int fileSize;
 
+  DateTime publishTime;
+  DateTime updateTime;
+
   final int steamIdOwner;
   int voteUp, voteDown;
 
@@ -68,6 +71,8 @@ class SteamFile implements ExplorerFile {
     required this.description,
     required this.steamIdOwner,
     required this.fileSize,
+    required this.updateTime,
+    required this.publishTime,
     this.voteUp = 0,
     this.voteDown = 0,
     this.ageRating,

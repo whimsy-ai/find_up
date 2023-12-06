@@ -14,11 +14,11 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../ui.dart';
 import '../../utils/steam_ex.dart';
-import '../explorer/select_steam_file_dialog.dart';
 import 'controller.dart';
 import 'ilp_editor_tips_dialog.dart';
 import 'ilp_layer_editor_list_tile.dart';
 import 'link_editor.dart';
+import 'steam/select_steam_file_dialog.dart';
 
 class PageILPEditor extends GetView<ILPEditorController> {
   final _formKey = GlobalKey<FormState>();
@@ -156,12 +156,15 @@ class PageILPEditor extends GetView<ILPEditorController> {
                           ListTile(
                             leading: Image.network(controller.steamFile!.cover),
                             title: Text(controller.steamFile!.name),
-                            trailing: InkWell(
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(Icons.close),
+                            trailing: Tooltip(
+                              message: UI.cancel.tr,
+                              child: InkWell(
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Icon(Icons.close),
+                                ),
+                                onTap: () => controller.steamFile = null,
                               ),
-                              onTap: () => controller.steamFile = null,
                             ),
                           ),
                         ListTile(

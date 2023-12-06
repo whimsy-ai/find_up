@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:ffi/ffi.dart';
@@ -15,6 +16,12 @@ import 'steam_tags.dart';
 enum ApiLanguage {
   english,
   schinese,
+}
+
+enum SteamFileSort {
+  publishTime,
+  updateTime,
+  vote,
 }
 
 extension ArrayCharExtensions on Array<Char> {
@@ -82,7 +89,7 @@ extension SteamClientEx on SteamClient {
       tag.ref.strings[index] = element.toNativeUtf8();
     });
     tag.ref.numStrings = tags.length;
-    final setTags = steamUgc.setItemTags(handle, tag, false);
+    final setTags = steamUgc.setItemTags(handle, tag);
     print('set tags $setTags $tags');
 
     if (title != null) {
@@ -152,39 +159,59 @@ extension SteamClientEx on SteamClient {
     bool subscribed = false,
     int? userId,
     String? search,
-    int voteType = 0,
+    required SteamFileSort sort,
     Set<String>? tags,
   }) async {
-    print('get page $page');
+    // print('get page $page, sort $voteType');
     final completer = Completer<SteamFiles>();
     final appId = steamUtils.getAppId();
     int query;
 
     if (subscribed || userId != null) {
+      EUserUgcListSortOrder _sort;
+      switch (sort) {
+        case SteamFileSort.publishTime:
+          _sort = EUserUgcListSortOrder.creationOrderDesc;
+          break;
+        case SteamFileSort.vote:
+          _sort = EUserUgcListSortOrder.voteScoreDesc;
+          break;
+        case SteamFileSort.updateTime:
+          _sort = EUserUgcListSortOrder.lastUpdatedDesc;
+          break;
+      }
       query = steamUgc.createQueryUserUgcRequest(
-        subscribed ? steamUser.getSteamId() : userId!,
+        subscribed ? this.userId : userId!,
         subscribed ? EUserUgcList.subscribed : EUserUgcList.published,
         EUgcMatchingUgcType.usableInGame,
-        voteType == 0
-            ? EUserUgcListSortOrder.lastUpdatedDesc
-            : EUserUgcListSortOrder.voteScoreDesc,
+        _sort,
         appId,
         appId,
         page,
       );
     } else {
+      EUgcQuery _sort;
+      switch (sort) {
+        case SteamFileSort.publishTime:
+          _sort = EUgcQuery.rankedByPublicationDate;
+          break;
+        case SteamFileSort.vote:
+          _sort = EUgcQuery.rankedByVote;
+          break;
+        case SteamFileSort.updateTime:
+          _sort = EUgcQuery.rankedByLastUpdatedDate;
+          break;
+      }
       query = steamUgc.createQueryAllUgcRequestPage(
-        voteType == 0
-            ? EUgcQuery.rankedByPublicationDate
-            : EUgcQuery.rankedByVotesUp,
+        _sort,
         EUgcMatchingUgcType.usableInGame,
         appId,
         appId,
         page,
       );
-      if (search != null) {
-        steamUgc.setSearchText(query, search.toNativeUtf8());
-      }
+    }
+    if (search != null) {
+      steamUgc.setSearchText(query, search.toNativeUtf8());
     }
     steamUgc.setReturnKeyValueTags(query, true);
     steamUgc.setReturnMetadata(query, true);
@@ -194,9 +221,13 @@ extension SteamClientEx on SteamClient {
     if (tags != null && tags.isNotEmpty) {
       for (var tag in tags) {
         final addTag = steamUgc.addRequiredTag(query, tag.toNativeUtf8());
-        print('addTag $tag $addTag');
       }
     }
+    print('steam query tags $tags');
+
+    final styles = TagStyle.values.map((e) => e.value);
+    final shapes = TagShape.values.map((e) => e.value);
+    final ages = TagAgeRating.values.map((e) => e.value);
 
     registerCallResult<SteamUgcQueryCompleted>(
         asyncCallId: steamUgc.sendQueryUgcRequest(query),
@@ -242,8 +273,8 @@ extension SteamClientEx on SteamClient {
                       value,
                       100,
                     );
-                    print('key:${key.toDartString()},'
-                        'value:${value.toDartString()}');
+                    // print('key:${key.toDartString()},'
+                    //     'value:${value.toDartString()}');
                     if (key.toDartString() == 'metaDataLength') {
                       metaDataLength = int.parse(value.toDartString()) + 10;
                     }
@@ -268,17 +299,13 @@ extension SteamClientEx on SteamClient {
                 late TagShape shape;
                 late TagAgeRating ageRating;
                 {
-                  final styles = TagStyle.values.map((e) => e.value);
-                  final shapes = TagShape.values.map((e) => e.value);
-                  final ages = TagAgeRating.values.map((e) => e.value);
-
-                  final tags = steamUgc.getQueryUgcNumTags(result.handle, 0);
+                  final tags = steamUgc.getQueryUgcNumTags(result.handle, i);
                   // print('tags $tags');
                   for (var index = 0; index < tags; index++) {
                     final tag = arena<Uint8>(255).cast<Utf8>();
                     steamUgc.getQueryUgcTag(
                       result.handle,
-                      0,
+                      i,
                       index,
                       tag,
                       255,
@@ -287,12 +314,10 @@ extension SteamClientEx on SteamClient {
                     if (styles.contains(tagString)) {
                       style = TagStyle.values
                           .firstWhere((element) => element.value == tagString);
-                    }
-                    if (shapes.contains(tagString)) {
+                    } else if (shapes.contains(tagString)) {
                       shape = TagShape.values
                           .firstWhere((element) => element.value == tagString);
-                    }
-                    if (ages.contains(tagString)) {
+                    } else if (ages.contains(tagString)) {
                       ageRating = TagAgeRating.values
                           .firstWhere((element) => element.value == tagString);
                     }
@@ -300,6 +325,12 @@ extension SteamClientEx on SteamClient {
                 }
                 // print('data $data');
                 details.add(SteamFile(
+                  publishTime: DateTime.fromMillisecondsSinceEpoch(
+                      detail.timeCreated * 1000,
+                      isUtc: true),
+                  updateTime: DateTime.fromMillisecondsSinceEpoch(
+                      detail.timeUpdated * 1000,
+                      isUtc: true),
                   fileSize: detail.fileSize,
                   style: style,
                   ageRating: ageRating,
@@ -342,7 +373,7 @@ extension SteamClientEx on SteamClient {
       final list = arena<UnsignedLongLong>();
       final res = steamUgc.getSubscribedItems(list, total);
 
-      print('getSubscribedItems $res ${list[0]}');
+      // print('getSubscribedItems $res ${list[0]}');
     });
     return list;
   }
@@ -352,7 +383,7 @@ extension SteamClientEx on SteamClient {
     registerCallResult<RemoteStorageUnsubscribePublishedFileResult>(
       asyncCallId: steamUgc.subscribeItem(id),
       cb: (r, f) {
-        print('subscribe $id ${r.result}');
+        // print('subscribe $id ${r.result}');
         complete.complete(r.result);
       },
     );
@@ -364,7 +395,7 @@ extension SteamClientEx on SteamClient {
     registerCallResult<RemoteStorageUnsubscribePublishedFileResult>(
       asyncCallId: steamUgc.unsubscribeItem(id),
       cb: (r, f) {
-        print('unsubscribe ugc item $id ${r.result}');
+        // print('unsubscribe ugc item $id ${r.result}');
         complete.complete(r.result);
       },
     );

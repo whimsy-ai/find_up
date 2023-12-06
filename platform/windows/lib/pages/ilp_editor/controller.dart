@@ -382,15 +382,25 @@ class ILPEditorController extends GetxController {
 
   SteamFile? get steamFile => _steamFile;
 
+  bool get isMySteamFile =>
+      (_steamFile?.steamIdOwner ?? SteamClient.instance.userId) ==
+      SteamClient.instance.userId;
+
   set steamFile(SteamFile? value) {
     _steamFile = value;
     name = _steamFile?.name ?? '';
     version = _steamFile?.version ?? 1;
     _desc = _steamFile?.description ?? '';
     update(['editor']);
+    print('set steamFile 年龄 ${_steamFile?.ageRating}');
   }
 
   uploadToSteam() async {
+    if (!isMySteamFile) return;
+
+    print(
+        'uploadToSteam ${_steamFile?.ageRating} ${_steamFile?.style} ${_steamFile?.shape}');
+
     final tags = await SteamTagsDialog.show(
       age: _steamFile?.ageRating,
       style: _steamFile?.style,

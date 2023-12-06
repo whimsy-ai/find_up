@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
 import 'package:game/explorer/file.dart';
@@ -31,9 +33,6 @@ class ILPExplorerController extends GetxController
   };
 
   TagStyle? _style;
-  TagAgeRating? _ageRating;
-  TagShape? _shape;
-
 
   TagStyle? get style => _style;
 
@@ -44,15 +43,44 @@ class ILPExplorerController extends GetxController
     reload();
   }
 
+  TagAgeRating? _ageRating = Data.isAdult ? null :TagAgeRating.everyone;
+
   TagAgeRating? get ageRating => _ageRating;
 
   set ageRating(TagAgeRating? value) {
-    _ageRating = value;
+    _checkAgeRating(value);
+  }
 
+  _checkAgeRating(TagAgeRating? value) async {
+    if (value != TagAgeRating.everyone) {
+      if (!Data.isAdult) {
+        final sure = await Get.dialog<bool>(
+          AlertDialog(
+            title: Text(UI.adultAgreementTitle.tr),
+            content: Text(UI.adultAgreementContent.tr),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(UI.cancel.tr),
+              ),
+              TextButton(
+                onPressed: () => Get.back(result: true),
+                child: Text(UI.confirm.tr),
+              ),
+            ],
+          ),
+        );
+        if (sure != true) return;
+        Data.isAdult = true;
+      }
+    }
+    _ageRating = value;
     currentPage = 1;
     update(['editor']);
     reload();
   }
+
+  TagShape? _shape;
 
   TagShape? get shape => _shape;
 
@@ -171,23 +199,24 @@ class ILPExplorerController extends GetxController
 
   bool subscribed = false;
 
-  /// 0 = update, 1 = vote
-  int voteType = 0;
+  SteamFileSort sort = SteamFileSort.updateTime;
 
   Future<void> _loadSteamFiles() async {
     if (currentPage <= 0) currentPage = 1;
     files.clear();
     update(['files']);
+    final userId = mode == ExplorerMode.selectSteamFile ? SteamClient.instance.userId : this.userId;
+    final sort = mode == ExplorerMode.selectSteamFile ? SteamFileSort.publishTime : this.sort;
     final res = await SteamClient.instance.getAllItems(
       page: currentPage,
       userId: userId,
       search: search,
       subscribed: subscribed,
-      voteType: voteType,
+      sort: sort,
       tags: {
-        if (style != null) style!.value,
-        if (shape != null) shape!.value,
-        if (ageRating != null) ageRating!.value,
+        if (_style != null) _style!.value,
+        if (_shape != null) _shape!.value,
+        if (_ageRating != null) _ageRating!.value,
       },
     );
     if (res.result == EResult.eResultOK) {

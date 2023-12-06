@@ -48,12 +48,13 @@ dependencies:
   msix: ^3.16.7
   chinese_font_library: ^1.1.0
   package_info_plus: ^5.0.1
-  steamworks: ^0.4.5
+  steamworks: 0.4.4
   ffi: ^2.1.0
   flutter_svg: ^2.0.9
   dotted_line: ^3.2.2
   font_awesome_flutter: ^10.6.0
   flutter_animate: ^4.3.0
+  logger: ^1.1.0
 
 dev_dependencies:
   flutter_test:
