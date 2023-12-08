@@ -185,7 +185,7 @@ class ILPExplorerController extends GetxController
 
   bool subscribed = false;
 
-  SteamFileSort sort = SteamFileSort.updateTime;
+  SteamFileSort sort = SteamFileSort.publishTime;
 
   Future<void> _loadSteamFiles() async {
     if (currentPage <= 0) currentPage = 1;
