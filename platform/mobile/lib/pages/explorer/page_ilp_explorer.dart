@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 
-import '../../ui.dart';
 import 'asset_file_list_tile.dart';
 import 'asset_ilp_file.dart';
 import 'controller.dart';
@@ -19,7 +19,7 @@ class PageILPExplorer extends StatelessWidget {
               child: Column(
                 children: [
                   AppBar(
-                    title: Text(MobileUI.explorer.tr),
+                    title: Text(UI.explorer.tr),
                   ),
                   Expanded(
                     child: GetBuilder<ExplorerController>(

@@ -6,8 +6,8 @@ import 'package:game/game/animated_unlock_progress_bar.dart';
 import 'package:game/game/canvas.dart';
 import 'package:game/game/controller.dart';
 import 'package:game/game/game_bar.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:oktoast/oktoast.dart';
 

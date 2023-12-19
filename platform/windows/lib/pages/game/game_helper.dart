@@ -2,8 +2,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-
-import '../../ui.dart';
+import 'package:i18n/ui.dart';
 
 class GameHelper extends StatelessWidget {
   static Future show() => Get.dialog(GameHelper());
@@ -54,9 +53,9 @@ class GameHelper extends StatelessWidget {
                       ),
                       SizedBox(width: 20),
                       Text([
-                        WindowsUI.dragToMove.tr,
-                        WindowsUI.clickToFind.tr,
-                        WindowsUI.doubleClickToReset.tr,
+                        UI.dragToMove.tr,
+                        UI.clickToFind.tr,
+                        UI.doubleClickToReset.tr,
                       ].join('\n')),
                     ],
                   ),
@@ -80,7 +79,7 @@ class GameHelper extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 20),
-                      Text(WindowsUI.scrollToScale.tr),
+                      Text(UI.scrollToScale.tr),
                     ],
                   ),
                 ),

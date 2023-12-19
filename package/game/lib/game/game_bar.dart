@@ -4,11 +4,11 @@ import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/utils/textfield_number_formatter.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 
 import '../build_flavor.dart';
 import '../explorer/ilp_info_bottom_sheet.dart';
 import '../info_table.dart';
-import '../ui.dart';
 import 'controller.dart';
 import 'page_game_entry.dart';
 

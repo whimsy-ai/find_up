@@ -3,13 +3,13 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
 import '../data.dart';
 import '../game/animated_unlock_progress_bar.dart';
 import '../game/drag_and_scale_widget.dart';
 import '../get_ilp_info_unlock.dart';
-import '../ui.dart';
 import 'save_image_controller.dart';
 
 class SaveImageEditor extends GetView<SaveImageController> {

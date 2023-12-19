@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:game/info_table.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:intl/intl.dart';
 
 import '../../explorer/controller.dart';
 import '../../explorer/steam/steam_file.dart';
 
 final _format = DateFormat('yyyy-MM-dd hh:mm:ss');
+
 class SelectSteamFileDialog extends StatelessWidget {
   static Future<SteamFile?>? show() async {
     Get.put(ILPExplorerController(ExplorerMode.selectSteamFile));
@@ -52,7 +53,7 @@ class SelectSteamFileDialog extends StatelessWidget {
                 return ListTile(
                   style: ListTileStyle.list,
                   dense: true,
-                  leading: Image.network(file.cover,width: 80),
+                  leading: Image.network(file.cover, width: 80),
                   title: Text(file.name),
                   subtitle: InfoTable(
                     firstColumnWidth: 120,

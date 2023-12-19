@@ -7,21 +7,20 @@ import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
 import 'package:game/game/controller.dart';
 import 'package:game/save_image/save_image_controller.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:mobile/utils/version.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'firebase_options.dart';
-import 'pages/about/page_about.dart';
+import 'pages/page_about.dart';
 import 'pages/explorer/controller.dart';
 import 'pages/explorer/page_ilp_explorer.dart';
 import 'pages/game/page_game.dart';
 import 'pages/page_save_image.dart';
 import 'pages/settings/page_settings.dart';
 import 'sound.dart';
-import 'ui.dart';
 import 'utils/landscape.dart';
 
 runMain() async {
@@ -57,8 +56,7 @@ class HomePage extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           locale: Data.locale,
-          translations: MobileUI(),
-          supportedLocales: [Locale("zh", "CN"), Locale("en", "US")],
+          translations: UI(),
           fallbackLocale: Locale("en", "US"),
           home: MyHomePage(),
           getPages: [

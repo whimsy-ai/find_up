@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-
-import 'ui.dart';
 
 class AboutCard extends StatelessWidget {
   final String version;
@@ -38,10 +37,10 @@ class AboutCard extends StatelessWidget {
           ListTile(
             leading: FaIcon(FontAwesomeIcons.steam),
             trailing: Icon(Icons.link),
-            title: Text(UI.steam.tr),
+            title: Text('Steam'),
             subtitle: Text(UI.steamWorkShop.tr),
             onTap: () => launchUrlString(
-                'https://store.steampowered.com/app/2550370/_/'),
+                'https://store.steampowered.com/app/2550370/'),
           ),
           ListTile(
             leading: FaIcon(FontAwesomeIcons.microsoft),

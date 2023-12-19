@@ -2,13 +2,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../bytes_size.dart';
 import '../game/unlock_progress_bar.dart';
 import '../info_table.dart';
-import '../ui.dart';
 import 'file.dart';
 
 class ILPInfoBottomSheet extends StatelessWidget {

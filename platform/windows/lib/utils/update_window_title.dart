@@ -1,5 +1,5 @@
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:window_manager/window_manager.dart';
 

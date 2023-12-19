@@ -4,15 +4,15 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/build_flavor.dart';
-import 'package:game/ui.dart';
 import 'package:game/utils/textfield_number_formatter.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:steamworks/steamworks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../../ui.dart';
 import '../../utils/steam_ex.dart';
 import 'controller.dart';
 import 'ilp_editor_tips_dialog.dart';
@@ -34,7 +34,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(WindowsUI.ilpEditor.tr),
+        title: Text(UI.ilpEditor.tr),
         actions: [
           TextButton(
             onPressed: () => ilpEditorTipsDialog(force: true),
@@ -109,13 +109,13 @@ class PageILPEditor extends GetView<ILPEditorController> {
                                 AutovalidateMode.onUserInteraction,
                             decoration: InputDecoration(
                               labelText: '${UI.ilpVersion.tr}(*)',
-                              hintText: WindowsUI.ilpVersionTip.tr,
+                              hintText: UI.ilpVersionTip.tr,
                             ),
                             onChanged: (val) =>
                                 controller.version = int.tryParse(val) ?? 1,
                             validator: (val) {
                               if (controller.version < 0) {
-                                return WindowsUI.ilpEditorVersionLimit.tr;
+                                return UI.ilpEditorVersionLimit.tr;
                               }
                               return null;
                             },
@@ -142,7 +142,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                         ),
                         if (env.isSteam)
                           ListTile(
-                            title: Text(WindowsUI.selectSteamFileToUpdate.tr),
+                            title: Text(UI.selectSteamFileToUpdate.tr),
                             onTap: () async {
                               final file = await SelectSteamFileDialog.show();
                               if (file == null &&
@@ -179,7 +179,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                             ],
                           ),
                           trailing: Text(
-                            WindowsUI.dragToSort.tr,
+                            UI.dragToSort.tr,
                             style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ),
@@ -195,10 +195,10 @@ class PageILPEditor extends GetView<ILPEditorController> {
                     )),
                     ListTile(
                       title: ElevatedButton(
-                        child: Text(WindowsUI.saveToILPFile.tr),
+                        child: Text(UI.saveToILPFile.tr),
                         onPressed: () {
                           if (controller.configs.isEmpty) {
-                            showToast(WindowsUI.ilpEditorConfigFileEmpty.tr);
+                            showToast(UI.ilpEditorConfigFileEmpty.tr);
                             return;
                           }
                           if (_formKey.currentState!.validate()) {
@@ -207,14 +207,14 @@ class PageILPEditor extends GetView<ILPEditorController> {
                         },
                       ),
                     ),
-                    if (env.isSteam) Text(WindowsUI.or.tr),
+                    if (env.isSteam) Text(UI.or.tr),
                     if (env.isSteam)
                       ListTile(
                         title: ElevatedButton(
-                          child: Text(WindowsUI.shareToSteam.tr),
+                          child: Text(UI.shareToSteam.tr),
                           onPressed: () {
                             if (controller.configs.isEmpty) {
-                              showToast(WindowsUI.ilpEditorConfigFileEmpty.tr);
+                              showToast(UI.ilpEditorConfigFileEmpty.tr);
                               return;
                             }
                             if (_formKey.currentState!.validate()) {
@@ -225,7 +225,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                       ),
                     if (env.isSteam)
                       Text.rich(
-                        TextSpan(text: WindowsUI.uploadAgreement.tr, children: [
+                        TextSpan(text: UI.uploadAgreement.tr, children: [
                           WidgetSpan(
                             child: GestureDetector(
                               onTap: () {
@@ -234,7 +234,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                                     'https://steamcommunity.com/sharedfiles/workshoplegalagreement');
                               },
                               child: Text(
-                                WindowsUI.agreementName.tr,
+                                UI.agreementName.tr,
                                 style: TextStyle(
                                   color: Colors.blue,
                                   fontSize: 12,
@@ -258,9 +258,8 @@ class PageILPEditor extends GetView<ILPEditorController> {
             child: DropTarget(
               onDragDone: (detail) {
                 if (detail.files.isEmpty) return;
-                controller.addConfigFiles(
-                  detail.files.map((e) => e.path).toList(),
-                );
+                controller
+                    .addConfigFiles(detail.files.map((e) => e.path).toList());
               },
               child: GetBuilder<ILPEditorController>(
                 id: 'layers',
@@ -269,7 +268,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                     ListTile(
                       title: Row(
                         children: [
-                          Text(WindowsUI.ilpEditorConfigFileList.tr),
+                          Text(UI.ilpEditorConfigFileList.tr),
                           TextButton(
                             onPressed: controller.selectConfigFiles,
                             child: Icon(Icons.add),
@@ -283,7 +282,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                         ],
                       ),
                       trailing: Text(
-                        '${WindowsUI.dragToSort.tr}, ${WindowsUI.clickToModify.tr}',
+                        '${UI.dragToSort.tr}, ${UI.clickToModify.tr}',
                         style: TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ),
@@ -318,13 +317,13 @@ class PageILPEditor extends GetView<ILPEditorController> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text(WindowsUI.ilpEditorEmptyTip1Title.tr),
+                title: Text(UI.ilpEditorEmptyTip1Title.tr),
                 subtitle: Row(
                   children: [
                     TextButton(
                       onPressed: () => ilpEditorTipsDialog(force: true),
                       child: Text(
-                        WindowsUI.ilpEditorEmptyTip1Btn.tr,
+                        UI.ilpEditorEmptyTip1Btn.tr,
                         style: TextStyle(color: Colors.blue),
                       ),
                     ),
@@ -332,16 +331,36 @@ class PageILPEditor extends GetView<ILPEditorController> {
                 ),
               ),
               ListTile(
-                title: Text(WindowsUI.ilpEditorEmptyTip2Title.tr),
+                title: Text(UI.ilpEditorEmptyTip2Title.tr),
                 subtitle: Text.rich(
                   TextSpan(
-                    text: WindowsUI.ilpEditorEmptyTip2Content.tr,
+                    text: UI.ilpEditorEmptyTip2Content.tr,
                     children: [
                       WidgetSpan(
                         child: TextButton(
                           onPressed: controller.selectConfigFiles,
                           child: Text(
-                            WindowsUI.ilpEditorEmptyTip2Btn.tr,
+                            UI.ilpEditorEmptyTip2Btn.tr,
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: Icon(FontAwesomeIcons.youtube,color: Colors.red),
+                title: Text(UI.ilpEditorEmptyTip2Title.tr),
+                subtitle: Text.rich(
+                  TextSpan(
+                    text: UI.ilpEditorEmptyTip2Content.tr,
+                    children: [
+                      WidgetSpan(
+                        child: TextButton(
+                          onPressed: controller.selectConfigFiles,
+                          child: Text(
+                            UI.ilpEditorEmptyTip2Btn.tr,
                             style: TextStyle(color: Colors.blue),
                           ),
                         ),

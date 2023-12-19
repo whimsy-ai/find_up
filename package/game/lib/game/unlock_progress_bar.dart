@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
 import '../convert_to_percentage.dart';
 import '../get_ilp_info_unlock.dart';
-import '../ui.dart';
 
 class UnlockProgressBar extends StatelessWidget {
   final Color color;

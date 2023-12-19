@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -101,11 +102,10 @@ abstract class Data {
   static Locale get locale {
     final locale = Data.core.getString(_localeKey);
     print('语言 $locale');
-    if (locale == null) return Get.deviceLocale!;
-    return switch (locale) {
-      'zh' => Locale('zh', 'cn'),
-      _ => Locale('en', 'us'),
-    };
+    if (locale != null && UI.languages.keys.contains(locale)) {
+      return Locale(locale);
+    }
+    return Get.deviceLocale!;
   }
 
   static set localeString(String locale) =>

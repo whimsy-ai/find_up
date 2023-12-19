@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
 import 'package:steamworks/steamworks.dart';
 
-import '../../../ui.dart';
+import 'package:i18n/ui.dart';
 import '../../../utils/steam_ex.dart';
 import '../../../utils/steam_tags.dart';
 import '../../../utils/tag_to_menu_items.dart';
@@ -22,7 +21,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
         onPrimary = Theme.of(context).colorScheme.onPrimary;
     final child = ExpansionTile(
       key: UniqueKey(),
-      title: Text(WindowsUI.steamWorkshop.tr),
+      title: Text(UI.steamWorkshop.tr),
       trailing: Wrap(
         children: [
           InkWell(
@@ -65,7 +64,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                       color: onPrimary,
                     ),
               label: Text(
-                WindowsUI.steamSubscribed.tr,
+                UI.steamSubscribed.tr,
                 style: TextStyle(color: onPrimary, fontSize: 14),
               ),
               selected: controller.subscribed,
@@ -91,7 +90,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                       color: onPrimary,
                     ),
               label: Text(
-                WindowsUI.steamMyFiles.tr,
+                UI.steamMyFiles.tr,
                 style: TextStyle(color: onPrimary, fontSize: 14),
               ),
               selected: controller.userId == SteamClient.instance.userId,
@@ -176,7 +175,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(WindowsUI.ageRating.tr),
+                    Text(UI.ageRating.tr),
                     SizedBox(width: 10),
                     SizedBox(
                       height: 24,
@@ -212,7 +211,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(WindowsUI.style.tr),
+                    Text(UI.style.tr),
                     SizedBox(width: 10),
                     SizedBox(
                       height: 24,
@@ -248,7 +247,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(WindowsUI.shape.tr),
+                    Text(UI.shape.tr),
                     SizedBox(width: 10),
                     SizedBox(
                       height: 24,

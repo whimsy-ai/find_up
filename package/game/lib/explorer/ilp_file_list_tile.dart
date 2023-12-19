@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
 import '../game/animated_unlock_progress_bar.dart';
 import '../game/page_game_entry.dart';
-import '../ui.dart';
 import 'ilp_file.dart';
 import 'ilp_info_bottom_sheet.dart';
 

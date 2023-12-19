@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 
-import '../../ui.dart';
 import 'controller.dart';
 
 class LinkEditor extends GetView<ILPEditorController> {
@@ -21,9 +20,7 @@ class LinkEditor extends GetView<ILPEditorController> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(link == null
-          ? '${UI.add.tr} ${UI.link.tr}'
-          : '${UI.edit.tr} ${UI.link.tr}'),
+      title: Text(link == null ? UI.addLink.tr : UI.modifyLink.tr),
       content: Container(
         constraints: BoxConstraints(minWidth: 300),
         child: Form(
@@ -63,7 +60,7 @@ class LinkEditor extends GetView<ILPEditorController> {
                     if (val!.isEmpty) return UI.contentCannotEmpty.tr;
                     final uri = Uri.parse(val);
                     if (!uri.isScheme('https')) {
-                      return WindowsUI.ilpEditorLinkProtocolLimit.tr;
+                      return UI.ilpEditorLinkProtocolLimit.tr;
                     }
                     return null;
                   },
@@ -77,7 +74,7 @@ class LinkEditor extends GetView<ILPEditorController> {
         TextButton(onPressed: () => Get.back(), child: Text(UI.cancel.tr)),
         ElevatedButton(
           onPressed: _submit,
-          child: Text(link == null ? UI.add.tr : UI.edit.tr),
+          child: Text(link == null ? UI.addLink.tr : UI.modifyLink.tr),
         ),
       ],
     );

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:game/data.dart';
 import 'package:game/http/http.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
-import '../../utils/update_window_title.dart';
+import '../utils/update_window_title.dart';
 
 class PageSettings extends StatelessWidget {
   late final _language = Data.locale.languageCode.obs
@@ -28,28 +29,35 @@ class PageSettings extends StatelessWidget {
               shrinkWrap: true,
               children: [
                 ListTile(
-                  title: Text('语言 / Language'),
+                  title: Text('${UI.language.tr}${Data.locale.languageCode=='en'?'':' / Language'} (${UI.languages.length})'),
                   trailing: Obx(() => DropdownButton<String>(
                         value: _language.value,
-                        items: [
-                          DropdownMenuItem(
-                            value: 'zh',
-                            child: Text("简体中文"),
-                          ),
-                          DropdownMenuItem(
-                            value: 'en',
-                            child: Text("English"),
-                          )
-                        ],
+                        items: UI.languages.keys.map((key) {
+                          return DropdownMenuItem(
+                            value: key,
+                            child: Text(UI.languages[key]!),
+                          );
+                        }).toList(),
                         onChanged: (v) {
                           _language.value = v!;
-                          Get.updateLocale(switch (v) {
-                            'zh' => Locale('zh', 'CN'),
-                            _ => Locale('en', 'US'),
-                          });
+                          Get.updateLocale(Locale(v));
                           updateWindowTitle();
                         },
                       )),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.info_outline_rounded,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  title: Text(UI.settingAutoTranslate.tr),
+                  trailing: InkWell(
+                    child: Icon(
+                      Icons.email_rounded,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    onTap: () => launchUrlString('mailto:gzlock88@gmail.com'),
+                  ),
                 ),
                 ListTile(
                   title: Text(UI.removeCache.tr),

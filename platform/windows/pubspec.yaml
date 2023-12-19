@@ -1,8 +1,8 @@
 name: windows
-description: Find Up!.
+description: Find Up!
 publish_to: 'none'
 
-version: 1.0.12
+version: 1.0.13
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
@@ -13,7 +13,7 @@ msix_config:
   identity_name: 49786gzlock.18476445307EC
   publisher: CN=823366A9-ECB6-42AB-BC60-76E199592B6F
   store: true
-  msix_version: 1.0.12.0
+  msix_version: 1.0.13.0
   logo_path: icon.png
   capabilities: internetClient
   languages: zh-cn, en-us
@@ -27,6 +27,8 @@ dependencies:
   get: ^4.6.6
   intl: any
   window_manager: ^0.3.7
+  i18n:
+    path: ../../package/i18n
   ilp_file_codec:
     path: ../../package/ilp_file_codec
   game:
@@ -64,17 +66,17 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
 
 flutter_launcher_icons:
-#  android: "launcher_icon"
-#  ios: true
+  #  android: "launcher_icon"
+  #  ios: true
   image_path: "icon.png"
-#  web:
-#    generate: true
-#    image_path: "path/to/image.png"
-#    background_color: "#hexcode"
-#    theme_color: "#hexcode"
+  #  web:
+  #    generate: true
+  #    image_path: "path/to/image.png"
+  #    background_color: "#hexcode"
+  #    theme_color: "#hexcode"
   windows:
     generate: true
-#    image_path: "path/to/image.png"
+    #    image_path: "path/to/image.png"
     icon_size: 256 # min:48, max:256, default: 48
 #  macos:
 #    generate: true

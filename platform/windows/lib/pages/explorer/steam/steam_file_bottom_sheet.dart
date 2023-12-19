@@ -9,12 +9,11 @@ import 'package:game/game/page_game_entry.dart';
 import 'package:game/game/unlock_progress_bar.dart';
 import 'package:game/get_ilp_info_unlock.dart';
 import 'package:game/info_table.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:steamworks/steamworks.dart';
 
-import '../../../ui.dart';
 import '../../../utils/steam_ex.dart';
 import '../controller.dart';
 import 'steam_file.dart';
@@ -115,8 +114,8 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                   ),
                   ElevatedButton(
                     child: widget.file.isSubscribed
-                        ? Text(WindowsUI.steamUnSubscribe.tr)
-                        : Text(WindowsUI.steamSubscribeAndDownload.tr),
+                        ? Text(UI.steamUnSubscribe.tr)
+                        : Text(UI.steamSubscribeAndDownload.tr),
                     onPressed: () async {
                       if (widget.file.isSubscribed) {
                         await widget.file.unSubscribe();
@@ -142,10 +141,10 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                           Chip(label: Text(widget.file.style!.value.tr)),
                           Chip(
                               label: Text(
-                                  '${WindowsUI.shape.tr}: ${widget.file.shape!.value.tr}')),
+                                  '${UI.shape.tr}: ${widget.file.shape!.value.tr}')),
                           Chip(
                               label: Text(
-                                  '${WindowsUI.ageRating.tr}: ${widget.file.ageRating!.value.tr}')),
+                                  '${UI.ageRating.tr}: ${widget.file.ageRating!.value.tr}')),
                         ],
                       ),
                     ),
@@ -159,8 +158,8 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
 
                   /// 打开作者的Steam页面
                   ListTile(
-                    title: Text(WindowsUI.steamAuthorInfo.tr),
-                    subtitle: Text(WindowsUI.openInSteam.tr),
+                    title: Text(UI.steamAuthorInfo.tr),
+                    subtitle: Text(UI.openInSteam.tr),
                     trailing: FaIcon(FontAwesomeIcons.steam),
                     onTap: () {
                       SteamClient.instance.openUrl(
@@ -171,7 +170,7 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                   /// 在steam打开这个文件页面
                   ListTile(
                     title: Text(UI.fileInfo.tr),
-                    subtitle: Text(WindowsUI.openInSteam.tr),
+                    subtitle: Text(UI.openInSteam.tr),
                     trailing: FaIcon(FontAwesomeIcons.steam),
                     onTap: () {
                       SteamClient.instance.openUrl(
@@ -181,7 +180,7 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
 
                   /// 作者其它文件
                   ListTile(
-                    title: Text(WindowsUI.steamAuthorOtherFiles.tr),
+                    title: Text(UI.steamAuthorOtherFiles.tr),
                     trailing: Icon(Icons.chevron_right_rounded),
                     onTap: () {
                       Get.back();
@@ -207,7 +206,7 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
 
                   /// desc
                   ListTile(
-                    title: Text(WindowsUI.fileSize.tr),
+                    title: Text(UI.fileSize.tr),
                     subtitle: Text(bytesSize(widget.file.fileSize, 2)),
                   ),
 

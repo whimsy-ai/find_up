@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 
-import '../../../ui.dart';
 import '../../../utils/steam_tags.dart';
 import '../../../utils/tag_to_menu_items.dart';
 
@@ -38,7 +37,7 @@ class SteamTagsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(WindowsUI.shareToSteam.tr),
+      title: Text(UI.shareToSteam.tr),
       content: Form(
         key: _form,
         child: Column(
@@ -56,24 +55,11 @@ class SteamTagsDialog extends StatelessWidget {
                 () => Column(
                   children: [
                     ListTile(
-                      title: Text(WindowsUI.shape.tr),
+                      title: Text(UI.shape.tr),
                       trailing: DropdownButton(
                         value: _shape.value,
                         onChanged: (val) => _shape.value = val,
-                        items: [
-                          DropdownMenuItem(
-                            value: TagShape.landscape,
-                            child: Text(WindowsUI.landscape.tr),
-                          ),
-                          DropdownMenuItem(
-                            value: TagShape.portrait,
-                            child: Text(WindowsUI.portrait.tr),
-                          ),
-                          DropdownMenuItem(
-                            value: TagShape.square,
-                            child: Text(WindowsUI.square.tr),
-                          ),
-                        ],
+                        items: tagToMenuItems(TagShape.values),
                       ),
                     ),
                     if (state.hasError)
@@ -98,7 +84,7 @@ class SteamTagsDialog extends StatelessWidget {
                 () => Column(
                   children: [
                     ListTile(
-                      title: Text(WindowsUI.style.tr),
+                      title: Text(UI.style.tr),
                       trailing: DropdownButton(
                         value: _style.value,
                         onChanged: (val) => _style.value = val,
@@ -127,24 +113,11 @@ class SteamTagsDialog extends StatelessWidget {
                 () => Column(
                   children: [
                     ListTile(
-                      title: Text(WindowsUI.ageRating.tr),
+                      title: Text(UI.ageRating.tr),
                       trailing: DropdownButton(
                         value: _age.value,
                         onChanged: (val) => _age.value = val,
-                        items: [
-                          DropdownMenuItem(
-                            value: TagAgeRating.everyone,
-                            child: Text(WindowsUI.ageEveryone.tr),
-                          ),
-                          DropdownMenuItem(
-                            value: TagAgeRating.questionable,
-                            child: Text(WindowsUI.ageQuestionable.tr),
-                          ),
-                          DropdownMenuItem(
-                            value: TagAgeRating.mature,
-                            child: Text(WindowsUI.ageMature.tr),
-                          ),
-                        ],
+                        items: tagToMenuItems(TagAgeRating.values),
                       ),
                     ),
                     if (state.hasError)
@@ -159,7 +132,7 @@ class SteamTagsDialog extends StatelessWidget {
 
             /// 其它自定义标签
             // ListTile(
-            //   title: Text(WindowsUI.customTags.tr),
+            //   title: Text(UI.customTags.tr),
             //   subtitle: Obx(
             //     () => Wrap(
             //       spacing: 10,
@@ -179,7 +152,7 @@ class SteamTagsDialog extends StatelessWidget {
       actions: [
         TextButton(onPressed: () => Get.back(), child: Text(UI.cancel.tr)),
         ElevatedButton(
-          child: Text(WindowsUI.shareToSteam.tr),
+          child: Text(UI.shareToSteam.tr),
           onPressed: () {
             if (_form.currentState!.validate()) {
               final tags = _tags.toSet();

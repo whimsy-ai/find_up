@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'ui.dart';
+import 'package:i18n/ui.dart';
 
 class GlobalProgressIndicatorDialog extends StatelessWidget {
   final String text;

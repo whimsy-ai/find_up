@@ -7,8 +7,8 @@ import 'package:game/game/canvas.dart';
 import 'package:game/game/controller.dart';
 import 'package:game/game/game_bar.dart';
 import 'package:game/game/page_game_entry.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'game_helper.dart';

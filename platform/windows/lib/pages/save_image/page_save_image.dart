@@ -5,12 +5,10 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:game/save_image/save_image_controller.dart';
 import 'package:game/save_image/save_image_editor.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:path/path.dart' as path;
 import 'package:url_launcher/url_launcher_string.dart';
-
-import '../../ui.dart';
 
 class PageSaveImage extends GetView<SaveImageController> {
   @override
@@ -35,7 +33,7 @@ class PageSaveImage extends GetView<SaveImageController> {
             Get.back();
             launchUrlString(path.dirname(file.path));
           },
-          child: Text(WindowsUI.openFolder.tr),
+          child: Text(UI.openFolder.tr),
         ),
         ElevatedButton(onPressed: () => Get.back(), child: Text(UI.ok.tr)),
       ],

@@ -15,6 +15,8 @@ dependencies:
     path: ../../package/ilp_file_codec
   game:
     path: ../../package/game
+  i18n:
+    path: ../../package/i18n
 
   get: ^4.6.6
   oktoast: ^3.4.0
@@ -22,10 +24,10 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   image_gallery_saver: ^2.0.3
-  firebase_core: ^2.24.0
-  dynamic_color: ^1.6.8
+  firebase_core: ^2.24.2
+  dynamic_color: ^1.6.9
   change_app_package_name: ^1.1.0
-  url_launcher: ^6.2.1
+  url_launcher: ^6.2.2
   package_info_plus: ^5.0.1
   flutter_launcher_icons: ^0.13.1
   font_awesome_flutter: ^10.6.0

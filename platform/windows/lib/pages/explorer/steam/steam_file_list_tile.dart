@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:game/game/animated_unlock_progress_bar.dart';
 import 'package:game/get_ilp_info_unlock.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 
 import '../controller.dart';
 import 'steam_cached_image.dart';

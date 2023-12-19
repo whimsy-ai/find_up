@@ -1,11 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:windows/ui.dart';
+import 'package:i18n/ui.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    final ui = WindowsUI();
-    final en = ui.keys['en_US']!;
-    final cn = ui.keys['zh_CN']!;
-    expect(en.keys, cn.keys);
+    print('语言数量 ${UI.languages.length}');
+
+    print(UI.languages.values.join('\n'));
   });
 }

@@ -3,9 +3,8 @@ import 'package:game/explorer/file.dart';
 import 'package:game/explorer/ilp_info_bottom_sheet.dart';
 import 'package:game/game/animated_unlock_progress_bar.dart';
 import 'package:game/game/page_game_entry.dart';
-import 'package:game/info_table.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
 import 'asset_ilp_file.dart';

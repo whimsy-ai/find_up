@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/global_progress_indicator_dialog.dart';
-import 'package:game/ui.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:path/path.dart' as path;
@@ -18,7 +18,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:steamworks/steamworks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../../ui.dart';
 import '../../utils/steam_ex.dart';
 import '../explorer/steam/steam_file.dart';
 import 'ilp_info_file.dart';
@@ -99,15 +98,14 @@ class ILPEditorController extends GetxController {
     for (var config in _configs) {
       if (config.config == null) {
         throw ILPConfigException(
-          message: '${config.file} ${WindowsUI.ilpEditorFilesNotExist.tr}',
+          message: '${config.file} ${UI.ilpEditorFilesNotExist.tr}',
           file: config.file,
         );
       }
       final validate = await config.config!.validate();
       if (!validate) {
         throw ILPConfigException(
-          message:
-              '${config.config!.name} ${WindowsUI.ilpEditorFilesNotExist.tr}',
+          message: '${config.config!.name} ${UI.ilpEditorFilesNotExist.tr}',
           file: config.file,
         );
       }
@@ -169,18 +167,18 @@ class ILPEditorController extends GetxController {
     final ilp = await ILP.fromFile(filePath);
     Get.dialog(
       AlertDialog(
-        title: Text(WindowsUI.ilpEditorValidatingFile.tr),
+        title: Text(UI.ilpEditorValidatingFile.tr),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             /// 验证文件长度
             _ValidatorListTile(
-                name: WindowsUI.ilpEditorFileLength.tr,
+                name: UI.ilpEditorFileLength.tr,
                 validator: () async {
                   if (bytes.length == await ilp.length) {
-                    return WindowsUI.ilpEditorConsistent.tr;
+                    return UI.ilpEditorConsistent.tr;
                   }
-                  return WindowsUI.ilpEditorInconsistent.tr;
+                  return UI.ilpEditorInconsistent.tr;
                 }),
 
             /// 验证文件信息
@@ -193,20 +191,20 @@ class ILPEditorController extends GetxController {
                   final fileInfoNames =
                       (await ilp.infos).map((info) => info.name).toList();
                   if (header.name != name) {
-                    return WindowsUI.ilpEditorNameInconsistent.tr;
+                    return UI.ilpEditorNameInconsistent.tr;
                   } else if (header.description != desc) {
                     print('desc $desc , header desc ${header.description}');
-                    return WindowsUI.ilpEditorDescInconsistent.tr;
+                    return UI.ilpEditorDescInconsistent.tr;
                   } else if (header.author != author) {
-                    return WindowsUI.ilpEditorAuthorInconsistent.tr;
+                    return UI.ilpEditorAuthorInconsistent.tr;
                   } else if (!eq(_linksString(), header.links)) {
-                    return WindowsUI.ilpEditorLinksInconsistent.tr;
+                    return UI.ilpEditorLinksInconsistent.tr;
                   } else if (!eq(infoNames, fileInfoNames)) {
-                    return WindowsUI.ilpEditorImagesInconsistent.tr;
+                    return UI.ilpEditorImagesInconsistent.tr;
                   } else if (header.version != version) {
-                    return WindowsUI.ilpEditorVersionInconsistent.tr;
+                    return UI.ilpEditorVersionInconsistent.tr;
                   } else {
-                    return WindowsUI.ilpEditorConsistent.tr;
+                    return UI.ilpEditorConsistent.tr;
                   }
                 }),
           ],
@@ -224,7 +222,7 @@ class ILPEditorController extends GetxController {
           ),
           ElevatedButton(
             onPressed: () => PageGameEntry.play(ilp),
-            child: Text(WindowsUI.playtest.tr),
+            child: Text(UI.test.tr),
           ),
         ],
       ),
@@ -247,7 +245,7 @@ class ILPEditorController extends GetxController {
 
     await Get.dialog<bool>(
       AlertDialog(
-        title: Text(WindowsUI.ilpEditorModifyImageName.tr),
+        title: Text(UI.ilpEditorModifyImageName.tr),
         content: Form(
           key: formKey,
           child: Column(
@@ -265,13 +263,13 @@ class ILPEditorController extends GetxController {
               SizedBox(height: 10),
               ListTile(
                 title: TextFormField(
-                  decoration: InputDecoration(
-                      labelText: WindowsUI.ilpEditorImageName.tr),
+                  decoration:
+                      InputDecoration(labelText: UI.ilpEditorImageName.tr),
                   initialValue: name,
                   onChanged: (v) => name = v,
                   onFieldSubmitted: (v) => check(),
                   validator: (v) {
-                    if (v!.isEmpty) return WindowsUI.ilpEditorInputImageName.tr;
+                    if (v!.isEmpty) return UI.ilpEditorInputImageName.tr;
                     return null;
                   },
                 ),
@@ -320,7 +318,7 @@ class ILPEditorController extends GetxController {
   removeLink(Link link) async {
     final sure = await Get.dialog<bool>(
       AlertDialog(
-        title: Text('${WindowsUI.ilpEditorRemoveLink.tr} ${link.name}?'),
+        title: Text('${UI.ilpEditorRemoveLink.tr} ${link.name}?'),
         content: Text(link.url),
         actions: [
           TextButton(onPressed: () => Get.back(), child: Text(UI.cancel.tr)),
@@ -370,7 +368,7 @@ class ILPEditorController extends GetxController {
     });
     if (exists.isNotEmpty) {
       showToast(
-        [WindowsUI.ilpEditorFileExisted.tr, ...exists].join('\n'),
+        [UI.ilpEditorFileExisted.tr, ...exists].join('\n'),
         duration: Duration(seconds: 5),
       );
     }
@@ -407,7 +405,7 @@ class ILPEditorController extends GetxController {
       shape: _steamFile?.shape,
     );
     if (tags == null) return;
-    GlobalProgressIndicatorDialog.show(WindowsUI.steamUploading.tr);
+    GlobalProgressIndicatorDialog.show(UI.steamUploading.tr);
     final bytes = await toBytes();
 
     final temp = await getTemporaryDirectory();
@@ -442,14 +440,14 @@ class ILPEditorController extends GetxController {
     Get.back();
     Get.dialog(
       AlertDialog(
-        title: Text(WindowsUI.steamUploadSuccess.tr),
+        title: Text(UI.steamUploadSuccess.tr),
         actions: [
           TextButton(
             onPressed: () {
               SteamClient.instance
                   .openUrl('steam://url/CommunityFilePage/$itemId');
             },
-            child: Text(WindowsUI.viewFileInSteam.tr),
+            child: Text(UI.viewFileInSteam.tr),
           ),
           ElevatedButton(onPressed: () => Get.back(), child: Text(UI.ok.tr)),
         ],
@@ -461,7 +459,7 @@ class ILPEditorController extends GetxController {
 class _ValidatorListTile extends StatelessWidget {
   final String name;
   final Future<String> Function() validator;
-  final _result = RxString(WindowsUI.ilpEditorValidating.tr);
+  final _result = RxString(UI.ilpEditorValidating.tr);
 
   _ValidatorListTile({
     super.key,
