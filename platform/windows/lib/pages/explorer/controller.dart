@@ -144,7 +144,7 @@ class ILPExplorerController extends GetxController
         showToast(UI.folderNotExists.trArgs([folderPath]));
         return;
       }
-      final files = dir.listSync(recursive: false).where((file) {
+      final files = dir.listSync(recursive: true).where((file) {
         var filter = true;
 
         if (search != null) {

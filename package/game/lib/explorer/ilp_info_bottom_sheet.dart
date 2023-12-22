@@ -10,6 +10,7 @@ import '../bytes_size.dart';
 import '../game/unlock_progress_bar.dart';
 import '../info_table.dart';
 import 'file.dart';
+import 'ilp_file.dart';
 
 class ILPInfoBottomSheet extends StatelessWidget {
   final ExplorerFile? file;
@@ -50,6 +51,11 @@ class ILPInfoBottomSheet extends StatelessWidget {
             header.description.isNotEmpty ? header.description : UI.empty.tr,
           ),
         ),
+        if (file is ILPFile)
+          ListTile(
+            title: Text(UI.path.tr),
+            subtitle: Text((file as ILPFile).file.path),
+          ),
         if (file != null)
           ListTile(
             title: Text(UI.fileSize.tr),

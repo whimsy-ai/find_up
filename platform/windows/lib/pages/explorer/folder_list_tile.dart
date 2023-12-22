@@ -8,7 +8,7 @@ class FolderListTile extends StatelessWidget {
   final void Function()? onTap;
   final void Function()? onRemove;
 
-  FolderListTile({
+  const FolderListTile({
     super.key,
     required this.folder,
     required this.isFixedFolder,

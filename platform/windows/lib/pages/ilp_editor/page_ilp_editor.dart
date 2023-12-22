@@ -6,6 +6,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/build_flavor.dart';
+import 'package:game/data.dart';
 import 'package:game/utils/textfield_number_formatter.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
@@ -313,6 +314,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
       child: FractionallySizedBox(
         widthFactor: 0.7,
         child: Card(
+          clipBehavior: Clip.antiAlias,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -349,26 +351,21 @@ class PageILPEditor extends GetView<ILPEditorController> {
                   ),
                 ),
               ),
-              ListTile(
-                leading: Icon(FontAwesomeIcons.youtube,color: Colors.red),
-                title: Text(UI.ilpEditorEmptyTip2Title.tr),
-                subtitle: Text.rich(
-                  TextSpan(
-                    text: UI.ilpEditorEmptyTip2Content.tr,
-                    children: [
-                      WidgetSpan(
-                        child: TextButton(
-                          onPressed: controller.selectConfigFiles,
-                          child: Text(
-                            UI.ilpEditorEmptyTip2Btn.tr,
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+              if (Data.locale.languageCode == 'zh')
+                ListTile(
+                  leading: Icon(FontAwesomeIcons.bilibili, color: Colors.blue),
+                  title: Text('使用stable diffusion制作游戏内容的教程视频'),
+                  onTap: () => launchUrlString(
+                      'https://www.bilibili.com/video/BV1Qj411p76M'),
                 ),
-              ),
+              if (Data.locale.languageCode != 'zh')
+                ListTile(
+                  leading: Icon(FontAwesomeIcons.youtube, color: Colors.red),
+                  title: Text(
+                      'Tutorial video for creating game content using stable diffusion(English)'),
+                  onTap: () => launchUrlString(
+                      'https://www.youtube.com/watch?v=pI6nHgf974k'),
+                ),
             ],
           ),
         ),
