@@ -19,6 +19,16 @@ void main() async {
   print('upload.jks: ${File('./android/upload.jks').lengthSync()}');
   print('secrets.properties: ${File('./android/key.properties').lengthSync()}');
 
+  /// 更新ilp游戏资源文件
+  var res = await Process.run(
+    'dart ',
+    ['build_pubspec.dart'],
+    runInShell: true,
+    workingDirectory:
+        path.join(Directory.current.path, '..', '..', 'package', 'ilp_assets'),
+  );
+  stdout.writeln('更新ilp文件 ${res.stdout}');
+
   await Process.run(
     'flutter',
     ['clean'],
@@ -32,7 +42,7 @@ void main() async {
     workingDirectory: Directory.current.path,
   );
 
-  var res = await Process.run(
+  res = await Process.run(
     'flutter',
     [
       'build',

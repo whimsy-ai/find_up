@@ -26,27 +26,20 @@ class PageSettings extends StatelessWidget {
               shrinkWrap: true,
               children: [
                 ListTile(
-                  title: Text('语言 / Language'),
+                  title: Text('${UI.language.tr}${Data.locale.languageCode=='en'?'':' / Language'} (${UI.languages.length})'),
                   trailing: Obx(() => DropdownButton<String>(
-                        value: _language.value,
-                        items: [
-                          DropdownMenuItem(
-                            value: 'zh',
-                            child: Text("简体中文"),
-                          ),
-                          DropdownMenuItem(
-                            value: 'en',
-                            child: Text("English"),
-                          )
-                        ],
-                        onChanged: (v) {
-                          _language.value = v!;
-                          Get.updateLocale(switch (v) {
-                            'zh' => Locale('zh', 'CN'),
-                            _ => Locale('en', 'US'),
-                          });
-                        },
-                      )),
+                    value: _language.value,
+                    items: UI.languages.keys.map((key) {
+                      return DropdownMenuItem(
+                        value: key,
+                        child: Text(UI.languages[key]!),
+                      );
+                    }).toList(),
+                    onChanged: (v) {
+                      _language.value = v!;
+                      Get.updateLocale(Locale(v));
+                    },
+                  )),
                 ),
                 ListTile(
                   title: Text(UI.removeCache.tr),

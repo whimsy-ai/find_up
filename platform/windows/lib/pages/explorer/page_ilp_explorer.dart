@@ -254,7 +254,7 @@ class PageILPExplorer extends GetView<ILPExplorerController> {
   }
 
   Widget _search() => SizedBox(
-        width: 130,
+        width: 200,
         height: 28,
         child: TextField(
           controller: TextEditingController(

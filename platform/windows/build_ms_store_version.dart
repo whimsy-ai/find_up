@@ -12,9 +12,17 @@ final buildPath = path.join(
 );
 
 void main() async {
-
   print('开始构建微软商店版本');
   print('当前文件夹 ${Directory.current.path}');
+
+  /// 更新ilp游戏资源
+  await Process.run(
+    'dart ',
+    ['build_pubspec.dart'],
+    runInShell: true,
+    workingDirectory:
+        path.join(Directory.current.path, '..', '..', 'package', 'ilp_assets'),
+  );
 
   await Process.run(
     'flutter',
@@ -41,34 +49,6 @@ void main() async {
     workingDirectory: Directory.current.path,
   );
   if (res.exitCode != 0) throw res.stderr;
-
-
-  final assets = Directory('ms_version_assets');
-  final copyTo = path.join(
-    buildPath,
-    'data',
-    'flutter_assets',
-    'packages',
-    'game',
-    'assets',
-    'ilp',
-  );
-  print('复制游戏内容 从 ${assets.absolute.path} 到 $copyTo');
-
-  if (Platform.isWindows) {
-    await Process.run(
-      'Xcopy',
-      [
-        assets.absolute.path,
-        copyTo,
-        '/e',
-      ],
-      runInShell: true,
-      workingDirectory: Directory.current.path,
-    ).then((value) {
-      print('复制结果 ${value.stderr}');
-    });
-  }
 
   /// 打包为msix文件
   await Process.run(

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dynamic_parallel_queue/dynamic_parallel_queue.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:game/build_flavor.dart';
@@ -9,6 +10,7 @@ import 'package:game/explorer/i_controller.dart';
 import 'package:game/explorer/ilp_file.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
+import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:path/path.dart' as path;
 import 'package:steamworks/steamworks.dart';
@@ -19,13 +21,15 @@ import '../../utils/steam_tags.dart';
 
 enum ExplorerMode { openFile, selectSteamFile }
 
+final Queue _searchQueue = Queue(parallel: 4);
+
 class ILPExplorerController extends GetxController
     implements IExplorerController {
   final ExplorerMode mode;
   String? search;
   bool loading = false;
   late final _fixedFolders = {
-    (UI.builtIn.tr, 'assets'),
+    if (!env.isSteam) (UI.builtIn.tr, 'assets'),
     if (env.isSteam) (UI.steamWorkshop.tr, 'steam'),
   };
 
@@ -125,6 +129,7 @@ class ILPExplorerController extends GetxController
   @override
   Future<void> openFolder(int index) async {
     if (loading) return;
+    _searchQueue.clear();
     loading = true;
     update(['folders', 'files']);
     var folder = _folders.elementAt(index);
@@ -135,24 +140,38 @@ class ILPExplorerController extends GetxController
       await _loadSteamFiles();
     } else {
       subscribed = false;
+      Iterable<String> files;
       if (folderPath == 'assets') {
         folderPath = assetPath(package: 'game', paths: ['ilp']);
-      }
-      // print('asset $path');
-      final dir = Directory(folderPath);
-      if (!await dir.exists()) {
-        showToast(UI.folderNotExists.trArgs([folderPath]));
-        return;
-      }
-      final files = dir.listSync(recursive: true).where((file) {
-        var filter = true;
-
-        if (search != null) {
-          filter = path.basenameWithoutExtension(file.path).contains(search!);
+        files = _loadAssets();
+      } else {
+        final dir = Directory(folderPath);
+        if (!await dir.exists()) {
+          showToast(UI.folderNotExists.trArgs([folderPath]));
+          return;
         }
-        return filter && file.path.endsWith('.ilp');
-      });
-      _files.addAll(files.map((file) => ILPFile(File(file.path))));
+        files = dir.listSync(recursive: true).map((e) => e.path);
+      }
+
+      /// 过滤ilp后缀
+      files = files.where((element) => element.endsWith('.ilp'));
+      // print('asset $path');
+
+      if (search == null) {
+        _files.addAll(files.map((file) => ILPFile(File(file))));
+      }
+
+      /// 搜索
+      else if (search != null) {
+        await _searchQueue.addAll(files.map((file) => () async {
+              final ilp = await ILP.fromFile(file);
+              final header = await ilp.header;
+              if (header.name.toLowerCase().contains(search!.toLowerCase())) {
+                _files.add(ILPFile(File(file)));
+              }
+              update(['files']);
+            }));
+      }
     }
     loading = false;
     update(['folders', 'files']);
@@ -213,4 +232,11 @@ class ILPExplorerController extends GetxController
       files.addAll(res.files);
     }
   }
+}
+
+Iterable<String> _loadAssets() {
+  return Directory(assetPath(package: 'ilp_assets'))
+      .listSync(recursive: true)
+      .reversed
+      .map((file) => file.path);
 }

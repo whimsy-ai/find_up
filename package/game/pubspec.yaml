@@ -14,7 +14,7 @@ dependencies:
   dio_cache_interceptor: ^3.5.0
   flutter:
     sdk: flutter
-  flutter_animate: ^4.3.0
+  flutter_animate: ^4.4.0
   font_awesome_flutter: ^10.6.0
   gesture_x_detector: ^1.1.1
   get: ^4.6.6
@@ -22,12 +22,11 @@ dependencies:
     path: ../ilp_file_codec
   i18n:
     path: ../i18n
-  path_provider: ^2.1.1
+  path_provider: ^2.1.2
   shared_preferences: ^2.2.2
   synchronized: ^3.1.0+1
   universal_io: ^2.2.2
-  url_launcher: ^6.2.2
-  logger: ^2.0.2+1
+  url_launcher: ^6.2.3
 
 dev_dependencies:
   flutter_test:
@@ -39,4 +38,3 @@ flutter:
     - assets/
     - assets/images/
     - assets/sounds/
-    - assets/ilp/

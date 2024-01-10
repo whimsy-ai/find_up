@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +14,13 @@ import 'package:i18n/ui.dart';
 import 'package:mobile/utils/version.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 import 'firebase_options.dart';
-import 'pages/page_about.dart';
 import 'pages/explorer/controller.dart';
 import 'pages/explorer/page_ilp_explorer.dart';
 import 'pages/game/page_game.dart';
+import 'pages/page_about.dart';
 import 'pages/page_save_image.dart';
 import 'pages/settings/page_settings.dart';
 import 'sound.dart';
@@ -33,6 +36,30 @@ runMain() async {
   }
   await Data.init();
   runApp(HomePage());
+  await UnityAds.setPrivacyConsent(PrivacyConsentType.gdpr, true);
+  await UnityAds.setPrivacyConsent(PrivacyConsentType.ageGate, true);
+  await UnityAds.setPrivacyConsent(PrivacyConsentType.ccpa, true);
+  await UnityAds.setPrivacyConsent(PrivacyConsentType.pipl, true);
+  await UnityAds.setPrivacyConsent(PrivacyConsentType.pipl, true);
+  await UnityAds.init(
+    firebaseTestLabMode: FirebaseTestLabMode.showAds,
+    gameId: GetPlatform.isIOS ? '5516256' : '5516257',
+    onComplete: () => print('Initialization Complete'),
+    onFailed: (error, message) =>
+        print('Initialization Failed: $error $message'),
+  );
+  // IronSource.setFlutterVersion('3.16.5');
+  // await IronSource.validateIntegration();
+  // await IronSource.setAdaptersDebug(true);
+  // await IronSource.shouldTrackNetworkState(false);
+  // await IronSource.setUserId('android-test-user-id-123');
+  // await IronSource.init(
+  //   appKey: '1d15edbcd',
+  //   adUnits: [
+  //     IronSourceAdUnit.RewardedVideo,
+  //     IronSourceAdUnit.Banner,
+  //   ],
+  // );
 }
 
 class HomePage extends StatelessWidget {
@@ -179,6 +206,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: UnityBannerAd(
+                placementId: 'main_banner',
+                onLoad: (placementId) => print('Banner loaded: $placementId'),
+                onClick: (placementId) => print('Banner clicked: $placementId'),
+                onShown: (placementId) => print('Banner shown: $placementId'),
+                onFailed: (placementId, error, message) =>
+                    print('Banner Ad $placementId failed: $error $message'),
+              ),
+            )
           ],
         ),
       );

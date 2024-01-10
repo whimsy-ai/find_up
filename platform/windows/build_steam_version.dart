@@ -38,6 +38,16 @@ void main() async {
   } else {
     throw res.stderr;
   }
+
+  /// 删除ilp资源文件夹
+  Directory(path.join(
+    buildPath,
+    'data',
+    'flutter_assets',
+    'packages',
+    'ilp_assets',
+    'assets',
+  )).deleteSync(recursive: true);
   print('成功, 位置$buildPath');
 }
 

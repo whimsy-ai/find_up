@@ -21,7 +21,10 @@ class AssetFileListTile extends StatelessWidget {
     return Obx(() {
       final ilp = file.ilp;
       if (ilp == null) {
-        return ListTile(title: Text(UI.loading.tr));
+        return Column(children: [
+          Container(height: 200, color: Colors.black12),
+          Text(UI.loading.tr),
+        ]);
       }
       return Column(
         children: [

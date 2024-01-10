@@ -17,8 +17,10 @@ class PageAbout extends StatelessWidget {
       body: Center(
         child: SizedBox(
           width: 500,
-          child: AboutCard(
-            version: '${packageInfo.version}$buildNumber',
+          child: SingleChildScrollView(
+            child: AboutCard(
+              version: '${packageInfo.version}$buildNumber',
+            ),
           ),
         ),
       ),
