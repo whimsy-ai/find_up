@@ -281,7 +281,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
         ? child
         : InkWell(
             onTap: () {
-              controller.openFolder(1);
+              controller.openFolder(0);
             },
             child: IgnorePointer(child: child),
           );

@@ -106,7 +106,10 @@ class ILPExplorerController extends GetxController
 
   ILPExplorerController(this.mode) {
     _folders.addAll(Data.folders.map((e) => (path.basename(e), e)));
-    openFolder(mode == ExplorerMode.openFile ? 0 : 1);
+
+    /// Steam版本, 0就是Steam创意工坊
+    /// 微软商店版本，0就是内置的游戏内容
+    openFolder(0);
   }
 
   bool isFixedFolder((String, String) dir) => _fixedFolders.contains(dir);

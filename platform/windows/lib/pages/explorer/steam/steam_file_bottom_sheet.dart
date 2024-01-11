@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../utils/steam_ex.dart';
 import '../controller.dart';
@@ -39,6 +40,8 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
   final _voted = RxnBool();
   final _controller = Get.find<ILPExplorerController>();
   final _ilp = Rxn<ILP>();
+  late ILPHeader _header;
+  final _links = <(String,String)>[];
   late final _infos = RxList<ILPInfo>(widget.file.infos);
 
   @override
@@ -56,6 +59,11 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
 
     if (widget.file.ilpFile != null && _ilp.value == null) {
       _ilp.value = await ILP.fromFile(widget.file.ilpFile!);
+      _header = await _ilp.value!.header;
+      _links.clear();
+      for (var i = 0; i < _header.links.length; i += 2) {
+        _links.add((_header.links[i], _header.links[i + 1]));
+      }
       _infos
         ..clear()
         ..addAll(await _ilp.value!.infos);
@@ -190,13 +198,13 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                     },
                   ),
 
-                  /// version
+                  /// 版本
                   ListTile(
                     title: Text(UI.ilpVersion.tr),
                     subtitle: Text(widget.file.version.toString()),
                   ),
 
-                  /// desc
+                  /// 描述
                   ListTile(
                     title: Text(UI.ilpDesc.tr),
                     subtitle: Text(widget.file.description?.isNotEmpty == true
@@ -204,10 +212,29 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                         : UI.empty.tr),
                   ),
 
-                  /// desc
+                  /// 文件大小
                   ListTile(
                     title: Text(UI.fileSize.tr),
                     subtitle: Text(bytesSize(widget.file.fileSize, 2)),
+                  ),
+
+
+                  ListTile(
+                    title: Text(UI.link.tr),
+                    subtitle: _links.isEmpty
+                        ? Text(UI.empty.tr)
+                        : Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: _links
+                          .map(
+                            (link) => TextButton(
+                          onPressed: () => launchUrlString(link.$2),
+                          child: Text(link.$1),
+                        ),
+                      )
+                          .toList(),
+                    ),
                   ),
 
                   /// image length
