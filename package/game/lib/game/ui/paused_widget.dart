@@ -72,7 +72,7 @@ class PausedWidget extends GetView<GameController> {
                     child: FloatingActionButton(
                       backgroundColor: ColorScheme.light().tertiaryContainer,
                       elevation: 0,
-                      onPressed: () => controller.start(),
+                      onPressed: () => controller.start(seed: controller.seed),
                       child: StrokeShadow.path(
                         Resources.iconRefresh,
                         color: Colors.white,
@@ -132,7 +132,6 @@ class PausedWidget extends GetView<GameController> {
                       color: Colors.white,
                     ),
                     onPressed: () async {
-                      controller.pause();
                       var seed = controller.seed;
                       final sure = await Get.dialog(AlertDialog(
                         title: Text(UI.inputTheSeed.tr),
@@ -156,9 +155,10 @@ class PausedWidget extends GetView<GameController> {
                               child: Text(UI.confirm.tr)),
                         ],
                       ));
-                      if (seed == controller.seed) {
+                      if (controller.isPaused && seed == controller.seed) {
                         return;
                       }
+                      print('输了，修改种子 $seed');
                       if (sure == true) controller.start(seed: seed);
                     },
                   ),

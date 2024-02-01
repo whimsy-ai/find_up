@@ -239,7 +239,6 @@ class GameController extends IOffsetScaleController {
         .easing(Ease.quart.easeOut)
         .onUpdate((obj) {
           _opacity = math.min(obj['opacity'], 1);
-          print('tween opacity $_opacity');
           update(['ui', 'game']);
         })
         .onComplete((obj) {
