@@ -58,9 +58,9 @@ class AboutCard extends StatelessWidget {
               spacing: 10,
               children: [
                 ElevatedButton.icon(
-                  icon: FaIcon(FontAwesomeIcons.envelope),
-                  label: Text('Email'),
-                  onPressed: () => launchUrlString('mailto:gzlock88@gmail.com'),
+                  icon: FaIcon(Icons.discord_rounded),
+                  label: Text('Discord'),
+                  onPressed: () => launchUrlString('https://discord.gg/cy6QTzSpJw'),
                 ),
                 ElevatedButton.icon(
                   icon: FaIcon(FontAwesomeIcons.github),

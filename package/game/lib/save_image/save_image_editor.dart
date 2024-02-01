@@ -21,108 +21,103 @@ class SaveImageEditor extends GetView<SaveImageController> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 260,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border(
-                right: BorderSide(
-              width: 2,
-              color: Theme.of(context).primaryColor,
-            )),
-          ),
-          child: GetBuilder<SaveImageController>(
-              id: 'layers',
-              builder: (controller) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
+        /// 左边图层列表
+        GetBuilder<SaveImageController>(
+            id: 'ui',
+            builder: (c) {
+              return Container(
+                width: Get.width / 4,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border(
+                      right: BorderSide(
+                    width: 2,
+                    color: Theme.of(context).primaryColor,
+                  )),
+                ),
+                child: GetBuilder<SaveImageController>(
+                    id: 'layers',
+                    builder: (controller) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: TextButton(
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStatePropertyAll(Colors.white),
+                              ),
+                              onPressed: () => Get.back(),
+                              child: Icon(Icons.arrow_back_ios),
+                            ),
+                            trailing: ElevatedButton.icon(
+                              onPressed: () => _saveToFile(),
+                              icon: Icon(Icons.save_outlined),
+                              label: Text(UI.save.tr),
+                            ),
+                          ),
+                          ListTile(title: Text(controller.info.name)),
+                          ListTile(
+                            title: AnimatedUnlockProgressBar(
+                              to: getIlpInfoUnlock(controller.info),
+                              height: 24,
+                              text: UI.unlock.tr,
+                            ),
+                          ),
+                          Expanded(
+                            child: GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                              ),
+                              itemBuilder: (_, i) => _LayerIcon(index: i),
+                              itemCount: controller.layers.length,
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+              );
+            }),
+
+        /// 右边图片预览
+        Expanded(
+          child: LayoutBuilder(builder: (context, constraints) {
+            controller
+              ..width = constraints.biggest.width
+              ..height = constraints.biggest.height;
+            controller.resetScaleAndOffset();
+            return DragAndScaleWidget(
+              controller: controller,
+              layer: controller.layer,
+              layers: [],
+              builder: (
+                context, {
+                required scale,
+                required minScale,
+                required maxScale,
+                required x,
+                required y,
+              }) {
+                print('scale $scale');
+                return Stack(
                   children: [
-                    ListTile(
-                      leading: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStatePropertyAll(Colors.white),
+                    Positioned(
+                      left: x,
+                      top: y,
+                      child: GetBuilder<SaveImageController>(
+                        id: 'canvas',
+                        builder: (controller) => CustomPaint(
+                          painter: _Painter(controller, scale),
                         ),
-                        onPressed: () => Get.back(),
-                        child: Icon(Icons.arrow_back_ios),
-                      ),
-                      trailing: ElevatedButton.icon(
-                        onPressed: () => _saveToFile(),
-                        icon: Icon(Icons.save_outlined),
-                        label: Text(UI.save.tr),
-                      ),
-                    ),
-                    ListTile(title: Text(controller.info.name)),
-                    ListTile(
-                      title: AnimatedUnlockProgressBar(
-                        to: getIlpInfoUnlock(controller.info),
-                        height: 24,
-                        text: UI.unlock.tr,
-                      ),
-                    ),
-                    Expanded(
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                        ),
-                        itemBuilder: (_, i) => _LayerIcon(index: i),
-                        itemCount: controller.layers.length,
                       ),
                     ),
                   ],
                 );
-              }),
+              },
+            );
+          }),
         ),
-        Expanded(
-          child: DragAndScaleWidget(
-            layer: controller.layer,
-            layers: [],
-            minScale: controller.minScale,
-            builder: (
-              context, {
-              required scale,
-              required minScale,
-              required maxScale,
-              required x,
-              required y,
-            }) =>
-                Stack(
-              children: [
-                Positioned.fill(
-                  left: x,
-                  top: y,
-                  child: GetBuilder<SaveImageController>(
-                    id: 'canvas',
-                    builder: (controller) => CustomPaint(
-                      painter: _Painter(controller, scale),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        // Expanded(
-        //     child: Stack(
-        //   children: [
-        //     Obx(
-        //       () => Positioned.fill(
-        //         left: _offset.value.dx,
-        //         top: _offset.value.dy,
-        //         child: GetBuilder<SaveImageController>(
-        //           id: 'canvas',
-        //           builder: (controller) => GestureDetector(
-        //             onDoubleTap: () => _offset.value = Offset.zero,
-        //             onPanUpdate: (details) {
-        //               _offset.value += details.delta;
-        //             },
-        //             child: CustomPaint(painter: _Painter(controller)),
-        //           ),
-        //         ),
-        //       ),
-        //     ),
-        //   ],
-        // )),
       ],
     );
   }
@@ -165,7 +160,7 @@ class _LayerIcon extends GetView<SaveImageController> {
               onTap: () => controller.selectLayer(layer),
               child: ColoredBox(
                 color: _selected
-                    ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                    ? Theme.of(context).colorScheme.primary
                     : Colors.transparent,
                 child: Padding(
                   padding: EdgeInsets.all(8.0),

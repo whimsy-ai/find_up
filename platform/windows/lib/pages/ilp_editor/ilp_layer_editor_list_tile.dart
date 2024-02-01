@@ -76,7 +76,7 @@ class ILPEditorInfoListTile extends GetView<ILPEditorController> {
             subtitle: InfoTable(
               style: TextStyle(fontSize: 12, color: Colors.grey),
               rows: [
-                ('${UI.file.tr} ${UI.path.tr}', info.filePath!),
+                (UI.path.tr, info.filePath!),
                 (UI.resolution.tr, '${info.width} x ${info.height}'),
                 (UI.layerCount.tr, info.layer.count()),
               ],

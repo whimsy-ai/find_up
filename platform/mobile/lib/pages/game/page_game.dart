@@ -5,18 +5,14 @@ import 'package:game/core.dart';
 import 'package:game/game/animated_unlock_progress_bar.dart';
 import 'package:game/game/canvas.dart';
 import 'package:game/game/controller.dart';
-import 'package:game/game/game_bar.dart';
+import 'package:game/game/game_ui.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
-import 'package:oktoast/oktoast.dart';
 
 class PageGame extends GetView<GameController> {
   PageGame({super.key}) {
     controller.onFinish = _onFinish;
-    controller.tipLayer.listen((p0) {
-      showToast(UI.showATip.tr);
-    });
   }
 
   static Future play(
@@ -81,7 +77,7 @@ class PageGame extends GetView<GameController> {
           TextButton(
             onPressed: () {
               Get.back();
-              controller.reStart();
+              controller.start();
             },
             child: Text(UI.playAgain.tr),
           ),
@@ -106,70 +102,67 @@ class PageGame extends GetView<GameController> {
   Widget build(BuildContext context) {
     controller.start();
     return Scaffold(
-      body: Stack(children: [
-        GetBuilder<GameController>(
-          id: 'game',
-          builder: (c) => Opacity(
-            opacity: controller.isStarted || controller.isStopped ? 1 : 0,
-            child: controller.layer == null
-                ? Center(
-                    child: SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+      body: OrientationBuilder(builder: (context, _) {
+        return Stack(children: [
+          GetBuilder<GameController>(
+            id: 'game',
+            builder: (c) => Opacity(
+              opacity: controller.isStarted || controller.isStopped ? 1 : 0,
+              child: controller.layer == null
+                  ? Center(
+                      child: SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : DragAndScaleWidget(
+                      controller: controller,
+                      layer: c.layer!,
+                      layers: c.layers,
+                      debug: controller.test,
+                      scaleEvent: (original) {
+                        // -2 是纵向分割线的宽度
+                        return Offset(
+                          (original.dx - 2) / 2,
+                          original.dy,
+                        );
+                      },
+                      builder: (
+                        context, {
+                        required scale,
+                        required minScale,
+                        required maxScale,
+                        required x,
+                        required y,
+                      }) {
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: ILPCanvas(
+                                layout: LayerLayout.left,
+                                debug: controller.isDebug,
+                              ),
+                            ),
+                            VerticalDivider(width: 2),
+                            Expanded(
+                              child: ILPCanvas(
+                                layout: LayerLayout.right,
+                                debug: controller.isDebug,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
-                  )
-                : DragAndScaleWidget(
-                    layer: c.layer!,
-                    layers: c.layers,
-                    debug: controller.test,
-                    minScale: controller.layer!.width > controller.layer!.height
-                        ? Get.width / 1.5 / controller.layer!.width
-                        : Get.height / 1.5 / controller.layer!.height,
-                    scaleEvent: (original) {
-                      // -2 是纵向分割线的宽度
-                      return Offset(
-                        (original.dx - 2) / 2,
-                        original.dy,
-                      );
-                    },
-                    builder: (
-                      context, {
-                      required scale,
-                      required minScale,
-                      required maxScale,
-                      required x,
-                      required y,
-                    }) {
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: ILPCanvas(
-                              layout: LayerLayout.left,
-                              debug: controller.isDebug,
-                            ),
-                          ),
-                          VerticalDivider(width: 2),
-                          Expanded(
-                            child: ILPCanvas(
-                              layout: LayerLayout.right,
-                              debug: controller.isDebug,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+            ),
           ),
-        ),
-        GetBuilder<GameController>(
-          id: 'bar',
-          builder: (c) => GameBar(
-            controller: c,
-            textStyle: TextStyle(fontSize: 12),
+          GetBuilder<GameController>(
+            id: 'ui',
+            builder: (c) => GameUI(controller: c),
           ),
-        ),
-      ]),
+        ]);
+      }),
     );
   }
 }

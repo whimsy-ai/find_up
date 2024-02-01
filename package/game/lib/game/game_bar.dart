@@ -173,11 +173,12 @@ class _GameBarState extends State<GameBar> {
                 (UI.usedTime.tr, widget.controller.time),
               if (widget.controller.timeMode == TimeMode.down)
                 (UI.timeLeft.tr, widget.controller.time),
-              (UI.unfound.tr, widget.controller.unTappedLayers),
+              (UI.clickToFind.tr, widget.controller.unTappedLayers),
             ],
             style: TextStyle(
               fontSize: 14,
               color: Colors.black54,
+              fontFamily: 'LilitaOne',
             ).copyWith(
               fontSize: widget.textStyle?.fontSize,
               color: widget.textStyle?.color,
@@ -232,11 +233,11 @@ class _GameBarState extends State<GameBar> {
                   child: Text(UI.confirm.tr)),
             ],
           ));
-          if (sure != true || seed == widget.controller.seed) {
-            widget.controller.resume();
+          print('seed $seed ${widget.controller.seed}');
+          if (seed == widget.controller.seed) {
             return;
           }
-          await widget.controller.start(seed: seed);
+          if (sure == true) widget.controller.start(seed: seed);
         },
       ),
 
@@ -271,7 +272,7 @@ class _GameBarState extends State<GameBar> {
             ));
             if (sure != true) return;
           }
-          widget.controller.reStart();
+          // widget.controller.reStart();
         },
       ),
 

@@ -7,8 +7,11 @@ import 'package:ffi/ffi.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:game/build_flavor.dart';
+import 'package:game/explorer/file.dart';
+import 'package:game/explorer/ilp_file.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/global_progress_indicator_dialog.dart';
+import 'package:game/info_table.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
@@ -19,6 +22,7 @@ import 'package:steamworks/steamworks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../utils/steam_ex.dart';
+import '../../utils/steam_tags.dart';
 import '../explorer/steam/steam_file.dart';
 import 'ilp_info_file.dart';
 import 'steam/steam_tags_dialog.dart';
@@ -30,6 +34,15 @@ class Link {
 
   @override
   String toString() => '$name => $url';
+
+  static List<Link> fromILPHeader(ILPHeader header) {
+    print('Link.fromILPHeader ${header.links}');
+    final list = <Link>[];
+    for (var i = 0; i < header.links.length; i += 2) {
+      list.add(Link(header.links[i], header.links[i + 1]));
+    }
+    return list;
+  }
 }
 
 final eq = ListEquality().equals;
@@ -131,28 +144,59 @@ class ILPEditorController extends GetxController {
   }
 
   save() async {
-    final String fileName =
-        '${DateTime.now().millisecondsSinceEpoch}_v$version.ilp';
-    final FileSaveLocation? file =
-        await getSaveLocation(suggestedName: fileName, acceptedTypeGroups: [
-      XTypeGroup(label: 'ILP', extensions: ['.ilp']),
-    ]);
-    if (file == null) return;
+    late String savePath;
+    if (_file is ILPFile) {
+      final file = _file as ILPFile;
+      savePath = file.file.path;
+
+      /// 确认更新本地文件
+      final sure = await Get.dialog(AlertDialog(
+        title: Text(UI.ilpEditorConfirmUpdateLocalFile.tr),
+        content: Table(
+          columnWidths: {0: FlexColumnWidth(0.3), 1: FlexColumnWidth(0.7)},
+          children: [
+            TableRow(children: [Text(UI.name.tr), Text(file.name)]),
+            TableRow(children: [
+              Text(UI.ilpVersion.tr),
+              Text(file.version.toString())
+            ]),
+            TableRow(children: [Text(UI.path.tr), Text(file.file.path)]),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: Text(UI.cancel.tr)),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(UI.confirm.tr),
+          )
+        ],
+      ));
+      if (sure != true) return;
+    } else {
+      final String fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_v$version.ilp';
+      final FileSaveLocation? file =
+          await getSaveLocation(suggestedName: fileName, acceptedTypeGroups: [
+        XTypeGroup(label: 'ILP', extensions: ['.ilp']),
+      ]);
+      if (file == null) return;
+      savePath = file.path;
+    }
     Get.dialog(
       AlertDialog(title: Text(UI.saving.tr)),
       barrierDismissible: false,
     );
-    late Uint8List bytes;
+    Uint8List? bytes;
     try {
       bytes = await toBytes();
     } catch (e) {
       showToast(e.toString());
+      Get.back();
       return;
     }
-    final XFile saveFile = XFile.fromData(bytes, name: fileName);
-    await saveFile.saveTo(file.path);
+    await File(savePath).writeAsBytes(bytes);
+    _check(bytes, savePath);
     Get.back();
-    _check(bytes, file.path);
   }
 
   List<String> _linksString() {
@@ -217,12 +261,12 @@ class ILPEditorController extends GetxController {
             child: Text(UI.open.tr, style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
-            onPressed: () => Get.back(),
-            child: Text(UI.ok.tr),
-          ),
-          ElevatedButton(
             onPressed: () => PageGameEntry.play(ilp),
             child: Text(UI.test.tr),
+          ),
+          ElevatedButton(
+            onPressed: () => Get.back(),
+            child: Text(UI.ok.tr),
           ),
         ],
       ),
@@ -376,33 +420,98 @@ class ILPEditorController extends GetxController {
     _configs.addAll(files.map((e) => ILPInfoFile(e)));
   }
 
-  SteamFile? _steamFile;
+  ExplorerFile? _file;
 
-  SteamFile? get steamFile => _steamFile;
+  ExplorerFile? get file => _file;
 
-  bool get isMySteamFile =>
-      (_steamFile?.steamIdOwner ?? SteamClient.instance.userId) ==
-      SteamClient.instance.userId;
+  Rxn<dynamic> currentFileCover = Rxn();
 
-  set steamFile(SteamFile? value) {
-    _steamFile = value;
-    name = _steamFile?.name ?? '';
-    version = _steamFile?.version ?? 1;
-    _desc = _steamFile?.description ?? '';
+  set file(ExplorerFile? file) {
+    _file = file;
+    currentFileCover.value = null;
+    if (file == null) {
+      update(['editor']);
+    } else if (file is SteamFile) {
+      if (file.steamIdOwner != SteamClient.instance.userId) return;
+      file.load();
+      if (file.ilp == null) {
+        showToast(UI.ilpEditorSubscribeFileWarning.tr);
+        return;
+      }
+      currentFileCover.value = file.cover;
+      _fillInfoFromFile(file.ilp!);
+      update(['editor']);
+    } else if (file is ILPFile) {
+      file.load().then((_) {
+        currentFileCover.value = file.cover;
+        _fillInfoFromFile(file.ilp!);
+        update(['editor']);
+      });
+    }
+  }
+
+  _fillInfoFromFile(ILP ilp) async {
+    links.clear();
+    final sure = await Get.dialog(
+      AlertDialog(
+        title: Text(UI.ilpEditorReuseInformation.tr),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: Text(UI.no.tr)),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(UI.confirm.tr),
+          ),
+        ],
+      ),
+    );
+    if (sure == true) {
+      final header = await ilp.header;
+      name = header.name;
+      author = header.author;
+      _desc = header.description;
+      version = header.version;
+      links.addAll(Link.fromILPHeader(header));
+    }
     update(['editor']);
-    print('set steamFile 年龄 ${_steamFile?.ageRating}');
   }
 
   uploadToSteam() async {
-    if (!isMySteamFile) return;
+    TagAgeRating? age;
+    TagShape? shape;
+    TagStyle? style;
+    int? itemId;
+    if (_file is SteamFile) {
+      final file = _file as SteamFile;
+      if (file.steamIdOwner != SteamClient.instance.userId) return;
+      itemId = file.id;
+      age = file.ageRating;
+      style = file.style;
+      shape = file.shape;
 
-    print(
-        'uploadToSteam ${_steamFile?.ageRating} ${_steamFile?.style} ${_steamFile?.shape}');
-
+      /// 确认更新文件
+      final sure = await Get.dialog(AlertDialog(
+        title: Text(UI.ilpEditorConfirmUpdateSteamFile.tr),
+        content: InfoTable(
+          rows: [
+            ('Steam id', file.id),
+            (UI.name.tr, file.name),
+            (UI.ilpVersion.tr, file.version),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: Text(UI.cancel.tr)),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(UI.confirm.tr),
+          )
+        ],
+      ));
+      if (sure != true) return;
+    }
     final tags = await SteamTagsDialog.show(
-      age: _steamFile?.ageRating,
-      style: _steamFile?.style,
-      shape: _steamFile?.shape,
+      age: age,
+      style: style,
+      shape: shape,
     );
     if (tags == null) return;
     GlobalProgressIndicatorDialog.show(UI.steamUploading.tr);
@@ -412,10 +521,11 @@ class ILPEditorController extends GetxController {
     final contentFolder = await temp.createTemp();
     final previewFile = File(path.join(temp.path, 'preview.png'));
     await previewFile.writeAsBytes(await ilp.cover);
-    final file = File(path.join(contentFolder.path, 'main.ilp'));
-    await file.writeAsBytes(bytes);
+    final newFile = File(path.join(contentFolder.path, 'main.ilp'));
+    await newFile.writeAsBytes(bytes);
 
-    final itemId = _steamFile?.id ?? await SteamClient.instance.createItem();
+    /// 多处复用
+    itemId ??= await SteamClient.instance.createItem();
     await SteamClient.instance.updateItem(
       itemId,
       language: ApiLanguage.english,

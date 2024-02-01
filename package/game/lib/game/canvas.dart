@@ -95,8 +95,6 @@ class ILPCanvasLayer extends ILayerBuilder {
         assert(left != null || right != null);
 }
 
-final _debugStyle = BoxDecoration(color: Colors.blue.withOpacity(0.3));
-
 class ILPCanvas extends GetView<GameController> {
   final LayerLayout layout;
   final bool debug;

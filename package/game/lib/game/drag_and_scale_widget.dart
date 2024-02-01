@@ -1,9 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:game/game/controller.dart';
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
+import '../i_offset_scale.dart';
 import 'canvas.dart';
 
 typedef DragAndScaleBuilder = Widget Function(
@@ -20,20 +20,18 @@ class DragAndScaleWidget extends StatefulWidget {
   final List<ILayerBuilder> layers;
   final bool debug;
   final double scaleStep;
-  final double minScale;
-  final double maxScale;
   final DragAndScaleBuilder builder;
+  final IOffsetScaleController controller;
   final Offset Function(Offset original)? scaleEvent;
 
   const DragAndScaleWidget({
     super.key,
+    required this.controller,
     required this.layer,
     required this.layers,
     required this.builder,
-    required this.minScale,
     this.scaleEvent,
     this.scaleStep = 0.05,
-    this.maxScale = 4.0,
     this.debug = false,
   });
 
@@ -42,7 +40,7 @@ class DragAndScaleWidget extends StatefulWidget {
 }
 
 class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
-  final controller = Get.find<GameController>();
+  late final controller = widget.controller;
   late Rect _real = Rect.fromLTWH(
     0,
     0,
@@ -50,7 +48,6 @@ class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
     widget.layer.height.toDouble(),
   );
   Offset _eventPosition = Offset.zero;
-
 
   double get _offsetX => controller.offsetX;
 
@@ -75,25 +72,24 @@ class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
 
   reset() {
     setState(() {
-      _offsetX = _offsetY = 0;
-      _scale = 1;
+      controller.resetScaleAndOffset();
       _real = Rect.fromLTWH(
         0,
         0,
         widget.layer.width.toDouble(),
         widget.layer.height.toDouble(),
       );
-      _scaleOffset();
+      // _scaleOffset();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget child = widget.builder(
+    final Widget child = widget.builder(
       context,
       scale: _scale,
-      minScale: widget.minScale,
-      maxScale: widget.maxScale,
+      minScale: controller.minScale,
+      maxScale: controller.maxScale,
       x: _offsetX,
       y: _offsetY,
     );
@@ -139,13 +135,14 @@ class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
       /// 滚轮缩放
       onPointerSignal: (event) {
         if (event is PointerScrollEvent) {
-          final half = Get.width / 2;
-          final pos = event.localPosition;
+          // final half = Get.width / 2;
+          // final pos = event.localPosition;
           _eventPosition = widget.scaleEvent?.call(event.localPosition) ??
               event.localPosition;
           final isZoomIn = event.scrollDelta.dy > 0;
           final step = widget.scaleStep * (isZoomIn ? 1 : -1);
-          _scale = (_scale + step).clamp(widget.minScale, widget.maxScale);
+          _scale =
+              (_scale + step).clamp(controller.minScale, controller.maxScale);
           _scaleOffset();
         }
       },
@@ -190,7 +187,7 @@ class DragAndScaleWidgetState extends State<DragAndScaleWidget> {
       }
 
       _scale = (_scale + (details.scale - _lastScale))
-          .clamp(widget.minScale, widget.maxScale);
+          .clamp(controller.minScale, controller.maxScale);
       // print('缩放 $_eventPosition');
       _scaleOffset();
       _lastScale = details.scale;

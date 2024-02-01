@@ -14,8 +14,8 @@ dependencies:
   dio_cache_interceptor: ^3.5.0
   flutter:
     sdk: flutter
-  flutter_animate: ^4.4.0
-  font_awesome_flutter: ^10.6.0
+  flutter_animate: ^4.4.1
+  font_awesome_flutter: ^10.7.0
   gesture_x_detector: ^1.1.1
   get: ^4.6.6
   ilp_file_codec:
@@ -26,7 +26,14 @@ dependencies:
   shared_preferences: ^2.2.2
   synchronized: ^3.1.0+1
   universal_io: ^2.2.2
-  url_launcher: ^6.2.3
+  url_launcher: ^6.2.4
+  tweener: ^2.2.3
+  flutter_svg: ^2.0.9
+  path_drawing: ^1.0.1
+  xml: ^6.5.0
+  borders: 0.3.0
+  google_fonts: ^6.1.0
+  oktoast: ^3.4.0
 
 dev_dependencies:
   flutter_test:

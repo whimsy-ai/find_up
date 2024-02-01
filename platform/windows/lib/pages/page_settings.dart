@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game/data.dart';
+import 'package:game/discord_link.dart';
 import 'package:game/http/http.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
@@ -45,20 +46,7 @@ class PageSettings extends StatelessWidget {
                         },
                       )),
                 ),
-                ListTile(
-                  leading: Icon(
-                    Icons.info_outline_rounded,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  title: Text(UI.settingAutoTranslate.tr),
-                  trailing: InkWell(
-                    child: Icon(
-                      Icons.email_rounded,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    onTap: () => launchUrlString('mailto:gzlock88@gmail.com'),
-                  ),
-                ),
+                DiscordLink(),
                 ListTile(
                   title: Text(UI.removeCache.tr),
                   onTap: () async {

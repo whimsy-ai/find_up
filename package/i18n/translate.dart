@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:csv/csv.dart';
 import 'package:dynamic_parallel_queue/dynamic_parallel_queue.dart';
 
 import './bin/ui.dart';
@@ -15,7 +16,7 @@ final queue = Queue(parallel: 8);
 
 late Map<String, String> caches;
 
-void main() async {
+void main(List<String> args) async {
   caches = await readCaches();
   print('缓存词条数量 ${caches.length}');
   await DeepLTranslator.init();
@@ -93,6 +94,24 @@ void main() async {
   text.writeln('}');
   await File(output).writeAsString(text.toString());
   await writeCaches();
+
+  /// Create a csv file to preview the translate quality
+  final csvConverter = ListToCsvConverter();
+  final csvData = <List<String>>[];
+  final keyIndex = zh.keys.toList();
+  csvData.add(['key']);
+  languages.forEach((language, value) {
+    csvData.first.add(language);
+    value.forEach((key, value) {
+      final index = keyIndex.indexOf(key) + 1;
+      if (language == 'zh') {
+        csvData.add([key, value]);
+      }else{
+        csvData[index].add(value);
+      }
+    });
+  });
+  File('ui.csv').writeAsStringSync(csvConverter.convert(csvData));
   exit(0);
 }
 

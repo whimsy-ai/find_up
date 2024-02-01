@@ -98,7 +98,8 @@ class SteamFile implements ExplorerFile {
   String? ilpFile;
   int? downloadedBytes, totalBytes;
 
-  load() {
+  @override
+  Future<void> load({force = false}) async {
     if (isSubscribed) {
       if (isDownLoading) {
         _getDownloadBytes();

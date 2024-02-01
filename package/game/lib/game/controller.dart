@@ -1,26 +1,20 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:flutter/material.dart';
+import 'package:game/i_offset_scale.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
+import 'package:tweener/tweener.dart';
 
 import '../data.dart';
 import '../get_ilp_info_unlock.dart';
-import '../sound.dart';
 import 'canvas.dart';
-
-class Action {
-  final Future<void> Function(Duration frameTime) onFixedUpdate;
-
-  Action(this.onFixedUpdate);
-
-  void update(Duration frameTime) {
-    onFixedUpdate(frameTime);
-  }
-}
+import 'core.dart';
+import 'resources.dart';
 
 enum TimeMode { up, down }
 
@@ -29,102 +23,50 @@ enum GameMode {
   hard,
 }
 
-enum GameCoreState {
-  notStart,
-  started,
-  stopped,
-  paused,
+enum GameBarMode {
+  fullSize,
+  miniSize,
 }
 
-class GameCore {
-  final void Function(Duration) update;
+enum GameState {
+  /// loading ilp layers
+  loading(0),
+  loadError(1),
 
-  GameCore(this.update);
+  /// game image fade in animate
+  animating(2),
+  already(3),
+  started(4),
+  paused(5),
+  stopped(6),
+  completed(7),
+  failed(8);
 
-  GameCoreState _state = GameCoreState.notStart;
+  final num value;
 
-  GameCoreState get state => _state;
-  DateTime? startTime, stopTime, pauseTime;
-
-  bool get isStarted => _state == GameCoreState.started;
-
-  bool get isPaused => _state == GameCoreState.paused;
-
-  bool get isStopped => _state == GameCoreState.stopped;
-
-  late DateTime _frameTime;
-
-  Future<void> _loop() async {
-    update(DateTime.now().difference(_frameTime));
-    _frameTime = DateTime.now();
-    if (isStarted) {
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-        _loop();
-      });
-    }
-  }
-
-  void start() {
-    _state = GameCoreState.started;
-    _frameTime = DateTime.now();
-    _loop();
-  }
-
-  void stop() {
-    if (_state != GameCoreState.started) return;
-    _state = GameCoreState.stopped;
-    stopTime = DateTime.now();
-  }
-
-  void pause() {
-    if (_state == GameCoreState.started) {
-      pauseTime = DateTime.now();
-      _state = GameCoreState.paused;
-    }
-  }
-
-  void resume() {
-    if (_state == GameCoreState.paused) {
-      _state = GameCoreState.started;
-      pauseTime = null;
-      _loop();
-    }
-  }
-
-  void reset() {
-    _state = GameCoreState.notStart;
-    startTime = stopTime = pauseTime = null;
-  }
+  const GameState(this.value);
 }
 
-class GameCoreTimer extends Action {
-  final TimeMode mode;
-  Duration _data = Duration.zero;
-  final Duration? target;
+class GameController extends IOffsetScaleController {
+  static final _audioPlayer = AudioPlayer();
 
-  GameCoreTimer({
-    required Future<void> Function(Duration) onFixedUpdate,
-    this.mode = TimeMode.up,
-    this.target,
-  })  : assert(mode == TimeMode.down ? target != null : target == null),
-        super(onFixedUpdate);
+  playCorrectAudio() => _audioPlayer
+    ..stop()
+    ..play(Resources.correctSource);
 
-  @override
-  void update(Duration frameTime) {
-    _data += frameTime;
-    super.update(frameTime);
-  }
+  playWrongAudio() => _audioPlayer
+    ..stop()
+    ..play(Resources.wrongSource);
 
-  Duration get time => mode == TimeMode.up ? _data : target! - _data;
-}
+  playErrorAudio() => _audioPlayer
+    ..stop()
+    ..play(Resources.errorSource);
 
-class GameController extends GetxController {
   void Function({
     required double pastUnlock,
     required double newUnlock,
     int? nextIndex,
   })? onFinish;
-  final ISound? sound;
 
   final ILP ilp;
   final TimeMode timeMode;
@@ -138,15 +80,13 @@ class GameController extends GetxController {
 
   set test(val) {
     _debug = val;
-    update(['bar', 'game']);
+    update(['ui', 'game']);
   }
-
-  late math.Random _random;
 
   late final GameCore _core = GameCore(_onFixedUpdate);
 
   late int index;
-  late int _seed = math.Random().nextInt(65535);
+  late int _seed = 0;
   ILPHeader? _header;
   ILPInfo? info;
   ILPLayer? layer;
@@ -156,23 +96,53 @@ class GameController extends GetxController {
 
   int get seed => _seed;
 
+  /// error text
+  String? error;
+
   final List<ILayerBuilder> layers = [];
 
-  GameCoreState get state => _core.state;
+  GameState get state => _state;
+  GameState _state = GameState.loading;
 
   Duration _time = Duration.zero;
 
   String get time {
-    final t = _time.toString().split('.');
-    t[1] = t[1].substring(0, 2);
-    return t.join('.');
+    var time = (_time.inMilliseconds / Duration.millisecondsPerSecond)
+        .toString()
+        .split('.');
+
+    /// 这里处理毫秒
+    // time[1] = time[1].padLeft(2, '0').substring(0, 2);
+
+    return time[0];
+    // final t = _time.toString().split('.');
+    // t[1] = t[1].substring(0, 2);
+    // return t.join('.');
   }
 
-  bool get isStarted => _core.isStarted;
+  bool get isLoading => _state == GameState.loading;
 
-  bool get isStopped => _core.isStopped;
+  bool get isLoadError => _state == GameState.loadError;
+
+  bool get isAnimating => _state == GameState.animating;
+
+  bool get isStarted => _state == GameState.started;
+
+  bool get isPaused => _state == GameState.paused;
+
+  bool get isFailed => _state == GameState.failed;
+
+  bool get isCompleted => _state == GameState.completed;
+
+  bool get isStopped => _state == GameState.stopped;
+
+  bool get isReady => _state == GameState.already;
 
   final _tappedLayerIdList = <String>[];
+
+  var _opacity = 0.0;
+
+  double get opacity => _opacity;
 
   // Widget _halfWidget(
   //   LayerLayout layout,
@@ -209,62 +179,116 @@ class GameController extends GetxController {
     required this.timeMode,
     required this.allowPause,
     required this.allowDebug,
-    this.sound,
     this.countdown,
   }) {
     if (timeMode == TimeMode.down) assert(countdown != null);
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-    print('onInit');
-  }
+  Tweener? _tweener;
 
-  start({int? index, int? seed}) async {
-    await Future.wait([
-      ilp.header,
-      ilp.info(index ?? this.index),
-      ilp.layer(index ?? this.index),
-    ]).then((list) {
+  Future<void> start({int? index, int? seed}) async {
+    error = null;
+    _core.stop();
+    _tweener?.stop();
+    _opacity = 0;
+    _clicks = 0;
+    _state = GameState.loading;
+    _seed = seed ?? randomSeed();
+    _time = Duration(minutes: 2);
+    print('切换到loading');
+    update(['ui', 'game']);
+    try {
+      /// 读取游戏界面资源
+      await Resources.init();
+
+      /// 读取游戏内容
+      final list = await Future.wait([
+        ilp.header,
+        ilp.info(index ?? this.index),
+        ilp.layer(index ?? this.index),
+
+        /// 读取时长 兜底
+        Future.delayed(Duration(milliseconds: 500)),
+      ]);
       _header = list.first as ILPHeader;
       info = list[1] as ILPInfo;
-      layer = list.last as ILPLayer;
-    });
-    _randomLayers(seed: seed);
+      layer = list[2] as ILPLayer;
+    } catch (e) {
+      _state = GameState.loadError;
+      error = e.toString();
+      update(['ui', 'game']);
+      return;
+    }
+    update(['ui', 'game']);
+    _randomLayers();
+    _state = GameState.animating;
+    update(['game']);
+
+    resetScaleAndOffset();
+
     _core.start();
-    update(['bar', 'game']);
+    _state = GameState.started;
+    await _opacityTweenTo(1);
+  }
+
+  Future<void> _opacityTweenTo(double opacity) {
+    final completer = Completer<void>();
+    _tweener?.stop();
+    _tweener = Tweener({'opacity': _opacity})
+        .to({'opacity': opacity}, 500)
+        .easing(Ease.quart.easeOut)
+        .onUpdate((obj) {
+          _opacity = math.min(obj['opacity'], 1);
+          print('tween opacity $_opacity');
+          update(['ui', 'game']);
+        })
+        .onComplete((obj) {
+          _opacity = opacity;
+          update(['ui', 'game']);
+          completer.complete();
+        })
+        .start();
+    return completer.future;
   }
 
   stop() {
-    _core.stop();
-    update(['bar', 'game']);
+    if (isStarted) {
+      _state = GameState.stopped;
+      _core.stop();
+      update(['ui', 'game']);
+    }
   }
 
-  pause() {
-    _core.pause();
-    update(['bar', 'game']);
+  fail() {
+    if (isStarted) {
+      _time = Duration.zero;
+      _state = GameState.failed;
+      _core.stop();
+      _opacity = 0;
+      update(['ui', 'game']);
+    }
   }
 
-  resume() {
-    _core.resume();
-    update(['bar', 'game']);
+  pause() async {
+    if (isStarted) {
+      _state = GameState.paused;
+      await _opacityTweenTo(0);
+      update(['ui', 'game']);
+    }
   }
 
-  reStart() async {
-    pause();
-    await Future.delayed(Duration(milliseconds: 100));
-    _clicks = 0;
-    _time = Duration.zero;
-    _core.reset();
-    start(index: index);
+  resume() async {
+    if (state == GameState.paused) {
+      _state = GameState.started;
+      update(['ui', 'game']);
+      await _opacityTweenTo(1);
+    }
   }
 
-  _randomLayers({int? index, int? seed}) async {
-    _seed = seed ?? math.Random().nextInt(65535);
-    info = await ilp.info(index ?? this.index);
+  _randomLayers() async {
+    info = await ilp.info(index);
     layers.clear();
-    _random = math.Random(_seed);
+    final random = math.Random(_seed);
     int layerIndex = 0;
     loop(List<ILPLayer> layers, {isGroup = false}) {
       final List<ILPLayer> contents = [];
@@ -277,20 +301,20 @@ class GameController extends GetxController {
       }
       if (contents.isNotEmpty) {
         if (isGroup) {
-          final isShow = _random.nextBool();
+          final isShow = random.nextBool();
           if (isShow) {
-            final layer = contents[_random.nextInt(contents.length)];
+            final layer = contents[random.nextInt(contents.length)];
             ILPLayer? otherLayer;
 
             /// if show other side layer
             /// 如果另外一边也要显示内容
-            if (_random.nextBool()) {
+            if (random.nextBool()) {
               contents.remove(layer);
               if (contents.isNotEmpty) {
-                otherLayer = contents[_random.nextInt(contents.length)];
+                otherLayer = contents[random.nextInt(contents.length)];
               }
             }
-            final leftSide = _random.nextBool();
+            final leftSide = random.nextBool();
             final canvasLayer = ILPCanvasLayer(
               name: '$layerIndex',
               layout: leftSide ? LayerLayout.left : LayerLayout.right,
@@ -302,9 +326,9 @@ class GameController extends GetxController {
           }
         } else {
           for (var layer in contents) {
-            final isShow = _random.nextBool();
+            final isShow = random.nextBool();
             if (isShow) {
-              final leftSide = _random.nextBool();
+              final leftSide = random.nextBool();
               final canvasLayer = ILPCanvasLayer(
                 name: '$layerIndex',
                 layout: leftSide ? LayerLayout.left : LayerLayout.right,
@@ -335,24 +359,25 @@ class GameController extends GetxController {
       loop(layer!.layers);
     }
     print('随机图层 ${layers.length}');
-    update(['bar', 'game']);
+    update(['ui', 'game']);
   }
 
   _onTap(LayerLayout clicked, ILPCanvasLayer layer, Offset tapPosition) {
+    if (state != GameState.started) return;
     _clicks++;
     print('点击了图层 ${(layer.left ?? layer.right)?.name}');
 
     /// 背景图层
     if (layer.layout == LayerLayout.all || layer.tapped) {
-      sound?.wrong();
+      playWrongAudio();
     }
 
     /// 未被点击过的图层
     else {
-      sound?.correct();
+      playCorrectAudio();
       layer.tappedSide = clicked;
       layer.highlight = false;
-      tipLayer.value = null;
+      if (layer == tipLayer) tipLayer = null;
 
       layers.add(LabelLayer(index: _clicks, position: tapPosition));
 
@@ -368,7 +393,7 @@ class GameController extends GetxController {
         if (layer.right != null) _tappedLayerIdList.add(layer.right!.id);
       }
     }
-    update(['bar', 'game']);
+    update(['ui', 'game']);
     if (unTappedLayers == 0) {
       stop();
       final pastUnlock = getIlpInfoUnlock(info!);
@@ -382,9 +407,64 @@ class GameController extends GetxController {
     }
   }
 
+  @override
+  void resetScaleAndOffset() {
+    final screenHalfWidth = Get.width / 2;
+    final int width = info!.width, height = info!.height;
+    // if (width > height) {
+    //   scale = (oneSideScreenWidth - IOffsetScaleController.padding) / info!.width;
+    // } else if (width < height) {
+    //   scale = (Get.height - IOffsetScaleController.padding) / info!.height;
+    // } else {
+    //   if (oneSideScreenWidth < Get.height) {
+    //     scale = (oneSideScreenWidth - IOffsetScaleController.padding) / info!.width;
+    //   } else {
+    //     scale = (Get.height - IOffsetScaleController.padding) / info!.height;
+    //   }
+    // }
+    scale = (math.min(screenHalfWidth, Get.height) - IOffsetScaleController.padding) /
+        math.max(width, height);
+    offsetX = (screenHalfWidth - width * scale) / 2;
+    offsetY = (Get.height - height * scale) / 2;
+  }
+
+  Future<void> changeSeed({bool force = false, int? seed}) async {
+    pause();
+    if (!force) {
+      final sure = await Get.dialog(AlertDialog(
+        title: Text(UI.gameBarChangeSeed.tr),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: Text(UI.cancel.tr)),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(UI.confirm.tr),
+          ),
+        ],
+      ));
+      if (sure != true) {
+        resume();
+        return;
+      }
+    }
+    start(seed: seed ?? randomSeed());
+  }
+
+  static int randomSeed() => math.Random().nextInt(65535);
+
   Future<void> _onFixedUpdate(Duration lastFrame) async {
-    _time += lastFrame;
-    update(['bar']);
+    if (isStarted) {
+      /// 游戏时间 倒计时
+      _time -= lastFrame;
+
+      /// 提示道具 倒计时
+      if (lastTipTimer.inMilliseconds > 0) lastTipTimer -= lastFrame;
+
+      update(['time', 'tip']);
+
+      if (_time.inMilliseconds < 0) {
+        fail();
+      }
+    }
   }
 
   int get unTappedLayers => layers
@@ -394,25 +474,53 @@ class GameController extends GetxController {
 
   int get allLayers => layers.whereType<ILPCanvasLayer>().length - 1;
 
-  var scale = 1.0, offsetX = 0.0, offsetY = 0.0;
+  @override
+  void onClose() {
+    print('GameController onClose');
+    _tweener?.stop();
+    _core.dispose();
+    super.onClose();
+  }
 
-  late final tipLayer = Rxn<ILPCanvasLayer>()..listen((v) {});
+  /// for debug
+  void setFailed() {
+    _time = Duration.zero;
+    update(['game', 'ui']);
+  }
 
-  showTip() {
-    if (unTappedLayers > 0 == false) return;
+  /// 提示道具 代码区域
+  // 在此局使用了多少次提示道具
+  int useTipToolTimes = 0;
+
+  // 最后一次使用提示道具 距今 的时间
+  Duration lastTipTimer = Duration.zero;
+
+  ILPCanvasLayer? tipLayer;
+
+  final _fixedTipTime = Duration(seconds: 10);
+
+  /// 显示提示
+  ILPCanvasLayer? showTip() {
+    if (lastTipTimer.inMilliseconds > 0) return null;
+    if (unTappedLayers > 0 == false) return null;
+    if (tipLayer != null) return null;
     final layer = layers
         .whereType<ILPCanvasLayer>()
         .firstWhereOrNull((element) => !element.tapped);
-    if (layer == null) return;
+    if (layer == null) return null;
     layer.highlight = true;
-    tipLayer.value = layer;
-    update(['game']);
+    tipLayer = layer;
+    useTipToolTimes++;
+    lastTipTimer = _fixedTipTime * useTipToolTimes;
+    update(['game', 'tip']);
+    return layer;
   }
 
   @override
-  void onClose() {
-    // print('GameController onClose');
-    _core.stop();
-    super.onClose();
-  }
+  double get maxScale => 4;
+
+  @override
+  double get minScale => layer!.width > layer!.height
+      ? Get.width / 3 / layer!.width
+      : Get.height / 2 / layer!.height;
 }

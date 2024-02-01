@@ -8,10 +8,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 const _layersKey = 'layers';
 const _foldersKey = 'folders';
 const _showILPEditorTipKey = 'show_ilp_editor_tip';
-const _explorerListModeKey = 'explorer_list_mode';
+const _steamFilterKey = 'steam_filter';
 const _localeKey = 'locale';
-const _gameHelperKey = 'game_helper';
 const _adultKey = 'adult';
+
+/// for v1.0.17+
+const _gameHelperKey = 'game_helper_v1.0.17';
 
 abstract class Data {
   static late SharedPreferences _core;
@@ -57,6 +59,9 @@ abstract class Data {
     if (_core.containsKey(_foldersKey)) {
       _folders.addAll(_core.getStringList(_foldersKey)!);
     }
+    if (_core.containsKey(_steamFilterKey)) {
+      _steamFilter.addAll(_core.getStringList(_steamFilterKey)!);
+    }
     _showILPEditorTip = _core.getBool(_showILPEditorTipKey) ?? true;
     _gameHelper = _core.getBool(_gameHelperKey) ?? true;
     _isAdult = _core.getBool(_adultKey) ?? false;
@@ -71,6 +76,7 @@ abstract class Data {
   static Future<void> reset() async {
     _layers.clear();
     _folders.clear();
+    _steamFilter.clear();
     _showILPEditorTip = true;
     _gameHelper = true;
     _isAdult = false;
@@ -94,6 +100,7 @@ abstract class Data {
   static _signAndSave() {
     _core.setStringList(_layersKey, _layers.toList());
     _core.setStringList(_foldersKey, _folders.toList());
+    _core.setStringList(_steamFilterKey, _steamFilter.toList());
     _core.setBool(_showILPEditorTipKey, _showILPEditorTip);
     _core.setBool(_gameHelperKey, _gameHelper);
     _core.setBool(_adultKey, _isAdult);
@@ -110,4 +117,13 @@ abstract class Data {
 
   static set localeString(String locale) =>
       Data.core.setString(_localeKey, locale);
+
+  static Set<String> _steamFilter = {};
+
+  static set steamFilter(Set<String> filter) {
+    _steamFilter = filter;
+    Data.core.setStringList(_steamFilterKey, filter.toList());
+  }
+
+  static Set<String> get steamFilter => _steamFilter;
 }

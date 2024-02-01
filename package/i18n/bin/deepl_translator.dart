@@ -4,28 +4,14 @@ import 'dart:io';
 import 'package:puppeteer/puppeteer.dart' as puppeteer;
 
 import 'languages.dart';
+import 'translator.dart';
 
-const _chromePathX86 =
-    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
-const _chromePath =
-    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const _edgePath =
-    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
-
-class DeepLTranslator {
+class DeepLTranslator extends Translator {
   static final Map<String, String> sourceLanguages = {}, targetLanguages = {};
-  puppeteer.Browser? _browser;
+  puppeteer.Browser? browser;
 
-  puppeteer.Page? _page;
   static int _maxTranslateCount = 1000;
   int _translateCount = 0;
-
-  Future<puppeteer.Browser> _launchBrowser() => puppeteer.puppeteer.launch(
-        // headless: false,
-        // devTools: true,
-        noSandboxFlag: true,
-        executablePath: _chromePath,
-      );
 
   static Future<void> init([int maxTranslateCount = 1000]) async {
     _maxTranslateCount = maxTranslateCount;
@@ -44,9 +30,6 @@ class DeepLTranslator {
     if (sourceLanguages.isEmpty) {
       throw Exception('Init first');
     }
-    await _browser?.close();
-    _browser = null;
-    _page = null;
     _translateCount = 0;
 
     if (sourceLanguages.containsKey(source)) {
@@ -70,25 +53,16 @@ class DeepLTranslator {
     }
   }
 
-  Future<puppeteer.Page> _create() async {
-    _browser ??= await _launchBrowser();
-    final page = await _browser!.newPage();
-    await page.emulate(puppeteer.puppeteer.devices.iPhoneXR);
-
-    return page;
-  }
-
   Future<String> translate(String txt) async {
     if (_sourceLanguage == null) {
       throw Exception('Set language first');
     }
     if (_translateCount > _maxTranslateCount) {
-      _page = null;
-      await _browser?.close();
-      _browser = null;
+      await closeBrowser();
       _translateCount = 0;
     }
-    final page = _page ??= await _create();
+    final page = await getPage();
+    await page.emulate(puppeteer.puppeteer.devices.iPhoneXR);
 
     final wait = Completer<String>();
     late StreamSubscription stream;
@@ -114,6 +88,6 @@ class DeepLTranslator {
   }
 
   Future<void> close() async {
-    await _browser?.close();
+    await closeBrowser();
   }
 }

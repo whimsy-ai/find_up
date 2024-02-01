@@ -1,18 +1,21 @@
 import 'dart:io';
 
 import 'package:desktop_drop/desktop_drop.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
+import 'package:game/explorer/ilp_file.dart';
 import 'package:game/utils/textfield_number_formatter.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:steamworks/steamworks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:windows/pages/explorer/steam/steam_file.dart';
 
 import '../../utils/steam_ex.dart';
 import 'controller.dart';
@@ -39,11 +42,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
         actions: [
           TextButton(
             onPressed: () => ilpEditorTipsDialog(force: true),
-            child: Text(
-              UI.help.tr,
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondaryContainer),
-            ),
+            child: Text(UI.help.tr),
           ),
         ],
       ),
@@ -141,33 +140,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                             onChanged: (val) => controller.desc = val,
                           ),
                         ),
-                        if (env.isSteam)
-                          ListTile(
-                            title: Text(UI.selectSteamFileToUpdate.tr),
-                            onTap: () async {
-                              final file = await SelectSteamFileDialog.show();
-                              if (file == null &&
-                                  controller.steamFile != null) {
-                                return;
-                              }
-                              controller.steamFile = file;
-                            },
-                          ),
-                        if (controller.steamFile != null)
-                          ListTile(
-                            leading: Image.network(controller.steamFile!.cover),
-                            title: Text(controller.steamFile!.name),
-                            trailing: Tooltip(
-                              message: UI.cancel.tr,
-                              child: InkWell(
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Icon(Icons.close),
-                                ),
-                                onTap: () => controller.steamFile = null,
-                              ),
-                            ),
-                          ),
+                        EditFileTab(),
                         ListTile(
                           title: Wrap(
                             spacing: 10,
@@ -230,9 +203,9 @@ class PageILPEditor extends GetView<ILPEditorController> {
                           WidgetSpan(
                             child: GestureDetector(
                               onTap: () {
-                                print('open agreement');
                                 SteamClient.instance.openUrl(
-                                    'https://steamcommunity.com/sharedfiles/workshoplegalagreement');
+                                  'https://steamcommunity.com/sharedfiles/workshoplegalagreement',
+                                );
                               },
                               child: Text(
                                 UI.agreementName.tr,
@@ -487,6 +460,83 @@ class _CoverListTile extends StatelessWidget {
                   ),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditFileTab extends GetView<ILPEditorController> {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shadowColor: Colors.transparent,
+      margin: EdgeInsets.all(8),
+      child: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            ListTile(
+              leading: Icon(Icons.edit),
+              title: Wrap(
+                children: [
+                  /// 本地文件
+                  TextButton(
+                    child: Text(UI.selectFileToUpdate.tr),
+                    onPressed: () async {
+                      const XTypeGroup typeGroup = XTypeGroup(
+                        label: 'ILP file',
+                        extensions: ['ilp'],
+                      );
+                      final XFile? file = await openFile(
+                          acceptedTypeGroups: <XTypeGroup>[typeGroup]);
+                      if (file == null) return;
+                      controller.file = ILPFile(File(file.path));
+                    },
+                  ),
+
+                  /// Steam 文件
+                  if (env.isSteam)
+                    TextButton(
+                      child: Text(UI.selectSteamFileToUpdate.tr),
+                      onPressed: () async {
+                        final file = await SelectSteamFileDialog.show();
+                        if (file == null) return;
+                        controller.file = file;
+                      },
+                    ),
+                ],
+              ),
+            ),
+            if (controller.file != null)
+              Obx(() {
+                Widget? cover;
+                if (controller.currentFileCover.value != null) {
+                  if (controller.file is SteamFile) {
+                    cover = Image.network(controller.currentFileCover.value);
+                  } else if (controller.file is ILPFile) {
+                    cover = Image.memory(controller.currentFileCover.value);
+                  }
+                }
+                return ListTile(
+                  leading: cover,
+                  title: Text(controller.file!.name),
+                  subtitle: controller.file is ILPFile
+                      ? Text((controller.file as ILPFile).file.path)
+                      : Text('Steam id: ${(controller.file as SteamFile).id}'),
+                  trailing: Tooltip(
+                    message: UI.cancel.tr,
+                    child: InkWell(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(Icons.close),
+                      ),
+                      onTap: () => controller.file = null,
+                    ),
+                  ),
+                );
+              }),
           ],
         ),
       ),

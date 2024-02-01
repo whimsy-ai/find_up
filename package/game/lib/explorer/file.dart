@@ -12,4 +12,6 @@ abstract class ExplorerFile {
   int get fileSize;
 
   ILP? get ilp;
+
+  Future<void> load({force = false});
 }

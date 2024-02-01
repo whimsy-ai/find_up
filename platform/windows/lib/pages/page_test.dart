@@ -1,129 +1,41 @@
-import 'package:flutter/gestures.dart';
+import 'package:borders/borders.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:game/game/stroke_shadow.dart';
+import 'package:game/game/ui/my_trapezium_border.dart';
 
 class PageTest extends StatefulWidget {
   @override
   State<PageTest> createState() => _PageTestState();
 }
 
-class _PageTestState extends State<PageTest> with WindowListener {
-  final _buttonKey = GlobalKey();
-  double _opacity = 0.4, _x = 0, _y = 0,_scale =1;
-
-  @override
-  void initState() {
-    super.initState();
-    windowManager.addListener(this);
-  }
-
-  @override
-  void dispose() {
-    windowManager.removeListener(this);
-    super.dispose();
-  }
-
-  @override
-  void onWindowResize() {
-    setState(() {});
-  }
+class _PageTestState extends State<PageTest> {
+  final _shadow = GlobalKey();
+  var index = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Test')),
-      backgroundColor: Colors.blueGrey,
-      body: Row(
-        children: [
-          SizedBox(
-            width: 200,
-            child: Column(
-              children: [
-                Text('透明度'),
-                Slider(
-                  value: _opacity,
-                  min: 0.2,
-                  max: 1,
-                  onChanged: (val) {
-                    setState(() {
-                      _opacity = val;
-                    });
-                  },
-                ),
-                SizedBox(height: 20),
-                Text('x 偏移 $_x'),
-                Slider(
-                  value: _x,
-                  min: -100,
-                  max: 100,
-                  onChanged: (val) {
-                    setState(() {
-                      _x = val.ceilToDouble();
-                    });
-                  },
-                ),
-                Text('y 偏移 $_y'),
-                Slider(
-                  value: _y,
-                  min: -100,
-                  max: 100,
-                  onChanged: (val) {
-                    setState(() {
-                      _y = val.ceilToDouble();
-                    });
-                  },
-                ),
-                SizedBox(height: 20),
-                Text('缩放 $_scale'),
-                Slider(
-                  value: _scale,
-                  min: 1,
-                  max: 5,
-                  onChanged: (val) {
-                    setState(() {
-                      _scale = val.ceilToDouble();
-                    });
-                  },
-                ),
-              ],
+      body: Center(
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 500),
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          decoration: ShapeDecoration(
+            color: Colors.black12.withOpacity(0.6),
+            shape: MyTrapeziumBorder(
+              w: 1,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(16),
+                bottom: Radius.circular(30),
+              ),
+              borderOffset: BorderOffset.vertical(
+                bottom: Offset(10, 0),
+              ),
             ),
           ),
-          Expanded(
-            child: Stack(
-              children: [
-              ],
-            ),
-          ),
-        ],
+          child: StrokeShadow.text('hi'),
+        ),
       ),
     );
-  }
-
-  void _tapUp(TapUpDetails details) async {
-    final RenderObject? renderObject =
-        _buttonKey.currentContext?.findRenderObject();
-    final RenderBox? renderBox =
-        renderObject is RenderBox ? renderObject : null;
-    final hitTestResult = BoxHitTestResult();
-    renderBox?.hitTest(hitTestResult,
-        position: Offset(renderBox.size.width / 2, renderBox.size.height / 2));
-
-    //get BoxHitTestEntry
-
-    BoxHitTestEntry entry = hitTestResult.path
-        .firstWhere((element) => element is BoxHitTestEntry) as BoxHitTestEntry;
-
-    //create Events and get GestureBinding Instance
-
-    GestureBinding instance = GestureBinding.instance;
-    var event2 = PointerUpEvent(
-        position: renderBox!.localToGlobal(
-            Offset(renderBox.size.width / 2, renderBox.size.height / 2)));
-
-    //dispatch and handle events using GestureBinding
-
-    instance.dispatchEvent(event2, hitTestResult);
-    instance.handleEvent(event2, entry);
   }
 }

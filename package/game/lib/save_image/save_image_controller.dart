@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -5,13 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
-class SaveImageController extends GetxController {
-  Offset offset = Offset.zero;
+import '../i_offset_scale.dart';
+
+class SaveImageController extends IOffsetScaleController {
+  late double width, height;
   final ILPInfo info;
   final ILPLayer layer;
+  @override
   late final minScale = layer.width > layer.height
       ? Get.width / 2 / layer.width
       : Get.height / 2 / layer.height;
+  @override
   final maxScale = 4;
 
   final layers = <String, ILPLayer>{};
@@ -45,5 +50,13 @@ class SaveImageController extends GetxController {
           await decodeImageFromList(layer.content as Uint8List);
     }
     update(['canvas', 'layers']);
+  }
+
+  @override
+  void resetScaleAndOffset() {
+    scale = (math.min(width, height) - IOffsetScaleController.padding) /
+        math.max(info.width, info.height);
+    offsetX = (width - info.width * scale) / 2;
+    offsetY = (height - info.height * scale) / 2;
   }
 }

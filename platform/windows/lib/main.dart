@@ -9,6 +9,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
+import 'package:game/discord_link.dart';
 import 'package:game/game/controller.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/http/http.dart';
@@ -18,13 +19,12 @@ import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:steamworks/steamworks.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
 
 import 'pages/explorer/controller.dart';
 import 'pages/explorer/page_ilp_explorer.dart';
-import 'pages/game/page_game.dart';
+import 'pages/game/find_differences/page_game.dart';
 import 'pages/ilp_editor/controller.dart';
 import 'pages/ilp_editor/page_ilp_editor.dart';
 import 'pages/page_about.dart';
@@ -32,7 +32,6 @@ import 'pages/page_settings.dart';
 import 'pages/page_test.dart';
 import 'pages/save_image/page_save_image.dart';
 import 'utils/asset_path.dart';
-import 'utils/sound.dart';
 import 'utils/update_window_title.dart';
 
 const steamAppId = 2550370;
@@ -65,7 +64,6 @@ Future runMain(List<String> args) async {
     await windowManager.focus();
     updateWindowTitle();
   });
-
   runApp(MyApp(args: args));
 }
 
@@ -152,7 +150,6 @@ class MyApp extends StatelessWidget {
                     timeMode: Get.arguments['timeMode'],
                     allowPause: Get.arguments['allowPause'],
                     allowDebug: Get.arguments['allowDebug'],
-                    sound: Sound.instance,
                   ),
                 );
               }),
@@ -221,16 +218,7 @@ class MyHomePage extends StatelessWidget {
             Positioned(
               child: Container(
                 constraints: BoxConstraints(maxWidth: 380),
-                child: Card(
-                  child: ListTile(
-                    onTap: () => launchUrlString('mailto:gzlock88@gmail.com'),
-                    leading: Icon(
-                      Icons.info_outline_rounded,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    title: Text(UI.settingAutoTranslate.tr),
-                  ),
-                ),
+                child: Card(child: DiscordLink()),
               ),
             ).animate(onPlay: (c) => c.repeat(reverse: true)).moveY(
                   duration: Duration(seconds: 1),
@@ -261,6 +249,7 @@ class MyHomePage extends StatelessWidget {
                   return;
                 } else if (_.files.length > 1) {
                   showToast('一次拖放只能打开一个ilp文件');
+                  return;
                 }
                 _openILP(_.files.first.path);
               },
@@ -288,7 +277,9 @@ class MyHomePage extends StatelessWidget {
                           onTap: () => Get.toNamed('/settings'),
                         ),
                         ListTile(
-                          title: Text(UI.about.tr),
+                          title: Text(
+                            UI.about.tr,
+                          ),
                           onTap: () => Get.toNamed('/about'),
                         ),
                         ListTile(
@@ -322,7 +313,9 @@ class MyHomePage extends StatelessWidget {
         floatingActionButton: env.isProd
             ? null
             : FloatingActionButton(
-                onPressed: () => Get.toNamed('/test'),
+                onPressed: () async {
+                  Get.toNamed('/test');
+                },
                 child: Text('test'),
               ),
       );

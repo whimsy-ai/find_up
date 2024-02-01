@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +6,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
 import 'package:game/game/controller.dart';
+import 'package:game/game/resources.dart';
 import 'package:game/save_image/save_image_controller.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n/ui.dart';
 import 'package:mobile/utils/version.dart';
 import 'package:oktoast/oktoast.dart';
@@ -23,7 +23,6 @@ import 'pages/game/page_game.dart';
 import 'pages/page_about.dart';
 import 'pages/page_save_image.dart';
 import 'pages/settings/page_settings.dart';
-import 'sound.dart';
 import 'utils/landscape.dart';
 
 runMain() async {
@@ -107,7 +106,6 @@ class HomePage extends StatelessWidget {
                     timeMode: Get.arguments['timeMode'],
                     allowPause: Get.arguments['allowPause'],
                     allowDebug: Get.arguments['allowDebug'],
-                    sound: Sound.instance,
                   ),
                 );
               }),
@@ -198,7 +196,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         onTap: () => Get.toNamed('/settings'),
                       ),
                       ListTile(
-                        title: Text(UI.about.tr),
+                        title: Text(
+                          UI.about.tr,
+                        ),
                         onTap: () => Get.toNamed('/about'),
                       ),
                     ],
