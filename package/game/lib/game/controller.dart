@@ -219,11 +219,12 @@ class GameController extends IOffsetScaleController {
       update(['ui', 'game']);
       return;
     }
-    _randomLayers();
+    await _randomLayers();
 
     /// 图层数量限制，降低难度
     if (layers.length > 10) {
-      final list = layers.sublist(0, 10);
+      // print('图层大于10');
+      final list = layers.sublist(0, 11);
       layers
         ..clear()
         ..addAll(list);
@@ -291,7 +292,7 @@ class GameController extends IOffsetScaleController {
     }
   }
 
-  _randomLayers() async {
+  Future<void> _randomLayers() async {
     info = await ilp.info(index);
     layers.clear();
     final random = math.Random(_seed);
