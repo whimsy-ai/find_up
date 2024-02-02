@@ -171,13 +171,13 @@ class _GameUI extends State<GameUI> {
           ),
 
         /// 完成界面
-        if (widget.controller.isCompleted)
-          Positioned(
-            bottom: Get.height / 2 - 100,
-            left: 0,
-            right: 0,
-            child: CompletedWidget(height: 200),
-          ),
+        // if (widget.controller.isCompleted)
+        //   Positioned(
+        //     bottom: Get.height / 2 - 100,
+        //     left: 0,
+        //     right: 0,
+        //     child: CompletedWidget(height: 200),
+        //   ),
       ],
     );
   }

@@ -219,10 +219,17 @@ class GameController extends IOffsetScaleController {
       update(['ui', 'game']);
       return;
     }
-    update(['ui', 'game']);
     _randomLayers();
+
+    /// 图层数量限制，降低难度
+    if (layers.length > 10) {
+      final list = layers.sublist(0, 10);
+      layers
+        ..clear()
+        ..addAll(list);
+    }
     _state = GameState.animating;
-    update(['game']);
+    update(['ui', 'game']);
 
     resetScaleAndOffset();
 
@@ -290,6 +297,7 @@ class GameController extends IOffsetScaleController {
     final random = math.Random(_seed);
     int layerIndex = 0;
     loop(List<ILPLayer> layers, {isGroup = false}) {
+      if (this.layers.length > 10) return;
       final List<ILPLayer> contents = [];
       for (var layer in layers) {
         if (layer.content.isNotEmpty) {
@@ -358,7 +366,6 @@ class GameController extends IOffsetScaleController {
       loop(layer!.layers);
     }
     print('随机图层 ${layers.length}');
-    update(['ui', 'game']);
   }
 
   _onTap(LayerLayout clicked, ILPCanvasLayer layer, Offset tapPosition) {
@@ -421,7 +428,8 @@ class GameController extends IOffsetScaleController {
     //     scale = (Get.height - IOffsetScaleController.padding) / info!.height;
     //   }
     // }
-    scale = (math.min(screenHalfWidth, Get.height) - IOffsetScaleController.padding) /
+    scale = (math.min(screenHalfWidth, Get.height) -
+            IOffsetScaleController.padding) /
         math.max(width, height);
     offsetX = (screenHalfWidth - width * scale) / 2;
     offsetY = (Get.height - height * scale) / 2;

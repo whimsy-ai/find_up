@@ -217,5 +217,6 @@ final fix = {
     'cancel': 'Cancel',
     'resume': 'Resume',
     'retry': 'Retry',
+    'seed': 'Seed',
   }
 };
