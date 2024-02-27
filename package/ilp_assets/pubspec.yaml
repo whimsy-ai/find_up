@@ -6,42 +6,8 @@ environment:
   sdk: '>=3.0.5 <4.0.0'
 
 dev_dependencies:
-  yaml_edit: ^2.1.1
+  yaml_edit: ^2.2.0
 
 flutter:
   assets:
     - assets/0/
-    - assets/3024310216/
-    - assets/3024310938/
-    - assets/3029392102/
-    - assets/3029911871/
-    - assets/3030982756/
-    - assets/3031012893/
-    - assets/3032296608/
-    - assets/3092120182/
-    - assets/3093262258/
-    - assets/3101013139/
-    - assets/3108566997/
-    - assets/3108900586/
-    - assets/3114718308/
-    - assets/3116042002/
-    - assets/3116384415/
-    - assets/3119487395/
-    - assets/3126076220/
-    - assets/3127955800/
-    - assets/3131372020/
-    - assets/3134311191/
-    - assets/3136843500/
-    - assets/3137116104/
-    - assets/3137234658/
-    - assets/3137281473/
-    - assets/3137617345/
-    - assets/3137761087/
-    - assets/3138466901/
-    - assets/3138846328/
-    - assets/3139638320/
-    - assets/3140271971/
-    - assets/3142797108/
-    - assets/3145356446/
-    - assets/3145383908/
-    - assets/3146616049/
