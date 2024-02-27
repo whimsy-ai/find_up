@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 
-import 'controller.dart';
+import 'ilp_editor_controller.dart';
 
 class LinkEditor extends GetView<ILPEditorController> {
   final Link? link;
@@ -31,7 +31,10 @@ class LinkEditor extends GetView<ILPEditorController> {
               ListTile(
                 title: TextFormField(
                   autofocus: true,
-                  controller: _nameController,
+                  controller: _nameController
+                    ..selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: _nameController.text.length),
                   decoration: InputDecoration(
                     labelText: '${UI.link.tr} ${UI.name.tr}(*)',
                   ),

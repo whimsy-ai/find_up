@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
-import 'controller.dart';
+import 'ilp_editor_controller.dart';
 
 class ILPInfoFile {
   final String file;

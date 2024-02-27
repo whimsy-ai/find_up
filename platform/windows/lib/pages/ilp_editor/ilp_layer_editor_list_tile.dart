@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
-import 'controller.dart';
+import 'ilp_editor_controller.dart';
 import 'ilp_info_file.dart';
 
 class ILPEditorInfoListTile extends GetView<ILPEditorController> {
