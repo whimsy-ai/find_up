@@ -222,7 +222,7 @@ class _GameBarState extends State<GameBar> {
               onChanged: (v) {
                 try {
                   seed = int.parse(v);
-                } on Exception catch (e) {}
+                } catch (e) {}
               },
             ),
             actions: [
