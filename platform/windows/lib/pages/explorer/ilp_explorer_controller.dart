@@ -17,7 +17,7 @@ import 'package:steamworks/steamworks.dart';
 import '../../utils/asset_path.dart';
 import '../../utils/steam_ex.dart';
 import '../../utils/steam_filter.dart';
-import '../../utils/steam_item_ex.dart';
+import '../../utils/steam_file_ex.dart';
 
 enum ExplorerMode { openFile, selectSteamFile }
 

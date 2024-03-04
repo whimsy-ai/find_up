@@ -6,27 +6,45 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
-import '../i_offset_scale.dart';
+import '../explorer/file.dart';
+import '../game/offset_scale_controller.dart';
 
-class SaveImageController extends IOffsetScaleController {
-  late double width, height;
-  final ILPInfo info;
-  final ILPLayer layer;
-  @override
-  late final minScale = layer.width > layer.height
-      ? Get.width / 2 / layer.width
-      : Get.height / 2 / layer.height;
-  @override
-  final maxScale = 4;
+abstract class SaveImageController extends GetxController
+    with OffsetScaleController {
+  final ExplorerFile file;
+  final int index;
+  final double flex;
+  bool loading = true;
+
+  late ILPInfo info;
+  late ILPLayer layer;
 
   final layers = <String, ILPLayer>{};
 
-  final canvasLayer = <ILPLayer, ui.Image>{};
+  final selectedLayers = <ILPLayer, ui.Image>{};
+
+  @override
+  double get maxScale => 3;
 
   SaveImageController({
-    required this.info,
-    required this.layer,
+    required this.file,
+    required this.index,
+    required this.flex,
   }) {
+    loadLayers();
+  }
+
+  Future<void> load();
+
+  Future<void> onSave(Uint8List data);
+
+  loadLayers() async {
+    loading = true;
+    update(['ui', 'game']);
+    await load();
+    await selectLayer(layer);
+    loading = false;
+
     _a(List<ILPLayer> layers) {
       for (var layer in layers) {
         if (layer.layers.isNotEmpty) {
@@ -39,24 +57,35 @@ class SaveImageController extends IOffsetScaleController {
     }
 
     _a(layer.layers);
-    selectLayer(layer);
+
+    width = layer.width.toDouble();
+    height = layer.height.toDouble();
+    resetScaleAndOffset();
+    update(['ui', 'game']);
   }
 
-  selectLayer(ILPLayer layer) async {
-    if (canvasLayer.containsKey(layer)) {
-      canvasLayer.remove(layer);
+  Future<void> selectLayer(ILPLayer layer) async {
+    if (selectedLayers.containsKey(layer)) {
+      selectedLayers.remove(layer);
     } else {
-      canvasLayer[layer] =
+      selectedLayers[layer] =
           await decodeImageFromList(layer.content as Uint8List);
     }
-    update(['canvas', 'layers']);
+    update(['game', 'ui']);
   }
 
   @override
   void resetScaleAndOffset() {
-    scale = (math.min(width, height) - IOffsetScaleController.padding) /
-        math.max(info.width, info.height);
-    offsetX = (width - info.width * scale) / 2;
-    offsetY = (height - info.height * scale) / 2;
+    final layoutWidth = Get.width * flex;
+    final layoutHeight = Get.height;
+    print('resetScaleAndOffset layout $layoutWidth, $layoutHeight');
+    minScale = scale = (math.min(layoutWidth, layoutHeight) -
+            OffsetScaleController.padding) /
+        math.max(width, height);
+    offsetX = (layoutWidth - width * scale) / 2;
+    offsetY = (layoutHeight - height * scale) / 2;
   }
+
+  @override
+  ui.Offset onScalePosition(ui.Offset position) => position;
 }

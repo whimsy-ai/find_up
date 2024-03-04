@@ -15,33 +15,49 @@ import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:steamworks/steamworks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../../../utils/datetime_format.dart';
 import '../../../utils/steam_ex.dart';
-import '../controller.dart';
+import '../../../utils/steam_filter.dart';
 import 'steam_file.dart';
 
-class SteamFileBottomSheet extends StatefulWidget {
+class SteamFileBottomSheet<T extends SteamFilterController>
+    extends StatefulWidget {
   final SteamFile file;
+  final String? tag;
 
-  const SteamFileBottomSheet._({super.key, required this.file});
+  const SteamFileBottomSheet({
+    super.key,
+    required this.file,
+    this.tag,
+  });
 
-  static Future show(SteamFile file) => showModalBottomSheet(
-        context: Get.context!,
-        builder: (context) => SteamFileBottomSheet._(file: file),
-      );
+  static Future show<T extends SteamFilterController>(
+    SteamFile file, {
+    String? tag,
+  }) {
+    return showModalBottomSheet(
+      context: Get.context!,
+      builder: (context) => SteamFileBottomSheet<T>(
+        file: file,
+        tag: tag,
+      ),
+    );
+  }
 
   @override
-  State<SteamFileBottomSheet> createState() => _SteamFileBottomSheetState();
+  State<SteamFileBottomSheet> createState() => _SteamFileBottomSheetState<T>();
 }
 
-class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
+class _SteamFileBottomSheetState<T extends SteamFilterController>
+    extends State<SteamFileBottomSheet<T>> {
   late final _voteUp = widget.file.voteUp.obs,
       _voteDown = widget.file.voteDown.obs;
 
   final _voted = RxnBool();
-  final _controller = Get.find<ILPExplorerController>();
+  late final _controller = Get.find<T>(tag: widget.tag);
   final _ilp = Rxn<ILP>();
   late ILPHeader _header;
-  final _links = <(String,String)>[];
+  final _links = <(String, String)>[];
   late final _infos = RxList<ILPInfo>(widget.file.infos);
 
   @override
@@ -83,13 +99,13 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: GetBuilder<ILPExplorerController>(
+      child: GetBuilder<T>(
         id: 'bottomSheet',
+        tag: widget.tag,
         builder: (controller) => Column(
           children: [
             /// file info title
             ListTile(
-              title: Text(UI.fileInfo.tr),
               trailing: Wrap(
                 spacing: 10,
                 crossAxisAlignment: WrapCrossAlignment.center,
@@ -98,10 +114,8 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                     ElevatedButton(
                       child: Icon(Icons.play_arrow_rounded),
                       onPressed: () async {
-                        await PageGameEntry.play(
-                          ILP.fromFileSync(widget.file.ilpFile!),
-                        );
-                        _controller.update([widget.file.id, 'bottomSheet']);
+                        await PageGameEntry.play([widget.file]);
+                        controller.update([widget.file.id, 'bottomSheet']);
                       },
                     ),
                   if (widget.file.isSubscribed && widget.file.ilpFile == null)
@@ -120,6 +134,20 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                       onPressed: () => _setVote(false),
                     ),
                   ),
+                  Tooltip(
+                    message: UI.steamWatchComments.tr,
+                    child: ElevatedButton.icon(
+                      icon: Icon(Icons.comment_rounded),
+                      label: Text(widget.file.comments.toString()),
+                      onPressed: () {
+                        SteamClient.instance.openUrl(
+                            'https://steamcommunity.com/sharedfiles/filedetails/comments/${widget.file.id}');
+                        // SteamClient.instance.openUrl(
+                        //     'steam://url/CommunityFilePage/${widget.file.id}'
+                        // );
+                      },
+                    ),
+                  ),
                   ElevatedButton(
                     child: widget.file.isSubscribed
                         ? Text(UI.steamUnSubscribe.tr)
@@ -130,7 +158,7 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                       } else {
                         await widget.file.subscribeAndDownload();
                       }
-                      controller.update([widget.file.id, 'bottomSheet']);
+                      _controller.update([widget.file.id, 'bottomSheet']);
                     },
                   ),
                 ],
@@ -170,6 +198,11 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                     subtitle: Text(UI.openInSteam.tr),
                     trailing: FaIcon(FontAwesomeIcons.steam),
                     onTap: () {
+                      // SteamClient.instance.steamFriends
+                      //     .activateGameOverlayToUser(
+                      //   'steamid'.toNativeUtf8(),
+                      //   widget.file.steamIdOwner,
+                      // );
                       SteamClient.instance.openUrl(
                           'steam://url/SteamIDPage/${widget.file.steamIdOwner}');
                     },
@@ -191,10 +224,9 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                     title: Text(UI.steamAuthorOtherFiles.tr),
                     trailing: Icon(Icons.chevron_right_rounded),
                     onTap: () {
+                      _controller.userId = widget.file.steamIdOwner;
+                      _controller.page = 1;
                       Get.back();
-                      controller.userId = widget.file.steamIdOwner;
-                      controller.currentPage = 1;
-                      controller.reload();
                     },
                   ),
 
@@ -218,23 +250,32 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                     subtitle: Text(bytesSize(widget.file.fileSize, 2)),
                   ),
 
-
                   ListTile(
                     title: Text(UI.link.tr),
                     subtitle: _links.isEmpty
                         ? Text(UI.empty.tr)
                         : Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: _links
-                          .map(
-                            (link) => TextButton(
-                          onPressed: () => launchUrlString(link.$2),
-                          child: Text(link.$1),
-                        ),
-                      )
-                          .toList(),
-                    ),
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: _links
+                                .map(
+                                  (link) => TextButton(
+                                    onPressed: () => launchUrlString(link.$2),
+                                    child: Text(link.$1),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                  ),
+
+                  ListTile(
+                    title: Text(UI.publishTime.tr),
+                    subtitle: Text(formatDate(widget.file.publishTime)),
+                  ),
+
+                  ListTile(
+                    title: Text(UI.updateTime.tr),
+                    subtitle: Text(formatDate(widget.file.updateTime)),
                   ),
 
                   /// image length
@@ -255,6 +296,8 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
   }
 
   final ugc = SteamClient.instance.steamUgc;
+
+  _open(String url) {}
 
   _setVote(bool up) {
     final ugc = SteamClient.instance.steamUgc;
@@ -341,18 +384,22 @@ class _SteamFileBottomSheetState extends State<SteamFileBottomSheet> {
                       children: [
                         TextButton(
                           onPressed: () => PageGameEntry.play(
-                            _ilp.value!,
-                            index: i,
+                            [widget.file],
+                            ilpIndex: i,
                           ),
                           child: Icon(Icons.play_arrow_rounded),
                         ),
                         TextButton(
                           child: Icon(Icons.save_outlined),
-                          onPressed: () async {
-                            Get.toNamed('/save', arguments: {
-                              'info': info,
-                              'layer': await _ilp.value!.layer(i),
-                            });
+                          onPressed: () {
+                            Get.toNamed(
+                              '/save',
+                              arguments: {
+                                'file': widget.file,
+                                'index': i,
+                              },
+                              preventDuplicates: true,
+                            );
                           },
                         ),
                       ],

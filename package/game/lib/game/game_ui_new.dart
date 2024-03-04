@@ -1,29 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:game/game/ui/tip_tool_widget.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 
-import 'controller.dart';
+import '../build_flavor.dart';
+import 'game_state.dart';
+import 'level_controller.dart';
 import 'resources.dart';
 import 'stroke_shadow.dart';
-import 'ui/completed_widget.dart';
-import 'ui/failed_widget.dart';
+import 'ui/level_desc_widget.dart';
 import 'ui/paused_widget.dart';
 import 'ui/score_bar.dart';
+import 'ui/tip_tool_widget.dart';
 
-class GameUI extends StatefulWidget {
-  final GameController controller;
+class NewGameUI<T extends LevelController> extends StatelessWidget {
+  NewGameUI({super.key});
 
-  const GameUI({super.key, required this.controller});
+  final controller = Get.find<T>();
 
-  @override
-  State<StatefulWidget> createState() => _GameUI();
-}
-
-class _GameUI extends State<GameUI> {
   @override
   Widget build(BuildContext context) {
-    if (widget.controller.isLoading) {
+    if (controller.isLoading) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -38,7 +34,7 @@ class _GameUI extends State<GameUI> {
           ],
         ),
       );
-    } else if (widget.controller.isLoadError) {
+    } else if (controller.isLoadError) {
       return LayoutBuilder(builder: (context, constrains) {
         return Center(
           child: AlertDialog(
@@ -53,12 +49,12 @@ class _GameUI extends State<GameUI> {
                 Text(UI.loadingError.tr),
               ],
             ),
-            content: Text(widget.controller.error ?? UI.unKnowError.tr),
+            content: Text(controller.error ?? UI.unKnowError.tr),
             actions: [
               TextButton.icon(
                 icon: Icon(Icons.refresh),
                 label: Text(UI.retry.tr),
-                onPressed: () => widget.controller.start(),
+                onPressed: () => controller.start(),
               ),
               ElevatedButton.icon(
                 icon: Icon(Icons.chevron_left_rounded),
@@ -72,15 +68,18 @@ class _GameUI extends State<GameUI> {
     }
     return Stack(
       children: [
+        if (controller.state == GameState.already)
+          Center(child: LevelDescriptionBuilder<T>()),
+
         /// 时间栏
         /// 得分栏
-        if (widget.controller.state.value > GameState.already.value)
+        if (controller.state.value > GameState.already.value)
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Center(
-              child: TopBar(),
+              child: TopBar<T>(),
             ),
           ),
 
@@ -109,7 +108,7 @@ class _GameUI extends State<GameUI> {
 
         /// 右上
         /// 暂停按钮
-        if (widget.controller.state == GameState.started)
+        if (controller.state == GameState.started)
           Positioned(
               top: 10,
               right: 10,
@@ -125,10 +124,10 @@ class _GameUI extends State<GameUI> {
                         Resources.iconPause,
                       ),
                       onPressed: () {
-                        if (widget.controller.isStarted) {
-                          widget.controller.pause();
-                        } else if (widget.controller.isPaused) {
-                          widget.controller.resume();
+                        if (controller.isStarted) {
+                          controller.pause();
+                        } else if (controller.isPaused) {
+                          controller.resume();
                         }
                       },
                     ),
@@ -137,47 +136,105 @@ class _GameUI extends State<GameUI> {
               )),
 
         /// 左下
-        // Positioned(
-        //   bottom: 0,
-        //   left: 0,
-        //   child: Text('bottom left'),
-        // ),
+        if (env.isDev && controller.state.value >= GameState.already.value)
+          Positioned(
+            left: 0,
+            bottom: 0,
+            child: Container(
+              color: Colors.white.withOpacity(0.6),
+              padding: EdgeInsets.all(8),
+              child: Wrap(
+                direction: Axis.vertical,
+                children: [
+                  Text([
+                    'Debug',
+                    'seed:${controller.seed}',
+                    'scale:${controller.scale}',
+                    'level:${controller.current + 1} / ${controller.levels.length}',
+                    'layers: ${controller.currentLevel!.layers.where((l) => !l.tapped).length} / ${controller.currentLevel!.layers.length - 1}'
+                  ].join('\n')),
+                  Wrap(
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          controller.prevLevel();
+                          controller.update(['ui', 'game']);
+                        },
+                        child: Text('Previous'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          controller.start();
+                        },
+                        child: Icon(Icons.refresh),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          controller.nextLevel();
+                          controller.update(['ui', 'game']);
+                        },
+                        child: Text('Next'),
+                      ),
+                    ],
+                  ),
+                  Wrap(
+                    children: [
+                      Text('debug'),
+                      SizedBox(
+                        width: 30,
+                        height: 20,
+                        child: FittedBox(
+                          fit: BoxFit.fill,
+                          child: Switch(
+                              value: controller.debug,
+                              onChanged: (v) {
+                                controller.debug = v;
+                                controller.update(['ui', 'game']);
+                              }),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
 
         /// 右下
         /// 提示功能
-        if (widget.controller.isStarted)
+        if (controller.isStarted)
           Positioned(
             bottom: 10,
             right: 10,
-            child: TipToolWidget(),
+            child: TipToolWidget<T>(),
           ),
 
         /// 暂停界面
-        if (widget.controller.isPaused)
+        if (controller.isPaused)
           Positioned(
             bottom: Get.height / 2 - 100,
             left: 0,
             right: 0,
-            child: PausedWidget(height: 200),
+            child: PausedWidget<T>(height: 200),
           ),
 
         /// 失败界面
-        if (widget.controller.isFailed)
+        if (controller.isFailed)
           Positioned(
             bottom: Get.height / 2 - 100,
             left: 0,
             right: 0,
-            child: PausedWidget(title: UI.failed.tr, height: 200),
+            child: PausedWidget<T>(title: UI.failed.tr, height: 200),
           ),
 
         /// 完成界面
-        // if (widget.controller.isCompleted)
-        //   Positioned(
-        //     bottom: Get.height / 2 - 100,
-        //     left: 0,
-        //     right: 0,
-        //     child: CompletedWidget(height: 200),
-        //   ),
+        if (controller.isCompleted)
+          Positioned(
+            bottom: Get.height / 2 - 100,
+            left: 0,
+            right: 0,
+            child: PausedWidget<T>(title: UI.finish.tr, height: 200),
+          ),
       ],
     );
   }
@@ -348,7 +405,7 @@ class _GameUI extends State<GameUI> {
 //                   child: Row(children: [
 //                     Icon(Icons.key, size: 20),
 //                     SizedBox(width: 10),
-//                     Text(widget.controller.seed.toString())
+//                     Text(controller.seed.toString())
 //                   ]),
 //                 ),
 //                 Tooltip(
@@ -356,7 +413,7 @@ class _GameUI extends State<GameUI> {
 //                   child: Row(children: [
 //                     Icon(Icons.timer_sharp, size: 20),
 //                     SizedBox(width: 10),
-//                     Text('${widget.controller.time} s')
+//                     Text('${controller.time} s')
 //                   ]),
 //                 ),
 //                 Tooltip(
@@ -364,7 +421,7 @@ class _GameUI extends State<GameUI> {
 //                   child: Row(children: [
 //                     Icon(Icons.image_search_rounded, size: 20),
 //                     SizedBox(width: 10),
-//                     Text(widget.controller.unTappedLayers.toString())
+//                     Text(controller.unTappedLayers.toString())
 //                   ]),
 //                 ),
 //               ],
@@ -378,7 +435,7 @@ class _GameUI extends State<GameUI> {
 //           //           height: 30,
 //           //           child: Icon(Icons.vpn_key, size: 20),
 //           //         ),
-//           //         Text(widget.controller.seed.toString())
+//           //         Text(controller.seed.toString())
 //           //       ],
 //           //     ),
 //           //     TableRow(children: [
@@ -386,7 +443,7 @@ class _GameUI extends State<GameUI> {
 //           //         height: 30,
 //           //         child: Icon(Icons.timer_sharp, size: 20),
 //           //       ),
-//           //       Text(widget.controller.time.toString())
+//           //       Text(controller.time.toString())
 //           //     ]),
 //           //     TableRow(children: [
 //           //       SizedBox(
@@ -394,7 +451,7 @@ class _GameUI extends State<GameUI> {
 //           //         child: Icon(Icons.image_search_rounded,
 //           //             size: 20),
 //           //       ),
-//           //       Text(widget.controller.unTappedLayers.toString())
+//           //       Text(controller.unTappedLayers.toString())
 //           //     ]),
 //           //     // TableRow(),
 //           //   ],
@@ -402,13 +459,13 @@ class _GameUI extends State<GameUI> {
 //           // child: InfoTable(
 //           //   runSpace: GetPlatform.isMobile ? 0 : 4,
 //           //   rows: [
-//           //     (UI.seed.tr, widget.controller.seed),
-//           //     (UI.clicks.tr, widget.controller.clicks),
-//           //     if (widget.controller.timeMode == TimeMode.up)
-//           //       (UI.usedTime.tr, widget.controller.time),
-//           //     if (widget.controller.timeMode == TimeMode.down)
-//           //       (UI.timeLeft.tr, widget.controller.time),
-//           //     (UI.unfound.tr, widget.controller.unTappedLayers),
+//           //     (UI.seed.tr, controller.seed),
+//           //     (UI.clicks.tr, controller.clicks),
+//           //     if (controller.timeMode == TimeMode.up)
+//           //       (UI.usedTime.tr, controller.time),
+//           //     if (controller.timeMode == TimeMode.down)
+//           //       (UI.timeLeft.tr, controller.time),
+//           //     (UI.unfound.tr, controller.unTappedLayers),
 //           //   ],
 //           //   style: TextStyle(
 //           //     fontSize: 14,
@@ -422,15 +479,15 @@ class _GameUI extends State<GameUI> {
 //       ),
 //
 //       /// 暂停
-//       if (widget.controller.allowPause)
+//       if (controller.allowPause)
 //         InkWell(
-//           onTap: () => widget.controller.isStarted
-//               ? widget.controller.pause()
-//               : widget.controller.resume(),
+//           onTap: () => controller.isStarted
+//               ? controller.pause()
+//               : controller.resume(),
 //           child: Tooltip(
 //             message: UI.gameBarPause.tr,
 //             child: Icon(
-//               widget.controller.isStarted
+//               controller.isStarted
 //                   ? Icons.pause_circle_outline_rounded
 //                   : Icons.play_circle_outline_outlined,
 //             ),
@@ -443,8 +500,8 @@ class _GameUI extends State<GameUI> {
 //             message: UI.gameBarChangeSeed.tr,
 //             child: Icon(Icons.keyboard_outlined)),
 //         onTap: () async {
-//           widget.controller.pause();
-//           var seed = widget.controller.seed;
+//           controller.pause();
+//           var seed = controller.seed;
 //           final sure = await Get.dialog(AlertDialog(
 //             title: Text(UI.inputTheSeed.tr),
 //             content: TextField(
@@ -467,17 +524,17 @@ class _GameUI extends State<GameUI> {
 //                   child: Text(UI.confirm.tr)),
 //             ],
 //           ));
-//           if (sure != true || seed == widget.controller.seed) {
-//             widget.controller.resume();
+//           if (sure != true || seed == controller.seed) {
+//             controller.resume();
 //             return;
 //           }
-//           await widget.controller.start(seed: seed);
+//           await controller.start(seed: seed);
 //         },
 //       ),
 //
 //       /// 提示
 //       InkWell(
-//         onTap: () => widget.controller.showTip(),
+//         onTap: () => controller.showTip(),
 //         child: Tooltip(
 //           message: UI.gameBarTip.tr,
 //           child: Icon(Icons.tips_and_updates_outlined),
@@ -492,7 +549,7 @@ class _GameUI extends State<GameUI> {
 //         ),
 //         onTap: () async {
 //           final foundLayers =
-//               widget.controller.allLayers - widget.controller.unTappedLayers;
+//               controller.allLayers - controller.unTappedLayers;
 //           if (foundLayers > 0) {
 //             final sure = await Get.dialog(AlertDialog(
 //               title: Text(UI.restartConfirm.trArgs([foundLayers.toString()])),
@@ -506,20 +563,20 @@ class _GameUI extends State<GameUI> {
 //             ));
 //             if (sure != true) return;
 //           }
-//           widget.controller.reStart();
+//           controller.reStart();
 //         },
 //       ),
 //
 //       /// debug
-//       if (env.isDev || widget.controller.allowDebug)
+//       if (env.isDev || controller.allowDebug)
 //         InkWell(
 //           child: Icon(
-//             widget.controller.test
+//             controller.test
 //                 ? Icons.bug_report_rounded
 //                 : Icons.bug_report_outlined,
 //           ),
 //           onTap: () {
-//             widget.controller.test = !widget.controller.test;
+//             controller.test = !controller.test;
 //           },
 //         ),
 //
@@ -530,17 +587,17 @@ class _GameUI extends State<GameUI> {
 //           child: Icon(Icons.info_outline),
 //         ),
 //         onTap: () async {
-//           final isStarted = widget.controller.isStarted;
-//           widget.controller.pause();
+//           final isStarted = controller.isStarted;
+//           controller.pause();
 //           await ILPInfoBottomSheet.show(
-//             ilp: widget.controller.ilp,
-//             currentInfo: widget.controller.info!,
+//             ilp: controller.ilp,
+//             currentInfo: controller.info!,
 //             onTapPlay: (index) => PageGameEntry.replace(
-//               widget.controller.ilp,
+//               controller.ilp,
 //               index: index,
 //             ),
 //           );
-//           if (isStarted) widget.controller.resume();
+//           if (isStarted) controller.resume();
 //         },
 //       ),
 //     ].forEachIndexed((index, e) {

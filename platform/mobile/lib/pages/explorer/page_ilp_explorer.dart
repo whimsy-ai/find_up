@@ -71,6 +71,6 @@ class PageILPExplorer extends StatelessWidget {
   }
 
   _tap(AssetILPFile file) async {
-    await PageGameEntry.play(file.ilp!);
+    await PageGameEntry.play([file]);
   }
 }

@@ -10,7 +10,7 @@ class DiscordLink extends StatelessWidget {
           Icons.discord_rounded,
           color: Color.fromRGBO(114, 137, 218, 1),
         ),
-        title: Text(UI.translationError.tr),
+        title: Text(UI.joinDiscord.tr),
         onTap: () => launchUrlString('https://discord.gg/cy6QTzSpJw'),
       );
 }

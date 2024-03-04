@@ -71,8 +71,8 @@ Widget _infoButton({
         file: file,
         ilp: ilp,
         onTapPlay: (int index) => PageGameEntry.play(
-          ilp,
-          index: index,
+          [file],
+          ilpIndex: index,
         ),
       ),
     );

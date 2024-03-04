@@ -39,17 +39,18 @@ void main(List<String> args) async {
     final languages = <String, String>{
       'en': '',
       'zh': '',
+      'ja': '',
+      'ko': '',
       'id': '',
       'es': '',
       'fr': '',
       'ru': '',
-      'ja': '',
-      'ko': '',
     };
 
     /// 这些语言DeepL不支持
     final skips = ['hr', 'ar', 'no', 'is', 'ga'];
 
+    /// 翻译语言本身的名称
     final keys = DeepLTranslator.targetLanguages.keys.toList();
     for (var language in keys) {
       final key = DeepLTranslator.targetLanguages[language]!;
@@ -57,17 +58,14 @@ void main(List<String> args) async {
       if (key == 'en') {
         languages['en'] = 'English';
       } else {
-        if (caches.containsKey(language)) {
-          languages[key] = caches[language]!;
-        } else {
-          queue.add(() async {
-            final translator = DeepLTranslator();
-            await translator.setLanguage('auto', key);
-            caches[language] =
-                languages[key] = await translator.translate(language);
-            await translator.close();
-          });
-        }
+        queue.add(() async {
+          final translator = DeepLTranslator();
+          await translator.setLanguage('en', key);
+          final txt = await translator.translate(language);
+          print('$language => $txt');
+          caches[language] = languages[key] = txt;
+          await translator.close();
+        });
       }
     }
     if (queue.pending + queue.processing > 0) await queue.whenComplete();
@@ -83,7 +81,7 @@ void main(List<String> args) async {
     final targetLanguage = DeepLTranslator.targetLanguages[key]!;
     if (targetLanguage == 'zh') continue;
     queue.add(() async {
-      languages[targetLanguage] = await _translate(targetLanguage, zh);
+      languages[targetLanguage] = await _translate('zh', targetLanguage, zh);
     });
   }
   await queue.whenComplete();
@@ -106,7 +104,7 @@ void main(List<String> args) async {
       final index = keyIndex.indexOf(key) + 1;
       if (language == 'zh') {
         csvData.add([key, value]);
-      }else{
+      } else {
         csvData[index].add(value);
       }
     });
@@ -115,10 +113,10 @@ void main(List<String> args) async {
   exit(0);
 }
 
-Future<Map<String, String>> _translate(
+Future<Map<String, String>> _translate(String sourceLanguage,
     String targetLanguage, Map<String, String> source) async {
   final translator = DeepLTranslator();
-  await translator.setLanguage('auto', targetLanguage);
+  await translator.setLanguage(sourceLanguage, targetLanguage);
   final map = Map<String, String>.from(source);
   for (var key in source.keys) {
     final text = map[key]!, md5 = toMD5('$targetLanguage-$text');
@@ -145,7 +143,7 @@ Future<Map<String, String>> _translate(
       } catch (e) {
         print('翻译$targetLanguage $key时错误：$e');
         await translator.close();
-        return _translate(targetLanguage, source);
+        return _translate(sourceLanguage, targetLanguage, source);
       }
     }
   }

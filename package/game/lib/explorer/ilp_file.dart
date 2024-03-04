@@ -14,9 +14,12 @@ class ILPFile implements ExplorerFile {
   ILPConfigException? get exception => _exception.value;
   final Rxn<ILPConfigException> _exception = Rxn();
 
+  final Rxn<ILP> _ilp = Rxn();
+
   @override
   ILP? get ilp => _ilp.value;
-  final Rxn<ILP> _ilp = Rxn();
+
+  set ilp(ILP? ilp) => _ilp.value = ilp;
 
   @override
   late String name;

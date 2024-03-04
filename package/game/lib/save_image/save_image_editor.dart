@@ -8,115 +8,85 @@ import 'package:ilp_file_codec/ilp_codec.dart';
 
 import '../data.dart';
 import '../game/animated_unlock_progress_bar.dart';
-import '../game/drag_and_scale_widget.dart';
+import '../game/drag_and_scale_widget_new.dart';
 import '../get_ilp_info_unlock.dart';
 import 'save_image_controller.dart';
 
-class SaveImageEditor extends GetView<SaveImageController> {
-  final void Function(Uint8List bytes) onSave;
-
-  const SaveImageEditor({super.key, required this.onSave});
-
+class SaveImageEditor<T extends SaveImageController> extends GetView<T> {
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         /// 左边图层列表
-        GetBuilder<SaveImageController>(
+        GetBuilder<T>(
             id: 'ui',
             builder: (c) {
-              return Container(
-                width: Get.width / 4,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border(
-                      right: BorderSide(
-                    width: 2,
-                    color: Theme.of(context).primaryColor,
-                  )),
-                ),
-                child: GetBuilder<SaveImageController>(
-                    id: 'layers',
-                    builder: (controller) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: TextButton(
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStatePropertyAll(Colors.white),
-                              ),
-                              onPressed: () => Get.back(),
-                              child: Icon(Icons.arrow_back_ios),
-                            ),
-                            trailing: ElevatedButton.icon(
-                              onPressed: () => _saveToFile(),
-                              icon: Icon(Icons.save_outlined),
-                              label: Text(UI.save.tr),
-                            ),
-                          ),
-                          ListTile(title: Text(controller.info.name)),
-                          ListTile(
-                            title: AnimatedUnlockProgressBar(
-                              to: getIlpInfoUnlock(controller.info),
-                              height: 24,
-                              text: UI.unlock.tr,
-                            ),
-                          ),
-                          Expanded(
-                            child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                              ),
-                              itemBuilder: (_, i) => _LayerIcon(index: i),
-                              itemCount: controller.layers.length,
-                            ),
-                          ),
-                        ],
-                      );
-                    }),
-              );
-            }),
-
-        /// 右边图片预览
-        Expanded(
-          child: LayoutBuilder(builder: (context, constraints) {
-            controller
-              ..width = constraints.biggest.width
-              ..height = constraints.biggest.height;
-            controller.resetScaleAndOffset();
-            return DragAndScaleWidget(
-              controller: controller,
-              layer: controller.layer,
-              layers: [],
-              builder: (
-                context, {
-                required scale,
-                required minScale,
-                required maxScale,
-                required x,
-                required y,
-              }) {
-                print('scale $scale');
-                return Stack(
+              if (c.loading) {
+                return SizedBox.shrink();
+              }
+              return Expanded(
+                flex: 100,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Positioned(
-                      left: x,
-                      top: y,
-                      child: GetBuilder<SaveImageController>(
-                        id: 'canvas',
-                        builder: (controller) => CustomPaint(
-                          painter: _Painter(controller, scale),
+                    AppBar(
+                      title: Text(UI.saveImage.tr),
+                      actions: [
+                        ElevatedButton.icon(
+                          onPressed: () => _saveToFile(),
+                          icon: Icon(Icons.save_outlined),
+                          label: Text(UI.save.tr),
+                        )
+                      ],
+                    ),
+                    ListTile(title: Text(controller.info.name)),
+                    ListTile(
+                      title: AnimatedUnlockProgressBar(
+                        to: getIlpInfoUnlock(controller.info),
+                        height: 24,
+                        text: UI.unlock.tr,
+                      ),
+                    ),
+                    Expanded(
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
                         ),
+                        itemBuilder: (_, i) => _LayerIcon<T>(index: i),
+                        itemCount: controller.layers.length,
                       ),
                     ),
                   ],
-                );
-              },
-            );
-          }),
+                ),
+              );
+            }),
+
+        VerticalDivider(width: 2),
+
+        /// 右边图片预览
+        Expanded(
+          flex: 300,
+          child: GetBuilder<T>(
+            id: 'game',
+            builder: (c) {
+              if (c.loading) {
+                return Center(child: CircularProgressIndicator());
+              }
+              return LayoutBuilder(
+                builder: (c, constrains) {
+                  return NewDragAndScaleWidget<T>(
+                    builder: (c) => ClipRect(
+                      clipBehavior: Clip.antiAlias,
+                      child: CustomPaint(
+                        size: constrains.biggest,
+                        painter: _Painter(controller),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ),
       ],
     );
@@ -124,31 +94,38 @@ class SaveImageEditor extends GetView<SaveImageController> {
 
   void _saveToFile() async {
     ui.PictureRecorder recorder = ui.PictureRecorder();
-    Canvas canvas = Canvas(recorder);
-    var painter = _Painter(controller, 1);
+    Canvas canvas = ui.Canvas(recorder);
+    double x = controller.offsetX,
+        y = controller.offsetY,
+        scale = controller.scale;
+    controller.offsetX = controller.offsetY = 0.0;
+    controller.scale = 1.0;
+    var painter = _Painter(controller);
 
-    final size = Size(
-        controller.layer.width.toDouble(), controller.layer.height.toDouble());
+    final size = Size(controller.width, controller.height);
     painter.paint(canvas, size);
     ui.Image renderedImage = await recorder.endRecording().toImage(
           controller.layer.width,
           controller.layer.height,
         );
+    controller.offsetX = x;
+    controller.offsetY = y;
+    controller.scale = scale;
 
     final bytes =
         await renderedImage.toByteData(format: ui.ImageByteFormat.png);
-    onSave(bytes!.buffer.asUint8List());
+    controller.onSave(bytes!.buffer.asUint8List());
   }
 }
 
-class _LayerIcon extends GetView<SaveImageController> {
+class _LayerIcon<T extends SaveImageController> extends GetView<T> {
   final int index;
   late final ILPLayer layer =
       controller.layers[controller.layers.keys.elementAt(index)]!;
-  late final _selected = controller.canvasLayer.containsKey(layer);
+  late final _selected = controller.selectedLayers.containsKey(layer);
   late final unlock = Data.layersId.contains(layer.id);
 
-  _LayerIcon({super.key, required this.index});
+  _LayerIcon({required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -204,15 +181,15 @@ class _LayerIcon extends GetView<SaveImageController> {
 // }
 
 class _Painter extends CustomPainter {
-  final double scale;
   final SaveImageController controller;
 
-  _Painter(this.controller, this.scale);
+  _Painter(this.controller);
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.scale(scale);
-    controller.canvasLayer.forEach((key, value) {
+    canvas.translate(controller.offsetX, controller.offsetY);
+    canvas.scale(controller.scale);
+    controller.selectedLayers.forEach((key, value) {
       paintImage(
         canvas: canvas,
         rect: Rect.fromLTWH(

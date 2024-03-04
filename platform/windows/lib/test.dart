@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:steamworks/steamworks.dart';
 
 import 'utils/steam_ex.dart';
+import 'utils/steam_file_ex.dart';
 import 'utils/steam_looper.dart';
 
 const itemId = 3020685633;
@@ -14,7 +15,7 @@ void main() async {
 
     await SteamClient.instance.getAllItems(
       page: 1,
-      sort: SteamFileSort.updateTime,
+      sort: SteamUGCSort.updateTime,
     );
 
     SteamLooper.instance.stop();

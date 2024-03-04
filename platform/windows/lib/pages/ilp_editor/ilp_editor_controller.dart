@@ -22,7 +22,7 @@ import 'package:steamworks/steamworks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../utils/steam_ex.dart';
-import '../../utils/steam_item_ex.dart';
+import '../../utils/steam_file_ex.dart';
 import '../../utils/steam_tags.dart';
 import '../explorer/steam/steam_file.dart';
 import 'ilp_info_file.dart';
@@ -141,6 +141,7 @@ class ILPEditorController extends GetxController {
       links: _linksString(),
       coverFilePath: _cover,
       version: version,
+      ignoreLayerName: env.isProd,
     );
   }
 
@@ -262,7 +263,7 @@ class ILPEditorController extends GetxController {
             child: Text(UI.open.tr, style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
-            onPressed: () => PageGameEntry.play(ilp),
+            onPressed: () => PageGameEntry.play([ILPFile(File(filePath))]),
             child: Text(UI.test.tr),
           ),
           ElevatedButton(
@@ -476,61 +477,40 @@ class ILPEditorController extends GetxController {
     update(['editor']);
   }
 
-  uploadToSteam() async {
+  Future<SubmitResult?> uploadToSteam() async {
     TagAgeRating? age;
     TagShape? shape;
     TagStyle? style;
     int? itemId;
     if (_file is SteamFile) {
       final file = _file as SteamFile;
-      if (file.steamIdOwner != SteamClient.instance.userId) return;
+      if (file.steamIdOwner != SteamClient.instance.userId) return null;
       itemId = file.id;
       age = file.ageRating;
       style = file.style;
       shape = file.shape;
-
-      /// 确认更新文件
-      final sure = await Get.dialog(AlertDialog(
-        title: Text(UI.ilpEditorConfirmUpdateSteamFile.tr),
-        content: InfoTable(
-          rows: [
-            ('Steam id', file.id),
-            (UI.name.tr, file.name),
-            (UI.ilpVersion.tr, file.version),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: Text(UI.cancel.tr)),
-          ElevatedButton(
-            onPressed: () => Get.back(result: true),
-            child: Text(UI.confirm.tr),
-          )
-        ],
-      ));
-      if (sure != true) return;
     }
     final tags = await SteamTagsDialog.show(
       age: age,
       style: style,
       shape: shape,
     );
-    if (tags == null) return;
-    GlobalProgressIndicatorDialog.show(UI.steamUploading.tr);
+    if (tags == null) return null;
     final bytes = await toBytes();
 
     final temp = await getTemporaryDirectory();
     final contentFolder = await temp.createTemp();
     final previewFile = File(path.join(temp.path, 'preview.png'));
-    if(hasCover){
+    if (hasCover) {
       await File(_cover!).copy(path.join(temp.path, 'preview.png'));
-    }else {
+    } else {
       await previewFile.writeAsBytes(await ilp.cover);
     }
     final newFile = File(path.join(contentFolder.path, 'main.ilp'));
     await newFile.writeAsBytes(bytes);
 
     /// 多处复用
-    final res = await SteamClient.instance.createItem(
+    return SteamClient.instance.createItem(
       itemId: itemId,
       language: ApiLanguage.english,
       title: name,
@@ -547,25 +527,6 @@ class ILPEditorController extends GetxController {
             return copy.writeToJson();
           }).toList(),
         },
-      ),
-    );
-    itemId = res.publishedFileId;
-
-    /// hide uploading dialog
-    Get.back();
-    Get.dialog(
-      AlertDialog(
-        title: Text(UI.steamUploadSuccess.tr),
-        actions: [
-          TextButton(
-            onPressed: () {
-              SteamClient.instance
-                  .openUrl('steam://url/CommunityFilePage/$itemId');
-            },
-            child: Text(UI.viewFileInSteam.tr),
-          ),
-          ElevatedButton(onPressed: () => Get.back(), child: Text(UI.ok.tr)),
-        ],
       ),
     );
   }

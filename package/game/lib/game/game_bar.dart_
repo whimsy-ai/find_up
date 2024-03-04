@@ -307,25 +307,25 @@ class _GameBarState extends State<GameBar> {
       ),
 
       /// 信息按钮
-      InkWell(
-        child: Tooltip(
-          message: UI.gameBarInfo.tr,
-          child: Icon(Icons.info_outline),
-        ),
-        onTap: () async {
-          final isStarted = widget.controller.isStarted;
-          widget.controller.pause();
-          await ILPInfoBottomSheet.show(
-            ilp: widget.controller.ilp,
-            currentInfo: widget.controller.info!,
-            onTapPlay: (index) => PageGameEntry.replace(
-              widget.controller.ilp,
-              index: index,
-            ),
-          );
-          if (isStarted) widget.controller.resume();
-        },
-      ),
+      // InkWell(
+      //   child: Tooltip(
+      //     message: UI.gameBarInfo.tr,
+      //     child: Icon(Icons.info_outline),
+      //   ),
+      //   onTap: () async {
+      //     final isStarted = widget.controller.isStarted;
+      //     widget.controller.pause();
+      //     await ILPInfoBottomSheet.show(
+      //       ilp: widget.controller.ilp,
+      //       currentInfo: widget.controller.info!,
+      //       onTapPlay: (index) => PageGameEntry.replace(
+      //         widget.controller.ilp,
+      //         index: index,
+      //       ),
+      //     );
+      //     if (isStarted) widget.controller.resume();
+      //   },
+      // ),
     ].forEachIndexed((index, e) {
       final isInfoTable = e is SizedBox;
       if (index == 0) {

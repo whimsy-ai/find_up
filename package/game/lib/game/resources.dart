@@ -6,7 +6,7 @@ import 'package:path_drawing/path_drawing.dart';
 import 'package:xml/xml.dart';
 
 class Resources {
-  static late final BytesSource correctSource, wrongSource, errorSource;
+  static late final BytesSource correctAudio, wrongAudio, errorAudio, duckAudio;
   static late final Path iconStack,
       iconTime,
       iconStopWatch,
@@ -27,16 +27,20 @@ class Resources {
 
   static Future<void> init() async {
     if (_inited) return;
-    correctSource = BytesSource(
+    correctAudio = BytesSource(
         (await rootBundle.load('packages/game/assets/sounds/correct.wav'))
             .buffer
             .asUint8List());
-    wrongSource = BytesSource(
+    wrongAudio = BytesSource(
         (await rootBundle.load('packages/game/assets/sounds/wrong.mp3'))
             .buffer
             .asUint8List());
-    errorSource = BytesSource(
+    errorAudio = BytesSource(
         (await rootBundle.load('packages/game/assets/sounds/error.wav'))
+            .buffer
+            .asUint8List());
+    duckAudio = BytesSource(
+        (await rootBundle.load('packages/game/assets/sounds/duck.mp3'))
             .buffer
             .asUint8List());
     iconLeft = await _loadSvg('icon_left');

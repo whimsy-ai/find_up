@@ -9,20 +9,23 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
 import 'package:game/explorer/ilp_file.dart';
+import 'package:game/global_progress_indicator_dialog.dart';
+import 'package:game/info_table.dart';
 import 'package:game/utils/textfield_number_formatter.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:steamworks/steamworks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:windows/pages/explorer/steam/steam_file.dart';
 
 import '../../utils/steam_ex.dart';
-import 'controller.dart';
+import '../challenge/gallery_dialog.dart';
+import '../explorer/steam/steam_file.dart';
+import 'ilp_editor_controller.dart';
 import 'ilp_editor_tips_dialog.dart';
 import 'ilp_layer_editor_list_tile.dart';
 import 'link_editor.dart';
-import 'steam/select_steam_file_dialog.dart';
+import 'steam/upload_success_dialog.dart';
 
 class PageILPEditor extends GetView<ILPEditorController> {
   final _formKey = GlobalKey<FormState>();
@@ -186,13 +189,48 @@ class PageILPEditor extends GetView<ILPEditorController> {
                       ListTile(
                         title: ElevatedButton(
                           child: Text(UI.shareToSteam.tr),
-                          onPressed: () {
+                          onPressed: () async {
                             if (controller.configs.isEmpty) {
                               showToast(UI.ilpEditorConfigFileEmpty.tr);
                               return;
                             }
                             if (_formKey.currentState!.validate()) {
-                              controller.uploadToSteam();
+                              final file = controller.file;
+
+                              /// 确认更新文件
+                              if (file is SteamFile) {
+                                final sure = await Get.dialog(AlertDialog(
+                                  title: Text(
+                                      UI.ilpEditorConfirmUpdateSteamFile.tr),
+                                  content: InfoTable(
+                                    rows: [
+                                      ('Steam id', file.id),
+                                      (UI.name.tr, file.name),
+                                      (UI.ilpVersion.tr, file.version),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () => Get.back(),
+                                        child: Text(UI.cancel.tr)),
+                                    ElevatedButton(
+                                      onPressed: () => Get.back(result: true),
+                                      child: Text(UI.confirm.tr),
+                                    )
+                                  ],
+                                ));
+                                if (sure != true) return;
+                              }
+
+                              GlobalProgressIndicatorDialog.show(
+                                  UI.steamUploading.tr);
+                              final res = await controller.uploadToSteam();
+
+                              /// hide indicator dialog
+                              Get.back();
+
+                              if (res == null) return;
+                              SteamUploadSuccessDialog.show(result: res);
                             }
                           },
                         ),
@@ -203,9 +241,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                           WidgetSpan(
                             child: GestureDetector(
                               onTap: () {
-                                SteamClient.instance.openUrl(
-                                  'https://steamcommunity.com/sharedfiles/workshoplegalagreement',
-                                );
+                                SteamClient.instance.openEulaUrl();
                               },
                               child: Text(
                                 UI.agreementName.tr,
@@ -250,7 +286,9 @@ class PageILPEditor extends GetView<ILPEditorController> {
                           TextButton(
                             child: Icon(Icons.refresh),
                             onPressed: () {
-                              controller.configs.forEach((file) => file.load());
+                              for (var file in controller.configs) {
+                                file.load();
+                              }
                             },
                           ),
                         ],
@@ -496,14 +534,31 @@ class EditFileTab extends GetView<ILPEditorController> {
                     },
                   ),
 
-                  /// Steam 文件
+                  /// 选择 Steam 文件
                   if (env.isSteam)
                     TextButton(
                       child: Text(UI.selectSteamFileToUpdate.tr),
                       onPressed: () async {
-                        final file = await SelectSteamFileDialog.show();
-                        if (file == null) return;
-                        controller.file = file;
+                        // final file = await SelectSteamFileDialog.show();
+                        final files = await SteamGalleryDialog.show(
+                            multipleSelect: false,
+                            userId: SteamClient.instance.userId,
+                            selected: {
+                              if (controller.file != null &&
+                                  controller.file is SteamFile)
+                                (controller.file as SteamFile).id:
+                                    controller.file as SteamFile,
+                            });
+                        final file = files?.values.first;
+                        debugPrint('选择文件 ${files?.length}');
+                        if (file != null) {
+                          if (file.steamIdOwner ==
+                              SteamClient.instance.userId) {
+                            controller.file = files?.values.first;
+                          } else {
+                            showToast(UI.steamNotYourFile.tr);
+                          }
+                        }
                       },
                     ),
                 ],
@@ -524,7 +579,7 @@ class EditFileTab extends GetView<ILPEditorController> {
                   title: Text(controller.file!.name),
                   subtitle: controller.file is ILPFile
                       ? Text((controller.file as ILPFile).file.path)
-                      : Text('Steam id: ${(controller.file as SteamFile).id}'),
+                      : Text('ID: ${(controller.file as SteamFile).id}'),
                   trailing: Tooltip(
                     message: UI.cancel.tr,
                     child: InkWell(

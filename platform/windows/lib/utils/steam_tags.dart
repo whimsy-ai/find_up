@@ -29,3 +29,17 @@ enum TagAgeRating {
 
   const TagAgeRating(this.value);
 }
+
+enum TagType {
+  file('File'),
+  challenge('Challenge');
+
+  final String value;
+
+  const TagType(this.value);
+}
+
+final TagAgeRatings = {for (var e in TagAgeRating.values) e.value: e};
+final TagShapes = {for (var e in TagShape.values) e.value: e};
+final TagStyles = {for (var e in TagStyle.values) e.value: e};
+final TagTypes = {for (var e in TagType.values) e.value: e};

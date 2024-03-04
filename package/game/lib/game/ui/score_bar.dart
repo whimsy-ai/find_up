@@ -5,11 +5,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n/ui.dart';
 
-import '../controller.dart';
+import '../level_controller.dart';
 import '../resources.dart';
 import '../stroke_shadow.dart';
 
-class TopBar extends GetView<GameController> {
+class TopBar<T extends LevelController> extends GetView<T> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -75,7 +75,7 @@ class TopBar extends GetView<GameController> {
                           offset: Offset(0, 2),
                         ),
                       ),
-                      GetBuilder<GameController>(
+                      GetBuilder<T>(
                         id: 'time',
                         builder: (_) => StrokeShadow.text(
                           '${controller.time} s',

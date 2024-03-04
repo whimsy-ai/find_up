@@ -18,7 +18,7 @@ Future<Map<String, String>> readCaches() async {
     final str = await file.readAsString();
     try {
       _data.addAll(Map.from(jsonDecode(str)));
-    } on Exception catch (e) {
+    } catch (e) {
       // TODO
     }
   }

@@ -11,6 +11,12 @@ enum LayerLayout {
   right,
 }
 
+typedef OnTapLayer = void Function(
+  LayerLayout clicked,
+  ILPCanvasLayer layer,
+  Offset position,
+);
+
 abstract interface class ILayerBuilder {
   String get name;
 
@@ -76,19 +82,15 @@ class ILPCanvasLayer extends ILayerBuilder {
     return rect!;
   }
 
-  final void Function(
-    LayerLayout clicked,
-    ILPCanvasLayer layer,
-    Offset position,
-  ) onTap;
+  final OnTapLayer? onTap;
 
   bool get isNotEmpty => left != null || right != null;
 
   ILPCanvasLayer({
+    super.tappedSide,
     required this.name,
     required super.layout,
-    required this.onTap,
-    super.tappedSide,
+    this.onTap,
     this.left,
     this.right,
   })  : isBackground = layout == LayerLayout.all,
@@ -127,8 +129,8 @@ class ILPCanvas extends GetView<GameController> {
         // print('点击位置 $position');
         for (final layer in ilpLayers.reversed) {
           final rect = layer.rect(layout);
-          if (rect.contains(position) == true) {
-            layer.onTap(layout, layer, position);
+          if (rect.contains(position)) {
+            layer.onTap?.call(layout, layer, position);
             break;
           }
         }

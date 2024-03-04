@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:intl/intl.dart';
 
-import '../../explorer/controller.dart';
+import '../../explorer/ilp_explorer_controller.dart';
 import '../../explorer/steam/steam_file.dart';
 
 final _format = DateFormat('yyyy-MM-dd hh:mm:ss');
@@ -27,15 +27,15 @@ class SelectSteamFileDialog extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () {
-                  controller.currentPage--;
+                  controller.page--;
                   controller.reload();
                 },
                 child: Icon(Icons.chevron_left_rounded),
               ),
-              Text('${controller.currentPage}'),
+              Text('${controller.page}'),
               TextButton(
                 onPressed: () {
-                  controller.currentPage++;
+                  controller.page++;
                   controller.reload();
                 },
                 child: Icon(Icons.chevron_right_rounded),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
 import 'package:steamworks/steamworks.dart';
 
-import 'package:i18n/ui.dart';
 import '../../../utils/steam_ex.dart';
 import '../../../utils/steam_tags.dart';
 import '../../../utils/tag_to_menu_items.dart';
-import '../controller.dart';
+import '../ilp_explorer_controller.dart';
 
 class SteamFolderListTile extends GetView<ILPExplorerController> {
   final _controller = ExpansionTileController();
@@ -72,7 +72,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                 controller.userId = null;
                 controller.subscribed = val;
                 controller.update(['folders']);
-                controller.currentPage = 1;
+                controller.page = 1;
                 controller.reload();
               },
             ),
@@ -98,7 +98,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                 controller.subscribed = false;
                 controller.userId = val ? SteamClient.instance.userId : null;
                 controller.update(['folders']);
-                controller.currentPage = 1;
+                controller.page = 1;
                 controller.reload();
               },
             ),
@@ -116,7 +116,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                     SizedBox(width: 10),
                     SizedBox(
                       height: 24,
-                      child: DropdownButton<SteamFileSort>(
+                      child: DropdownButton<SteamUGCSort>(
                         isDense: true,
                         enableFeedback: false,
                         value: controller.sort,
@@ -129,7 +129,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                           if (v != null) {
                             controller.sort = v;
                             controller.update(['folders']);
-                            controller.currentPage = 1;
+                            controller.page = 1;
                             controller.reload();
                           }
                         },
@@ -137,21 +137,21 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                         dropdownColor: Theme.of(context).colorScheme.primary,
                         items: [
                           DropdownMenuItem(
-                            value: SteamFileSort.updateTime,
+                            value: SteamUGCSort.updateTime,
                             child: Text(
                               UI.updateTime.tr,
                               style: _itemStyle,
                             ),
                           ),
                           DropdownMenuItem(
-                            value: SteamFileSort.publishTime,
+                            value: SteamUGCSort.publishTime,
                             child: Text(
                               UI.publishTime.tr,
                               style: _itemStyle,
                             ),
                           ),
                           DropdownMenuItem(
-                            value: SteamFileSort.vote,
+                            value: SteamUGCSort.vote,
                             child: Text(
                               UI.vote.tr,
                               style: _itemStyle,
@@ -164,7 +164,6 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                 ),
               ),
             ),
-
 
             /// age
             Chip(
@@ -187,7 +186,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                         padding: EdgeInsets.zero,
                         underline: SizedBox.shrink(),
                         elevation: 0,
-                        onChanged: (v) => controller.ageRating = v,
+                        onChanged: (v) => controller.addTag(v),
                         itemHeight: kMinInteractiveDimension,
                         dropdownColor: Theme.of(context).colorScheme.primary,
                         items: tagToMenuItems(
@@ -199,7 +198,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                   ],
                 ),
               ),
-              onDeleted: () => controller.ageRating = null,
+              onDeleted: controller.clearAgeRating,
             ),
 
             /// style
@@ -223,7 +222,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                         padding: EdgeInsets.zero,
                         underline: SizedBox.shrink(),
                         elevation: 0,
-                        onChanged: (v) => controller.style = v,
+                        onChanged: controller.addTag,
                         itemHeight: kMinInteractiveDimension,
                         dropdownColor: Theme.of(context).colorScheme.primary,
                         items: tagToMenuItems(
@@ -235,7 +234,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                   ],
                 ),
               ),
-              onDeleted: () => controller.style = null,
+              onDeleted: controller.clearStyle,
             ),
 
             /// 形状
@@ -259,7 +258,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                         padding: EdgeInsets.zero,
                         underline: SizedBox.shrink(),
                         elevation: 0,
-                        onChanged: (v) => controller.shape = v,
+                        onChanged: controller.addTag,
                         itemHeight: kMinInteractiveDimension,
                         dropdownColor: Theme.of(context).colorScheme.primary,
                         items: tagToMenuItems(
@@ -271,7 +270,7 @@ class SteamFolderListTile extends GetView<ILPExplorerController> {
                   ],
                 ),
               ),
-              onDeleted: () => controller.shape = null,
+              onDeleted: controller.clearShape,
             ),
           ],
         ),

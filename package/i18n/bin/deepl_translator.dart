@@ -7,7 +7,8 @@ import 'languages.dart';
 import 'translator.dart';
 
 class DeepLTranslator extends Translator {
-  static final Map<String, String> sourceLanguages = {}, targetLanguages = {};
+  static final Map<String, String> sourceLanguages = {},
+      targetLanguages = {};
   puppeteer.Browser? browser;
 
   static int _maxTranslateCount = 1000;
@@ -69,12 +70,15 @@ class DeepLTranslator extends Translator {
     stream = await page.onRequestFinished.listen((req) async {
       if (req.url.contains('LMT_handle_jobs') &&
           req.method.toLowerCase() == 'post') {
+        final res = _parseResult(await req.response!.json);
+        if (res.isEmpty) return;
         await stream.cancel();
-        wait.complete(_parseResult(await req.response!.json));
+        wait.complete(res);
       }
     });
     final url =
-        'https://www.deepl.com/translator-mobile#$_sourceLanguage/$_targetLanguage/${Uri.encodeComponent(txt)}';
+        'https://www.deepl.com/translator-mobile#$_sourceLanguage/$_targetLanguage/${Uri
+        .encodeComponent(txt)}';
     stdout.writeln('Opening $url');
     await page.goto(url, wait: puppeteer.Until.networkAlmostIdle);
     _translateCount += txt.length;

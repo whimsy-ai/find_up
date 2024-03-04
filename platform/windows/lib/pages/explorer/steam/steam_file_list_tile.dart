@@ -5,7 +5,7 @@ import 'package:game/get_ilp_info_unlock.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 
-import '../controller.dart';
+import '../ilp_explorer_controller.dart';
 import 'steam_cached_image.dart';
 import 'steam_file.dart';
 import 'steam_file_bottom_sheet.dart';
@@ -74,5 +74,5 @@ Widget _infoButton(
         padding: EdgeInsets.all(8),
         child: Icon(Icons.info_outline_rounded, color: color),
       ),
-      onTap: () => SteamFileBottomSheet.show(file),
+      onTap: () => SteamFileBottomSheet.show<ILPExplorerController>(file),
     );

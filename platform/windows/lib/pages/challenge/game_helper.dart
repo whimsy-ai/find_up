@@ -1,4 +1,3 @@
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:game/data.dart';
@@ -9,7 +8,7 @@ class GameHelper extends StatelessWidget {
   static Future show() => Get.dialog(
         AlertDialog(
           title: Text(UI.pcGameOperationInstructions.tr),
-          content: GameHelper(),
+          content: GameHelper._(),
           actions: [
             ElevatedButton(
               child: Text(UI.dontShowAgain.tr),
@@ -106,4 +105,6 @@ class GameHelper extends StatelessWidget {
       ],
     );
   }
+
+  const GameHelper._();
 }

@@ -10,10 +10,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
 import 'package:game/discord_link.dart';
-import 'package:game/game/controller.dart';
+import 'package:game/explorer/ilp_file.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/http/http.dart';
-import 'package:game/save_image/save_image_controller.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
@@ -22,15 +21,19 @@ import 'package:steamworks/steamworks.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
 
-import 'pages/explorer/controller.dart';
+import 'pages/challenge/page_challenge_explorer.dart';
+import 'pages/challenge/page_create_challenge.dart';
+import 'pages/challenge/page_play_challenge.dart';
+import 'pages/explorer/ilp_explorer_controller.dart';
 import 'pages/explorer/page_ilp_explorer.dart';
-import 'pages/game/find_differences/page_game.dart';
-import 'pages/ilp_editor/controller.dart';
+import 'pages/challenge/pc_game_controller.dart';
+import 'pages/ilp_editor/ilp_editor_controller.dart';
 import 'pages/ilp_editor/page_ilp_editor.dart';
 import 'pages/page_about.dart';
 import 'pages/page_settings.dart';
-import 'pages/page_test.dart';
+import 'pages/page_test2.dart';
 import 'pages/save_image/page_save_image.dart';
+import 'pages/save_image/pc_save_image_controller.dart';
 import 'utils/asset_path.dart';
 import 'utils/update_window_title.dart';
 
@@ -138,23 +141,6 @@ class MyApp extends StatelessWidget {
               }),
             ),
             GetPage(
-              name: '/game',
-              page: () => PageGame(),
-              popGesture: false,
-              preventDuplicates: true,
-              binding: BindingsBuilder(() {
-                Get.put(
-                  GameController(
-                    ilp: Get.arguments['ilp'],
-                    index: Get.arguments['index'],
-                    timeMode: Get.arguments['timeMode'],
-                    allowPause: Get.arguments['allowPause'],
-                    allowDebug: Get.arguments['allowDebug'],
-                  ),
-                );
-              }),
-            ),
-            GetPage(
               name: '/editor',
               page: () => PageILPEditor(),
               binding: BindingsBuilder(() {
@@ -165,16 +151,63 @@ class MyApp extends StatelessWidget {
               name: '/save',
               page: () => PageSaveImage(),
               binding: BindingsBuilder(() {
-                Get.put(SaveImageController(
-                  info: Get.arguments['info'],
-                  layer: Get.arguments['layer'],
+                Get.put(PCSaveImageController(
+                  file: Get.arguments['file'],
+                  index: Get.arguments['index'],
                 ));
               }),
               preventDuplicates: true,
             ),
             GetPage(name: '/about', page: () => PageAbout()),
             GetPage(name: '/settings', page: () => PageSettings()),
-            GetPage(name: '/test', page: () => PageTest()),
+            GetPage(name: '/test', page: () => PageTest2()),
+
+            /// for steam
+            GetPage(
+              name: '/create_challenge',
+              page: () => PageCreateChallenge(),
+              binding: BindingsBuilder(() {
+                Get.put(CreateChallengeController());
+              }),
+            ),
+            GetPage(
+              name: '/challenge_explorer',
+              page: () => PageChallengeExplorer(),
+              binding: BindingsBuilder(() {
+                Get.put(SteamExplorerController(multipleSelect: true));
+              }),
+            ),
+            GetPage(
+              name: '/play_challenge',
+              page: () => PagePlayChallenge(),
+              binding: BindingsBuilder(() {
+                Get.put(PCGameController(
+                  files: Get.arguments['files'],
+                  ilpIndex: Get.arguments['ilpIndex'],
+                  // files: [
+                  //   SteamFile(
+                  //     id: 3169490223,
+                  //     name: '',
+                  //     cover: '',
+                  //     version: 1,
+                  //     infos: [],
+                  //     description: '',
+                  //     steamIdOwner: 0,
+                  //     fileSize: 0,
+                  //     updateTime: DateTime.now(),
+                  //     publishTime: DateTime.now(),
+                  //     comments: 0,
+                  //   ),
+                  //   ILPFile(
+                  //     File(
+                  //         r'E:\SteamLibrary\steamapps\workshop\content\2550370\3168722996\main.ilp'),
+                  //   ),
+                  //   AssetILPFile(
+                  //       'packages/ilp_assets/assets/0/logo_example.ilp'),
+                  // ],
+                ));
+              }),
+            ),
           ],
         ),
       );
@@ -261,8 +294,29 @@ class MyHomePage extends StatelessWidget {
                     child: ListView(
                       shrinkWrap: true,
                       children: [
+                        if (env.isSteam)
+                          ListTile(
+                            title: Text.rich(TextSpan(
+                              text: UI.steamChallenge.tr,
+                              children: [
+                                TextSpan(
+                                  text: 'Beta',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 12,
+                                    fontFeatures: [
+                                      FontFeature.superscripts(),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )),
+                            onTap: () => Get.toNamed('/challenge_explorer'),
+                          ),
                         ListTile(
-                          title: Text(UI.startGame.tr),
+                          title: Text(
+                            env.isSteam ? UI.gallery.tr : UI.startGame.tr,
+                          ),
                           onTap: () => Get.toNamed('/explorer'),
                         ),
                         ListTile(
@@ -312,11 +366,15 @@ class MyHomePage extends StatelessWidget {
         ),
         floatingActionButton: env.isProd
             ? null
-            : FloatingActionButton(
-                onPressed: () async {
-                  Get.toNamed('/test');
-                },
-                child: Text('test'),
+            : Wrap(
+                children: [
+                  FloatingActionButton(
+                    onPressed: () async {
+                      Get.toNamed('/test');
+                    },
+                    child: Text('test'),
+                  ),
+                ],
               ),
       );
     });
@@ -332,7 +390,7 @@ _openILP(String path) async {
   final ilp = await ILP.fromFile(path);
   try {
     if (await ilp.isILP) {
-      PageGameEntry.play(ilp);
+      PageGameEntry.play([ILPFile(File(path))]);
     } else {
       showToast('只支持ilp格式文件');
     }

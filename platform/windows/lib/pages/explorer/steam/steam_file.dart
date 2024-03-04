@@ -27,12 +27,79 @@ class SteamFiles {
   });
 }
 
-class SteamFile implements ExplorerFile {
+class SteamSimpleFile implements ExplorerFile {
+  static Pointer<ISteamUgc> get ugc => SteamClient.instance.steamUgc;
+  final int id;
+  int downloadedBytes = 0, totalBytes = 0;
+
+  @override
+  ILP? ilp;
+
+  String? ilpFile;
+
+  SteamSimpleFile({required this.id});
+
+  Future<void> updateDownloadBytes() async {
+    final c = Completer();
+    using((arena) {
+      final current = arena<UnsignedLongLong>();
+      final total = arena<UnsignedLongLong>();
+      final res = ugc.getItemDownloadInfo(id, current, total);
+      if (res) {
+        downloadedBytes = current[0];
+        totalBytes = current[1];
+        c.complete();
+      }
+    });
+    return c.future;
+  }
+
+  @override
+  Future<void> load({force = false}) async {
+    if (isDownLoading) {
+      return updateDownloadBytes();
+    } else if (isInstalled) {
+      // print('get install info $id');
+      if (ilpFile == null) {
+        using((arena) {
+          final size = arena<UnsignedLongLong>();
+          final folder = arena<Uint8>(1000).cast<Utf8>();
+          final timeStamp = arena<UnsignedInt>();
+          final installed = ugc.getItemInstallInfo(
+            id,
+            size,
+            folder,
+            1000,
+            timeStamp,
+          );
+          if (installed) {
+            final file = File(path.join(folder.toDartString(), 'main.ilp'));
+            ilpFile = file.existsSync() ? file.absolute.path : null;
+          }
+        });
+      }
+    }
+  }
+
+  int get _state => SteamClient.instance.steamUgc.getItemState(id);
+
+  bool get isInstalled => hasFlag(_state, EItemState.installed.value);
+
+  bool get isDownLoading => hasFlag(_state, EItemState.downloading.value);
+
+  bool get isSubscribed => hasFlag(_state, EItemState.subscribed.value);
+
+  bool get isNeedsUpdate => hasFlag(_state, EItemState.needsUpdate.value);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class SteamFile extends SteamSimpleFile {
   TagShape? shape;
   TagStyle? style;
   TagAgeRating? ageRating;
 
-  int id;
   @override
   String cover;
 
@@ -44,6 +111,8 @@ class SteamFile implements ExplorerFile {
 
   @override
   int fileSize;
+
+  int comments;
 
   DateTime publishTime;
   DateTime updateTime;
@@ -58,12 +127,8 @@ class SteamFile implements ExplorerFile {
 
   List<ILPInfo> infos;
 
-  int get _state => SteamClient.instance.steamUgc.getItemState(id);
-
-  Pointer<ISteamUgc> get ugc => SteamClient.instance.steamUgc;
-
   SteamFile({
-    required this.id,
+    required super.id,
     required this.name,
     required this.cover,
     required this.version,
@@ -73,6 +138,7 @@ class SteamFile implements ExplorerFile {
     required this.fileSize,
     required this.updateTime,
     required this.publishTime,
+    required this.comments,
     this.voteUp = 0,
     this.voteDown = 0,
     this.ageRating,
@@ -82,62 +148,8 @@ class SteamFile implements ExplorerFile {
     unlock = infos.map((e) => getIlpInfoUnlock(e)).toList().sum / infos.length;
   }
 
-  bool get isInstalled =>
-      isSubscribed && hasFlag(_state, EItemState.installed.value);
-
-  bool get isDownLoading =>
-      isSubscribed && hasFlag(_state, EItemState.downloading.value);
-
-  bool get isSubscribed => hasFlag(_state, EItemState.subscribed.value);
-
-  bool get isNeedsUpdate => hasFlag(_state, EItemState.needsUpdate.value);
-
   @override
   ILP? get ilp => ilpFile == null ? null : ILP.fromFileSync(ilpFile!);
-
-  String? ilpFile;
-  int? downloadedBytes, totalBytes;
-
-  @override
-  Future<void> load({force = false}) async {
-    if (isSubscribed) {
-      if (isDownLoading) {
-        _getDownloadBytes();
-      } else if (isInstalled) {
-        // print('get install info $id');
-        if (ilpFile == null) {
-          using((arena) {
-            final size = arena<UnsignedLongLong>();
-            final folder = arena<Uint8>(1000).cast<Utf8>();
-            final timeStamp = arena<UnsignedInt>();
-            final installed = ugc.getItemInstallInfo(
-              id,
-              size,
-              folder,
-              1000,
-              timeStamp,
-            );
-            if (installed) {
-              final file = File(path.join(folder.toDartString(), 'main.ilp'));
-              ilpFile = file.existsSync() ? file.absolute.path : null;
-            }
-          });
-        }
-      }
-    }
-  }
-
-  _getDownloadBytes() {
-    using((arena) {
-      final current = arena<UnsignedLongLong>();
-      final total = arena<UnsignedLongLong>();
-      final res = ugc.getItemDownloadInfo(id, current, total);
-      if (res) {
-        downloadedBytes = current[0];
-        totalBytes = current[1];
-      }
-    });
-  }
 
   Future subscribeAndDownload() async {
     await SteamClient.instance.subscribe(id);

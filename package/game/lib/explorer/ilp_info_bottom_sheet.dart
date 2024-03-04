@@ -13,17 +13,17 @@ import 'file.dart';
 import 'ilp_file.dart';
 
 class ILPInfoBottomSheet extends StatelessWidget {
-  final ExplorerFile? file;
+  final ExplorerFile file;
   final ILP ilp;
   final ILPInfo? currentInfo;
   final RxList<Widget> _children = RxList();
   final Rxn<ILPHeader> _header = Rxn();
 
-  final void Function(int) onTapPlay;
+  final void Function(int)? onTapPlay;
 
   ILPInfoBottomSheet._({
     required this.ilp,
-    this.file,
+    required this.file,
     required this.onTapPlay,
     this.currentInfo,
   }) {
@@ -56,11 +56,10 @@ class ILPInfoBottomSheet extends StatelessWidget {
             title: Text(UI.path.tr),
             subtitle: Text((file as ILPFile).file.path),
           ),
-        if (file != null)
-          ListTile(
-            title: Text(UI.fileSize.tr),
-            subtitle: Text(bytesSize(file!.fileSize, 2)),
-          ),
+        ListTile(
+          title: Text(UI.fileSize.tr),
+          subtitle: Text(bytesSize(file.fileSize, 2)),
+        ),
         ListTile(
           title: Text(UI.link.tr),
           subtitle: header.links.isEmpty
@@ -91,9 +90,9 @@ class ILPInfoBottomSheet extends StatelessWidget {
   }
 
   static Future show({
-    ExplorerFile? file,
+    required ExplorerFile file,
     required ILP ilp,
-    required void Function(int) onTapPlay,
+    void Function(int)? onTapPlay,
     ILPInfo? currentInfo,
   }) =>
       Get.bottomSheet(
@@ -119,6 +118,7 @@ class ILPInfoBottomSheet extends StatelessWidget {
                     shrinkWrap: true,
                     itemCount: _header.value?.infoList.length ?? 0,
                     itemBuilder: (_, i) => _InfoListTile(
+                      file: file,
                       ilp: ilp,
                       index: i,
                       onTapPlay: onTapPlay,
@@ -134,17 +134,19 @@ class ILPInfoBottomSheet extends StatelessWidget {
 }
 
 class _InfoListTile extends StatelessWidget {
+  final ExplorerFile? file;
   final ILP ilp;
   final int index;
   final String? currentInfoId;
-  final void Function(int) onTapPlay;
+  final void Function(int)? onTapPlay;
   final _info = Rxn<ILPInfo>();
 
   _InfoListTile({
     super.key,
+    required this.file,
     required this.ilp,
     required this.index,
-    required this.onTapPlay,
+    this.onTapPlay,
     this.currentInfoId,
   }) {
     ilp.info(index).then((value) => _info.value = value);
@@ -192,16 +194,16 @@ class _InfoListTile extends StatelessWidget {
         trailing: Wrap(
           spacing: 10,
           children: [
-            if (!selected)
+            if (onTapPlay != null)
               TextButton(
-                  onPressed: () => onTapPlay(index),
+                  onPressed: () => onTapPlay!(index),
                   child: Icon(Icons.play_arrow_rounded)),
             TextButton(
               child: Icon(Icons.save_outlined),
               onPressed: () async {
                 Get.toNamed('/save', arguments: {
-                  'info': info,
-                  'layer': await ilp.layer(index),
+                  'file': file,
+                  'index': index,
                 });
               },
             ),

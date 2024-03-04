@@ -6,25 +6,25 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
 
-import '../controller.dart';
+import '../level_controller.dart';
 import '../resources.dart';
 import '../stroke_shadow.dart';
 
-class TipToolWidget extends StatelessWidget {
+class TipToolWidget<T extends LevelController> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
       message: UI.gameBarTip.tr,
-      child: GetBuilder<GameController>(
+      child: GetBuilder<T>(
           id: 'tip',
           builder: (controller) {
             return Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (controller.lastTipTimer.inMilliseconds > 0)
+                if (controller.nextHintTime.inMilliseconds > 0)
                   StrokeShadow.text(
-                    controller.lastTipTimer.toSemanticString(),
+                    controller.nextHintTime.toSemanticString(),
                     style: GoogleFonts.lilitaOne(
                       fontSize: 16,
                       letterSpacing: 1.5,
@@ -40,20 +40,18 @@ class TipToolWidget extends StatelessWidget {
                   children: [
                     if (env.isDev)
                       ElevatedButton(
-                        onPressed: () {
-                          controller.setFailed();
-                        },
+                        onPressed: controller.setFail,
                         child: Text('测试失败'),
                       ),
                     FloatingActionButton(
                       onPressed: () {
-                        if (controller.showTip() != null) {
+                        if (controller.showHint(controller.currentLevel)) {
                           showToast(UI.showATip.tr);
                         }
                       },
                       child: StrokeShadow.path(
                         Resources.iconFocus,
-                        color: controller.lastTipTimer.inMilliseconds > 0
+                        color: controller.nextHintTime.inMilliseconds > 0
                             ? Colors.grey
                             : Colors.black,
                       ),

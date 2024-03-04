@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:game/i_offset_scale.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
@@ -12,8 +10,11 @@ import 'package:tweener/tweener.dart';
 
 import '../data.dart';
 import '../get_ilp_info_unlock.dart';
+import '../ilp_layer_extend.dart';
 import 'canvas.dart';
-import 'core.dart';
+import 'game_state.dart';
+import 'level_controller.dart';
+import 'offset_scale_controller.dart';
 import 'resources.dart';
 
 enum TimeMode { up, down }
@@ -28,40 +29,7 @@ enum GameBarMode {
   miniSize,
 }
 
-enum GameState {
-  /// loading ilp layers
-  loading(0),
-  loadError(1),
-
-  /// game image fade in animate
-  animating(2),
-  already(3),
-  started(4),
-  paused(5),
-  stopped(6),
-  completed(7),
-  failed(8);
-
-  final num value;
-
-  const GameState(this.value);
-}
-
-class GameController extends IOffsetScaleController {
-  static final _audioPlayer = AudioPlayer();
-
-  playCorrectAudio() => _audioPlayer
-    ..stop()
-    ..play(Resources.correctSource);
-
-  playWrongAudio() => _audioPlayer
-    ..stop()
-    ..play(Resources.wrongSource);
-
-  playErrorAudio() => _audioPlayer
-    ..stop()
-    ..play(Resources.errorSource);
-
+class GameController extends LevelController {
   void Function({
     required double pastUnlock,
     required double newUnlock,
@@ -70,7 +38,6 @@ class GameController extends IOffsetScaleController {
 
   final ILP ilp;
   final TimeMode timeMode;
-  final Duration? countdown;
   final bool allowDebug, allowPause;
   bool _debug = false;
 
@@ -82,8 +49,6 @@ class GameController extends IOffsetScaleController {
     _debug = val;
     update(['ui', 'game']);
   }
-
-  late final GameCore _core = GameCore(_onFixedUpdate);
 
   late int index;
   late int _seed = 0;
@@ -101,9 +66,6 @@ class GameController extends IOffsetScaleController {
 
   final List<ILayerBuilder> layers = [];
 
-  GameState get state => _state;
-  GameState _state = GameState.loading;
-
   Duration _time = Duration.zero;
 
   String get time {
@@ -119,24 +81,6 @@ class GameController extends IOffsetScaleController {
     // t[1] = t[1].substring(0, 2);
     // return t.join('.');
   }
-
-  bool get isLoading => _state == GameState.loading;
-
-  bool get isLoadError => _state == GameState.loadError;
-
-  bool get isAnimating => _state == GameState.animating;
-
-  bool get isStarted => _state == GameState.started;
-
-  bool get isPaused => _state == GameState.paused;
-
-  bool get isFailed => _state == GameState.failed;
-
-  bool get isCompleted => _state == GameState.completed;
-
-  bool get isStopped => _state == GameState.stopped;
-
-  bool get isReady => _state == GameState.already;
 
   final _tappedLayerIdList = <String>[];
 
@@ -179,26 +123,24 @@ class GameController extends IOffsetScaleController {
     required this.timeMode,
     required this.allowPause,
     required this.allowDebug,
-    this.countdown,
-  }) {
-    if (timeMode == TimeMode.down) assert(countdown != null);
-  }
+  });
 
   Tweener? _tweener;
 
+  @override
   Future<void> start({int? index, int? seed}) async {
     error = null;
-    _core.stop();
+    core.stop();
     _tweener?.stop();
     _opacity = 0;
     _clicks = 0;
-    _state = GameState.loading;
+    state = GameState.loading;
     _seed = seed ?? randomSeed();
     _time = Duration(minutes: 2);
     print('切换到loading');
     update(['ui', 'game']);
     try {
-      /// 读取游戏界面资源
+      /// 读取游戏资源
       await Resources.init();
 
       /// 读取游戏内容
@@ -214,28 +156,35 @@ class GameController extends IOffsetScaleController {
       info = list[1] as ILPInfo;
       layer = list[2] as ILPLayer;
     } catch (e) {
-      _state = GameState.loadError;
+      state = GameState.loadError;
       error = e.toString();
       update(['ui', 'game']);
       return;
     }
-    await _randomLayers();
+    layers
+      ..clear()
+      ..addAll(layer!.randomList(
+        max: 10,
+        random: math.Random(_seed),
+      ));
+
+    // await _randomLayers();
 
     /// 图层数量限制，降低难度
-    if (layers.length > 10) {
-      // print('图层大于10');
-      final list = layers.sublist(0, 11);
-      layers
-        ..clear()
-        ..addAll(list);
-    }
-    _state = GameState.animating;
+    // if (layers.length > 10) {
+    //   // print('图层大于10');
+    //   final list = layers.sublist(0, 11);
+    //   layers
+    //     ..clear()
+    //     ..addAll(list);
+    // }
+    state = GameState.animating;
     update(['ui', 'game']);
 
     resetScaleAndOffset();
 
-    _core.start();
-    _state = GameState.started;
+    core.start();
+    state = GameState.started;
     await _opacityTweenTo(1);
   }
 
@@ -258,10 +207,10 @@ class GameController extends IOffsetScaleController {
     return completer.future;
   }
 
+  @override
   stop() {
     if (isStarted) {
-      _state = GameState.stopped;
-      _core.stop();
+      super.stop();
       update(['ui', 'game']);
     }
   }
@@ -269,16 +218,17 @@ class GameController extends IOffsetScaleController {
   fail() {
     if (isStarted) {
       _time = Duration.zero;
-      _state = GameState.failed;
-      _core.stop();
+      state = GameState.failed;
+      core.stop();
       _opacity = 0;
       update(['ui', 'game']);
     }
   }
 
+  @override
   pause() async {
     if (isStarted) {
-      _state = GameState.paused;
+      super.pause();
       await _opacityTweenTo(0);
       update(['ui', 'game']);
     }
@@ -286,7 +236,7 @@ class GameController extends IOffsetScaleController {
 
   resume() async {
     if (state == GameState.paused) {
-      _state = GameState.started;
+      state = GameState.started;
       update(['ui', 'game']);
       await _opacityTweenTo(1);
     }
@@ -430,7 +380,7 @@ class GameController extends IOffsetScaleController {
     //   }
     // }
     scale = (math.min(screenHalfWidth, Get.height) -
-            IOffsetScaleController.padding) /
+            OffsetScaleController.padding) /
         math.max(width, height);
     offsetX = (screenHalfWidth - width * scale) / 2;
     offsetY = (Get.height - height * scale) / 2;
@@ -459,7 +409,8 @@ class GameController extends IOffsetScaleController {
 
   static int randomSeed() => math.Random().nextInt(65535);
 
-  Future<void> _onFixedUpdate(Duration lastFrame) async {
+  @override
+  Future<void> onUpdate(Duration lastFrame) async {
     if (isStarted) {
       /// 游戏时间 倒计时
       _time -= lastFrame;
@@ -485,9 +436,8 @@ class GameController extends IOffsetScaleController {
   @override
   void onClose() {
     print('GameController onClose');
-    _tweener?.stop();
-    _core.dispose();
     super.onClose();
+    _tweener?.stop();
   }
 
   /// for debug
@@ -531,4 +481,20 @@ class GameController extends IOffsetScaleController {
   double get minScale => layer!.width > layer!.height
       ? Get.width / 3 / layer!.width
       : Get.height / 2 / layer!.height;
+
+  @override
+  Offset onScalePosition(Offset position) {
+    // TODO: implement onScalePosition
+    throw UnimplementedError();
+  }
+
+  @override
+  void onLevelFinish() {
+    // TODO: implement onLevelFinish
+  }
+
+  @override
+  void onTap(LayerLayout layout, TapUpDetails details) {
+    // TODO: implement onTap
+  }
 }

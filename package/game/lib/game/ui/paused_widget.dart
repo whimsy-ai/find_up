@@ -5,13 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n/ui.dart';
 
 import '../../explorer/ilp_info_bottom_sheet.dart';
+import '../../explorer/test_ilp_file.dart';
 import '../../utils/textfield_number_formatter.dart';
-import '../controller.dart';
-import '../page_game_entry.dart';
+import '../level_controller.dart';
 import '../resources.dart';
 import '../stroke_shadow.dart';
+import 'levels_indicator.dart';
 
-class PausedWidget extends GetView<GameController> {
+class PausedWidget<T extends LevelController> extends GetView<T> {
   final String? title;
   final double height;
 
@@ -19,6 +20,9 @@ class PausedWidget extends GetView<GameController> {
 
   @override
   Widget build(BuildContext context) {
+    final level = controller.currentLevel!;
+    final isTestFile = level.file is TestILPFile;
+    var title = isTestFile ? UI.test.tr : this.title;
     return Container(
       height: height,
       color: Color.fromRGBO(5, 13, 24, 0.5),
@@ -31,7 +35,7 @@ class PausedWidget extends GetView<GameController> {
             Container(
               margin: EdgeInsets.only(bottom: 15),
               child: StrokeShadow.text(
-                title!,
+                title,
                 style: GoogleFonts.lilitaOne(fontSize: 24, letterSpacing: 1.5),
                 stroke: Stroke(
                   width: 2,
@@ -95,22 +99,24 @@ class PausedWidget extends GetView<GameController> {
                       color: Colors.white,
                     ),
                     onPressed: () async {
-                      final foundLayers =
-                          controller.allLayers - controller.unTappedLayers;
-                      if (foundLayers > 0) {
-                        final sure = await Get.dialog(AlertDialog(
-                          title: Text(UI.restartConfirm
-                              .trArgs([foundLayers.toString()])),
-                          actions: [
-                            TextButton(
-                                onPressed: () => Get.back(),
-                                child: Text(UI.cancel.tr)),
-                            ElevatedButton(
-                                onPressed: () => Get.back(result: true),
-                                child: Text(UI.confirm.tr)),
-                          ],
-                        ));
-                        if (sure != true) return;
+                      if (!controller.isCompleted) {
+                        final foundLayers =
+                            controller.allLayers - controller.unTappedLayers;
+                        if (foundLayers > 0) {
+                          final sure = await Get.dialog(AlertDialog(
+                            title: Text(UI.restartConfirm
+                                .trArgs([foundLayers.toString()])),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Get.back(),
+                                  child: Text(UI.cancel.tr)),
+                              ElevatedButton(
+                                  onPressed: () => Get.back(result: true),
+                                  child: Text(UI.confirm.tr)),
+                            ],
+                          ));
+                          if (sure != true) return;
+                        }
                       }
                       controller.start();
                     },
@@ -143,7 +149,7 @@ class PausedWidget extends GetView<GameController> {
                           onChanged: (v) {
                             try {
                               seed = int.parse(v);
-                            } on Exception catch (e) {}
+                            } catch (e) {}
                           },
                         ),
                         actions: [
@@ -166,56 +172,60 @@ class PausedWidget extends GetView<GameController> {
               ),
 
               /// 保存图片
-              SizedBox(
-                width: 80,
-                height: 80,
-                child: Tooltip(
-                  message: UI.saveImage.tr,
-                  child: FloatingActionButton(
-                    elevation: 0,
-                    backgroundColor: Theme.of(context).primaryColorDark,
-                    child: StrokeShadow.path(
-                      Resources.iconSave,
-                      color: Colors.white,
+              if (!isTestFile)
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: Tooltip(
+                    message: UI.saveImage.tr,
+                    child: FloatingActionButton(
+                      elevation: 0,
+                      backgroundColor: Theme.of(context).primaryColorDark,
+                      child: StrokeShadow.path(
+                        Resources.iconSave,
+                        color: Colors.white,
+                      ),
+                      onPressed: () async {
+                        Get.toNamed('/save', arguments: {
+                          'info': controller.currentLevel!.info!,
+                          'layer': controller.currentLevel!.layer!,
+                        });
+                      },
                     ),
-                    onPressed: () async {
-                      Get.toNamed('/save', arguments: {
-                        'info': controller.info,
-                        'layer': controller.layer,
-                      });
-                    },
                   ),
                 ),
-              ),
 
               /// 图片信息
-              SizedBox(
-                width: 80,
-                height: 80,
-                child: Tooltip(
-                  message: UI.fileInfo.tr,
-                  child: FloatingActionButton(
-                    elevation: 0,
-                    backgroundColor: Theme.of(context).primaryColorDark,
-                    child: StrokeShadow.path(
-                      Resources.iconInfo,
-                      color: Colors.white,
+              if (!isTestFile)
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: Tooltip(
+                    message: UI.fileInfo.tr,
+                    child: FloatingActionButton(
+                      elevation: 0,
+                      backgroundColor: Theme.of(context).primaryColorDark,
+                      child: StrokeShadow.path(
+                        Resources.iconInfo,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        ILPInfoBottomSheet.show(
+                          file: controller.currentLevel!.file,
+                          ilp: controller.currentLevel!.ilp!,
+                          currentInfo: controller.currentLevel!.info!,
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      ILPInfoBottomSheet.show(
-                        ilp: controller.ilp,
-                        currentInfo: controller.info!,
-                        onTapPlay: (index) => PageGameEntry.replace(
-                          controller.ilp,
-                          index: index,
-                        ),
-                      );
-                    },
                   ),
                 ),
-              ),
             ],
           ),
+          if (controller.levels.length > 1)
+            Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: LevelsIndicator<T>(itemSize: 30),
+            ),
         ],
       ),
     ).animate().moveX(

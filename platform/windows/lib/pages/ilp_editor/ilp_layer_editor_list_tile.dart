@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:game/explorer/test_ilp_file.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/global_progress_indicator_dialog.dart';
 import 'package:game/info_table.dart';
@@ -104,9 +105,8 @@ class ILPEditorInfoListTile extends GetView<ILPEditorController> {
                       if (ilp != null) {
                         Get.back();
                         PageGameEntry.play(
-                          ilp,
-                          index: controller.configs.indexOf(file),
-                          allowDebug: true,
+                          [TestILPFile(ilp: ilp)],
+                          ilpIndex: controller.configs.indexOf(file),
                         );
                       }
                     },

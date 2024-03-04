@@ -5,13 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
-import 'package:game/game/controller.dart';
-import 'package:game/game/resources.dart';
-import 'package:game/save_image/save_image_controller.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n/ui.dart';
-import 'package:mobile/utils/version.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
@@ -19,11 +14,12 @@ import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 import 'firebase_options.dart';
 import 'pages/explorer/controller.dart';
 import 'pages/explorer/page_ilp_explorer.dart';
-import 'pages/game/page_game.dart';
 import 'pages/page_about.dart';
-import 'pages/page_save_image.dart';
+import 'pages/save/mobile_save_image_controller.dart';
+import 'pages/save/page_save_image.dart';
 import 'pages/settings/page_settings.dart';
 import 'utils/landscape.dart';
+import 'utils/version.dart';
 
 runMain() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -93,32 +89,15 @@ class HomePage extends StatelessWidget {
                 Get.put(ExplorerController());
               }),
             ),
-            GetPage(
-              name: '/game',
-              page: () => PageGame(),
-              popGesture: false,
-              preventDuplicates: true,
-              binding: BindingsBuilder(() {
-                Get.put(
-                  GameController(
-                    ilp: Get.arguments['ilp'],
-                    index: Get.arguments['index'],
-                    timeMode: Get.arguments['timeMode'],
-                    allowPause: Get.arguments['allowPause'],
-                    allowDebug: Get.arguments['allowDebug'],
-                  ),
-                );
-              }),
-            ),
             GetPage(name: '/about', page: () => PageAbout()),
             GetPage(name: '/settings', page: () => PageSettings()),
             GetPage(
               name: '/save',
               page: () => PageSaveImage(),
               binding: BindingsBuilder(() {
-                Get.put(SaveImageController(
-                  info: Get.arguments['info'],
-                  layer: Get.arguments['layer'],
+                Get.put(MobileSaveImageController(
+                  file: Get.arguments['file'],
+                  index: Get.arguments['index'],
                 ));
               }),
               preventDuplicates: true,

@@ -38,9 +38,9 @@ class AboutCard extends StatelessWidget {
             leading: FaIcon(FontAwesomeIcons.steam),
             trailing: Icon(Icons.link),
             title: Text('Steam'),
-            subtitle: Text(UI.steamWorkShop.tr),
-            onTap: () => launchUrlString(
-                'https://store.steampowered.com/app/2550370/'),
+            subtitle: Text(UI.supportSteamWorkshop.tr),
+            onTap: () =>
+                launchUrlString('https://store.steampowered.com/app/2550370/'),
           ),
           ListTile(
             leading: FaIcon(FontAwesomeIcons.microsoft),
@@ -60,7 +60,8 @@ class AboutCard extends StatelessWidget {
                 ElevatedButton.icon(
                   icon: FaIcon(Icons.discord_rounded),
                   label: Text('Discord'),
-                  onPressed: () => launchUrlString('https://discord.gg/cy6QTzSpJw'),
+                  onPressed: () =>
+                      launchUrlString('https://discord.gg/cy6QTzSpJw'),
                 ),
                 ElevatedButton.icon(
                   icon: FaIcon(FontAwesomeIcons.github),
