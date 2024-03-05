@@ -90,6 +90,6 @@ void main() async {
   if (res.exitCode != 0) throw res.stderr;
   print('apk 完成');
 
-  print('成功, 位置$buildPath');
   wait.complete();
+  print('成功, 位置$buildPath');
 }
