@@ -1,4 +1,8 @@
+import 'dart:math';
+
 import 'package:get/get.dart';
+
+import '../explorer/file.dart';
 
 mixin LoadingController on GetxController {
   int downloadedBytes = 0, totalBytes = 0;
@@ -8,4 +12,6 @@ mixin LoadingController on GetxController {
   resetBytes() {
     downloadedBytes = totalBytes = 0;
   }
+
+  Future<void> loadFile(ExplorerFile file, Random random);
 }

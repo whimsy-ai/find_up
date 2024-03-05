@@ -85,7 +85,7 @@ class DragAndScaleWidgetState<T extends OffsetScaleController>
     controller.offsetY += details.focalPointDelta.dy;
 
     /// 单指移动，包括鼠标
-    if (details.pointerCount == 1) {
+    if (details.pointerCount == 1 &&controller is MouseController) {
       (controller as MouseController).position += details.focalPointDelta;
     }
 

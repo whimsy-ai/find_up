@@ -75,26 +75,25 @@ class NewGameUI<T extends LevelController> extends GetView<T> {
 
         /// 左上
         /// 返回按钮
-        Positioned(
-          top: 10,
-          left: 10,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 50,
-                height: 50,
-                child: FloatingActionButton(
-                  onPressed: () => controller.exit(),
-                  elevation: 0,
-                  child: StrokeShadow.path(
-                    Resources.iconLeft,
+        if (controller.state != GameState.init)
+          Positioned(
+            top: 10,
+            left: 10,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: FloatingActionButton(
+                    onPressed: () => controller.exit(),
+                    elevation: 0,
+                    child: StrokeShadow.path(Resources.iconLeft),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
         /// 关卡介绍对话框
         if (controller.state == GameState.already)
@@ -102,13 +101,13 @@ class NewGameUI<T extends LevelController> extends GetView<T> {
 
         /// 时间栏
         /// 得分栏
-        if (controller.state.value >= GameState.started.value)
+        if (controller.state.value > GameState.already.value)
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Center(
-              child: TopBar<T>(),
+              child: ScoreBar<T>(),
             ),
           ),
 

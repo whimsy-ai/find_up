@@ -43,7 +43,7 @@ class NewILPCanvas<T extends LevelController> extends GetView<T> {
         ),
       ),
     );
-    return GetPlatform.isDesktop
+    return controller is MouseController
         ? MouseRegion(
             onHover: (controller as MouseController).onHover,
             child: child,

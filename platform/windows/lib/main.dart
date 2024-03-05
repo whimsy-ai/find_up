@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:desktop_drop/desktop_drop.dart';
@@ -8,13 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:game/build_flavor.dart';
+import 'package:game/bundle_files.dart';
 import 'package:game/data.dart';
 import 'package:game/discord_link.dart';
 import 'package:game/explorer/ilp_file.dart';
 import 'package:game/game/page_game_entry.dart';
-import 'package:game/game/ui/steam_downloading_indicator.dart';
+import 'package:game/game/resources.dart';
 import 'package:game/http/http.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
@@ -23,8 +26,8 @@ import 'package:steamworks/steamworks.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
 
-import 'pages/challenge/page_challenge_explorer.dart';
 import 'pages/challenge/page_challenge_editor.dart';
+import 'pages/challenge/page_challenge_explorer.dart';
 import 'pages/challenge/page_play_challenge.dart';
 import 'pages/challenge/pc_game_controller.dart';
 import 'pages/explorer/ilp_explorer_controller.dart';
@@ -71,6 +74,9 @@ Future runMain(List<String> args) async {
     updateWindowTitle();
   });
   runApp(MyApp(args: args));
+
+  /// 预读取游戏资源
+  Resources.init();
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
@@ -182,32 +188,11 @@ class MyApp extends StatelessWidget {
             ),
             GetPage(
               name: '/play_challenge',
-              page: () => PagePlayChallenge(),
+              page: () => PagePlayChallenge<PCGameController>(),
               binding: BindingsBuilder(() {
                 Get.put(PCGameController(
                   files: Get.arguments['files'],
                   ilpIndex: Get.arguments['ilpIndex'],
-                  // files: [
-                  //   SteamFile(
-                  //     id: 3169490223,
-                  //     name: '',
-                  //     cover: '',
-                  //     version: 1,
-                  //     infos: [],
-                  //     description: '',
-                  //     steamIdOwner: 0,
-                  //     fileSize: 0,
-                  //     updateTime: DateTime.now(),
-                  //     publishTime: DateTime.now(),
-                  //     comments: 0,
-                  //   ),
-                  //   ILPFile(
-                  //     File(
-                  //         r'E:\SteamLibrary\steamapps\workshop\content\2550370\3168722996\main.ilp'),
-                  //   ),
-                  //   AssetILPFile(
-                  //       'packages/ilp_assets/assets/0/logo_example.ilp'),
-                  // ],
                 ));
               }),
             ),
@@ -297,29 +282,34 @@ class MyHomePage extends StatelessWidget {
                     child: ListView(
                       shrinkWrap: true,
                       children: [
-                        if (env.isSteam)
-                          ListTile(
-                            title: Text.rich(TextSpan(
-                              text: UI.steamChallenge.tr,
-                              children: [
-                                TextSpan(
-                                  text: ' Beta',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 12,
-                                    fontFeatures: [
-                                      FontFeature.superscripts(),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            )),
-                            onTap: () => Get.toNamed('/challenge_explorer'),
-                          ),
                         ListTile(
-                          title: Text(
-                            env.isSteam ? UI.gallery.tr : UI.startGame.tr,
-                          ),
+                          title: Text.rich(TextSpan(
+                            text: UI.steamChallenge.tr,
+                            children: [
+                              TextSpan(
+                                text: ' New',
+                                style: GoogleFonts.lilitaOne(color: Colors.red),
+                              ),
+                            ],
+                          )),
+                          onTap: () async {
+                            if (env.isSteam) {
+                              Get.toNamed('/challenge_explorer');
+                              return;
+                            }
+                            final files = await getBundleFiles();
+                            files.shuffle();
+                            print('files length: ${files.length}');
+                            Get.toNamed('/play_challenge', arguments: {
+                              'files': files.sublist(
+                                0,
+                                math.min(files.length, 5),
+                              )
+                            });
+                          },
+                        ),
+                        ListTile(
+                          title: Text(UI.gallery.tr),
                           onTap: () => Get.toNamed('/explorer'),
                         ),
                         ListTile(

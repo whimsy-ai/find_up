@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
+import 'package:ilp_assets/update_pubspec.dart';
 
 final buildPath = path.join(
   Directory.current.path,
@@ -11,9 +12,27 @@ final buildPath = path.join(
   'release',
 );
 
+final assetsPath = path.join(
+  Directory.current.path,
+  '..',
+  '..',
+  'package',
+  'ilp_assets',
+);
+
 void main() async {
   print('开始构建Google Play版本');
   print('当前文件夹 ${Directory.current.path}');
+
+  /// 更新游戏资源索引
+  final wait = await updateILPAssetsPubspec(path.join(
+  Directory.current.path,
+  '..',
+  '..',
+  'package',
+  'ilp_assets',
+  ));
+
 
   print('检查文件');
   print('upload.jks: ${File('./android/upload.jks').lengthSync()}');
@@ -72,4 +91,5 @@ void main() async {
   print('apk 完成');
 
   print('成功, 位置$buildPath');
+  wait.complete();
 }

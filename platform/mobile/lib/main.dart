@@ -1,19 +1,26 @@
+import 'dart:math' as math;
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:game/build_flavor.dart';
+import 'package:game/bundle_files.dart';
 import 'package:game/data.dart';
+import 'package:game/game/resources.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 import 'firebase_options.dart';
-import 'pages/explorer/controller.dart';
+import 'pages/explorer/gallery_controller.dart';
 import 'pages/explorer/page_ilp_explorer.dart';
+import 'pages/game/mobile_game_controller.dart';
+import 'pages/game/page_play_challenge.dart';
 import 'pages/page_about.dart';
 import 'pages/save/mobile_save_image_controller.dart';
 import 'pages/save/page_save_image.dart';
@@ -55,6 +62,9 @@ runMain() async {
   //     IronSourceAdUnit.Banner,
   //   ],
   // );
+
+  /// 预读取游戏资源
+  Resources.init();
 }
 
 class HomePage extends StatelessWidget {
@@ -82,6 +92,15 @@ class HomePage extends StatelessWidget {
           fallbackLocale: Locale("en", "US"),
           home: MyHomePage(),
           getPages: [
+            GetPage(
+              name: '/play_challenge',
+              page: () => PagePlayChallenge<MobileGameController>(),
+              binding: BindingsBuilder(() {
+                Get.put(MobileGameController(
+                  files: Get.arguments['files'],
+                ));
+              }),
+            ),
             GetPage(
               name: '/explorer',
               page: () => PageILPExplorer(),
@@ -167,7 +186,33 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       ListTile(
-                        title: Text(UI.startGame.tr),
+                        title: Text.rich(
+                          TextSpan(
+                            text: UI.challenge.tr,
+                            children: [
+                              TextSpan(
+                                text: ' New',
+                                style: GoogleFonts.lilitaOne(
+                                  color: Colors.red,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        onTap: () async {
+                          final files = await getBundleFiles();
+                          files.shuffle();
+                          print('files length: ${files.length}');
+                          Get.toNamed('/play_challenge', arguments: {
+                            'files': files.sublist(
+                              0,
+                              math.min(files.length, 5),
+                            )
+                          });
+                        },
+                      ),
+                      ListTile(
+                        title: Text(UI.gallery.tr),
                         onTap: () => Get.toNamed('/explorer'),
                       ),
                       ListTile(

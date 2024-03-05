@@ -9,7 +9,7 @@ import '../level_controller.dart';
 import '../resources.dart';
 import '../stroke_shadow.dart';
 
-class TopBar<T extends LevelController> extends GetView<T> {
+class ScoreBar<T extends LevelController> extends GetView<T> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(

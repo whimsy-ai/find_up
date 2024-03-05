@@ -90,7 +90,6 @@ class ILPExplorerController extends SteamFilterController
     if (folderPath == 'steam') {
       await _loadSteamFiles();
     } else {
-      subscribed = false;
       Iterable<String> files;
       if (folderPath == 'assets') {
         folderPath = assetPath(package: 'game', paths: ['ilp']);

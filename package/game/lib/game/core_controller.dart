@@ -79,7 +79,7 @@ mixin CoreController on GetxController {
     }
   }
 
-  setFail() {
+  void setFail() {
     state = GameState.failed;
     update(['ui', 'game']);
   }

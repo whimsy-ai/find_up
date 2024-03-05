@@ -3,15 +3,19 @@ import 'dart:math' as math;
 import 'package:collection/collection.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:game/game/resources.dart';
 import 'package:get/get.dart';
 
 import '../data.dart';
 import '../duration_extension.dart';
+import '../explorer/file.dart';
 import 'core_controller.dart';
 import 'game_state.dart';
 import 'hint_controller.dart';
 import 'layer.dart';
 import 'level.dart';
+import 'level_find_differences.dart';
+import 'level_puzzle.dart';
 import 'loading_controller.dart';
 import 'offset_scale_controller.dart';
 import 'seed_controller.dart';
@@ -24,7 +28,8 @@ abstract class LevelController extends GetxController
         OffsetScaleController,
         SoundController,
         SeedController,
-        HintController,LoadingController {
+        HintController,
+        LoadingController {
   final List<Level> levels = [];
   int current = 0;
 
@@ -36,8 +41,44 @@ abstract class LevelController extends GetxController
 
   String? error;
 
+  final List<ExplorerFile> files;
+  final int? ilpIndex;
+
+  LevelController({required this.files, this.ilpIndex});
+
   @override
-  void start({int? seed});
+  void start({int? seed}) async {
+    state = GameState.init;
+    update(['ui', 'game']);
+
+    levels.clear();
+    this.seed = seed ?? math.Random().nextInt(65535);
+    final random = math.Random(this.seed);
+
+    super.stop();
+
+    /// 读取游戏资源
+    await Resources.init();
+
+    tapPositions.clear();
+
+    current = 0;
+    update(['ui', 'game']);
+
+    await loadFile(files.first, random);
+    print('total level ${levels.length}');
+    state = GameState.already;
+    update(['ui', 'game']);
+
+    /// 读取第一关，关卡信息对话框会等待读取
+    loadCurrentLevel();
+
+    /// 静默读取其余文件，创建关卡
+    for (var i = 1; i < files.length; i++) {
+      // print('silent load $i level');
+      await loadFile(files[i], random);
+    }
+  }
 
   void prevLevel() {
     if (current > 0) {
@@ -91,7 +132,14 @@ abstract class LevelController extends GetxController
     }
   }
 
-  void onLevelFinish();
+  void onLevelFinish() {
+    if (current < levels.length - 1) {
+      nextLevel();
+    } else {
+      onCompleted();
+    }
+    update(['ui', 'game']);
+  }
 
   final _controller = ConfettiController();
 
@@ -184,4 +232,44 @@ abstract class LevelController extends GetxController
   }
 
   void exit();
+
+  @override
+  void resetScaleAndOffset() {
+    final screenHalfWidth = Get.width / 2;
+    final width = currentLevel!.width, height = currentLevel!.height;
+    minScale = scale = (math.min(screenHalfWidth, Get.height) -
+            OffsetScaleController.padding) /
+        math.max(width, height);
+    offsetX = (screenHalfWidth - width * scale) / 2;
+    offsetY = (Get.height - height * scale) / 2;
+  }
+
+  @override
+  Future<void> loadFile(ExplorerFile file, math.Random random) async {
+    await file.load();
+
+    final ilp = file.ilp!;
+    final length = (await ilp.infos).length;
+    for (var i = 0; i < length; i++) {
+      final mode = LevelMode.random(random);
+      switch (mode) {
+        case LevelMode.findDifferences:
+          levels.add(LevelFindDifferences(
+            controller: this,
+            file: file,
+            ilpIndex: i,
+            type: LevelDifferentType.random(random),
+            flip: Flip.random(random),
+          ));
+          break;
+        case LevelMode.puzzle:
+          levels.add(LevelPuzzle(
+            controller: this,
+            file: file,
+            ilpIndex: i,
+            type: LevelPuzzleType.random(random),
+          ));
+      }
+    }
+  }
 }

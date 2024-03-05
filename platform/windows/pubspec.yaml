@@ -65,9 +65,9 @@ dependencies:
   path_drawing: ^1.0.1
   borders: 0.3.0
   yaml_edit: ^2.2.0
-  palette_generator: ^0.3.3+3
   enough_convert: ^1.6.0
   hotkey_manager: ^0.2.0
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

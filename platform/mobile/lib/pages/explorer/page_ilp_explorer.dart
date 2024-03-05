@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:game/explorer/asset_ilp_file.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 
 import 'asset_file_list_tile.dart';
-import 'asset_ilp_file.dart';
-import 'controller.dart';
+import 'gallery_controller.dart';
 
 class PageILPExplorer extends StatelessWidget {
   @override
