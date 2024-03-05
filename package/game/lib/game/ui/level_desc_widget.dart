@@ -28,12 +28,8 @@ class LevelDescriptionBuilder<T extends LevelController> extends GetView<T> {
             height: 20,
             child: CircularProgressIndicator(),
           ),
-        if (loading)
-          Text(
-            UI.loading.tr,
-            style: _loadingStyle,
-          ),
-        TextButton(
+        if (loading) _loading(),
+        ElevatedButton(
           onPressed: loading
               ? null
               : () {
@@ -62,7 +58,51 @@ class LevelDescriptionBuilder<T extends LevelController> extends GetView<T> {
   }
 
   Widget _content() {
-    if (controller.levels.length < 2) return SizedBox.shrink();
-    return LevelsIndicator<T>();
+    final level = controller.currentLevel!;
+    final desc = switch (level.mode) {
+      LevelMode.findDifferences => SizedBox(
+          height: 100,
+          child: _imageRow((level as LevelFindDifferences).type),
+        ),
+      LevelMode.puzzle => SizedBox.shrink(),
+    };
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        desc,
+        SizedBox(height: 10),
+        if (controller.current > 0) LevelsIndicator<T>(),
+      ],
+    );
   }
+
+  Widget _loading() {
+    var text = UI.loading.tr;
+    if (controller.totalBytes > 0) text += ' ${controller.downloadedPercent} %';
+    return Text(
+      text,
+      style: _loadingStyle,
+    );
+  }
+}
+
+Widget _imageRow(LevelDifferentType tpe) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Image.asset(
+        tpe == LevelDifferentType.single
+            ? 'assets/images/monalisa_left.png'
+            : 'assets/images/monalisa_left_multi.png',
+        package: 'game',
+      ),
+      VerticalDivider(width: 1),
+      Image.asset(
+        tpe == LevelDifferentType.single
+            ? 'assets/images/monalisa_right.png'
+            : 'assets/images/monalisa_right_multi.png',
+        package: 'game',
+      ),
+    ],
+  );
 }

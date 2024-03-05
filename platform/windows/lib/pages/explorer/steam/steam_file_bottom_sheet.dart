@@ -110,7 +110,6 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                 spacing: 10,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  if (widget.file.isSubscribed && widget.file.ilpFile != null)
                     ElevatedButton(
                       child: Icon(Icons.play_arrow_rounded),
                       onPressed: () async {
@@ -118,8 +117,6 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                         controller.update([widget.file.id, 'bottomSheet']);
                       },
                     ),
-                  if (widget.file.isSubscribed && widget.file.ilpFile == null)
-                    Text(UI.downloading.tr),
                   Obx(
                     () => ElevatedButton.icon(
                       icon: Icon(Icons.thumb_up_rounded),
@@ -148,15 +145,16 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                       },
                     ),
                   ),
-                  ElevatedButton(
-                    child: widget.file.isSubscribed
+                  ElevatedButton.icon(
+                    icon: Icon(widget.file.isSubscribed?Icons.heart_broken_rounded:Icons.favorite_border_rounded),
+                    label: widget.file.isSubscribed
                         ? Text(UI.steamUnSubscribe.tr)
-                        : Text(UI.steamSubscribeAndDownload.tr),
+                        : Text(UI.steamSubscribe.tr),
                     onPressed: () async {
                       if (widget.file.isSubscribed) {
                         await widget.file.unSubscribe();
                       } else {
-                        await widget.file.subscribeAndDownload();
+                        await widget.file.subscribe();
                       }
                       _controller.update([widget.file.id, 'bottomSheet']);
                     },

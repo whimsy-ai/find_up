@@ -62,6 +62,9 @@ class LevelFindDifferences extends Level with LevelLoader {
   }
 
   @override
+  int get allLayers => layers.length - 1;
+
+  @override
   Future<void> drawContent() async {
     await Future.wait([
       _drawFindDifferencesImage(layers, LayerLayout.left).then((value) {
@@ -126,7 +129,10 @@ class LevelFindDifferences extends Level with LevelLoader {
               y: y,
             );
             print('是否透明 $isTransparent');
-            if (!isTransparent) return layer;
+            if (!isTransparent) {
+              foundLayers++;
+              return layer;
+            }
           }
         }
       }

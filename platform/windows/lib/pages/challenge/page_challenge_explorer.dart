@@ -87,8 +87,9 @@ class PageChallengeExplorer extends GetView<SteamExplorerController> {
                               : Image.network(controller.collections[i].image),
                           title: Text(controller.collections[i].name),
                           subtitle: Text(
-                              'children id ${controller.collections[i].childrenItemId}\n'
-                              'images: ${controller.collections[i].childrenItemId.length}\n'
+                              '${controller.collections[i].description}\n'
+                              // 'children id ${controller.collections[i].childrenItemId}\n'
+                              // 'images: ${controller.collections[i].childrenItemId.length}\n'
                               '${UI.updateTime.tr}: ${formatDate(controller.collections[i].updateTime)}'),
                           trailing: Icon(Icons.play_circle_rounded),
                           onTap: () {

@@ -35,6 +35,7 @@ dependencies:
   google_fonts: ^6.1.0
   oktoast: ^3.4.0
   image: ^4.1.7
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:

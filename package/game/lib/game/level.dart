@@ -109,4 +109,8 @@ abstract class Level {
   void onCompleted() {
     state = LevelState.completed;
   }
+
+  int get allLayers;
+
+  int foundLayers = 0;
 }

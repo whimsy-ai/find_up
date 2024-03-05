@@ -126,11 +126,11 @@ extension SteamCollectionEX on SteamClient {
     return completer.future;
   }
 
-  Future<SubmitItemUpdateResult> createCollection(
+  Future<SubmitResult> createCollection(
     SteamCollection collection, {
     visibility = ERemoteStoragePublishedFileVisibility.public,
   }) async {
-    final completer = Completer<SubmitItemUpdateResult>();
+    final completer = Completer<SubmitResult>();
     final itemId = await createItemReturnId();
     final tempDir = await getTemporaryDirectory();
     final itemDir =
@@ -204,7 +204,12 @@ extension SteamCollectionEX on SteamClient {
         asyncCallId: steamUgc.submitItemUpdate(handle, ''.toNativeUtf8()),
         cb: (res, failed) {
           if (failed) return completer.completeError(Exception());
-          completer.complete(res.ref);
+          completer.complete(SubmitResult(
+            publishedFileId: res.publishedFileId,
+            result: res.result,
+            userNeedsToAcceptWorkshopLegalAgreement:
+                res.userNeedsToAcceptWorkshopLegalAgreement,
+          ));
         });
     return completer.future;
   }

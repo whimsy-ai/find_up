@@ -42,14 +42,15 @@ class SteamSimpleFile implements ExplorerFile {
   Future<void> updateDownloadBytes() async {
     final c = Completer();
     using((arena) {
-      final current = arena<UnsignedLongLong>();
+      final downloaded = arena<UnsignedLongLong>();
       final total = arena<UnsignedLongLong>();
-      final res = ugc.getItemDownloadInfo(id, current, total);
+      final res = ugc.getItemDownloadInfo(id, downloaded, total);
       if (res) {
-        downloadedBytes = current[0];
-        totalBytes = current[1];
-        c.complete();
+        downloadedBytes = downloaded.value;
+        totalBytes = total.value;
+        // print('获取下载数据 ${downloaded.value} ${total.value}');
       }
+      c.complete();
     });
     return c.future;
   }
@@ -157,9 +158,11 @@ class SteamFile extends SteamSimpleFile {
     SteamClient.instance.steamUgc.downloadItem(id, true);
     load();
   }
+  Future subscribe() async {
+    await SteamClient.instance.subscribe(id);
+  }
 
   Future unSubscribe() async {
     await SteamClient.instance.unsubscribe(id);
-    load();
   }
 }

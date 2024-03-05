@@ -90,15 +90,29 @@ class PCGameController extends LevelController with MouseController {
     );
   }
 
-  Future<File> _downloadSteamFile(int itemId) async {
-    await SteamClient.instance.downloadUGCItem(itemId);
+  Timer? _downloadTimer;
+
+  Future<File> _downloadSteamFile(SteamSimpleFile file) async {
+    SteamClient.instance.steamUgc.suspendDownloads(false);
+    final download = SteamClient.instance.downloadUGCItem(
+      file.id,
+      highPriority: true,
+    );
     final completer = Completer<String>();
+    _downloadTimer = Timer.periodic(Duration(milliseconds: 100), (timer) async {
+      await file.updateDownloadBytes();
+      downloadedBytes = file.downloadedBytes;
+      totalBytes = file.totalBytes;
+      update(['ui']);
+    });
+    await download;
+    _downloadTimer?.cancel();
     using((arena) async {
       final size = arena<UnsignedLongLong>();
       final folder = arena<Uint8>(1000).cast<Utf8>();
       final timeStamp = arena<UnsignedInt>();
       final installed = SteamClient.instance.steamUgc.getItemInstallInfo(
-        itemId,
+        file.id,
         size,
         folder,
         1000,
@@ -111,7 +125,7 @@ class PCGameController extends LevelController with MouseController {
 
   Future<void> _loadFile(ExplorerFile file, math.Random random) async {
     if (file is SteamSimpleFile) {
-      file = ILPFile(await _downloadSteamFile(file.id));
+      file = ILPFile(await _downloadSteamFile(file));
     }
     await file.load();
     final ilp = file.ilp!;
@@ -137,5 +151,11 @@ class PCGameController extends LevelController with MouseController {
           ));
       }
     }
+  }
+
+  @override
+  void exit() {
+    SteamClient.instance.steamUgc.suspendDownloads(true);
+    Get.back();
   }
 }

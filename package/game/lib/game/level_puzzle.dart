@@ -51,6 +51,9 @@ class LevelPuzzle extends Level with LevelLoader {
   }
 
   @override
+  int get allLayers => layers.length - 1;
+
+  @override
   Future<void> drawContent() async {}
 
   @override

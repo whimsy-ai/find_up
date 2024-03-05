@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:game/global_progress_indicator_dialog.dart';
 import 'package:game/info_table.dart';
 import 'package:game/utils/input_decoration_outline_collapsed.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,7 @@ import '../../utils/steam_tags.dart';
 import '../challenge/gallery_dialog.dart';
 import '../explorer/steam/steam_cached_image.dart';
 import '../explorer/steam/steam_file.dart';
+import '../ilp_editor/steam/upload_success_dialog.dart';
 import 'steam_challenge.dart';
 
 class PageCreateChallenge extends GetView<CreateChallengeController> {
@@ -245,16 +247,7 @@ class PageCreateChallenge extends GetView<CreateChallengeController> {
       if (controller.list.isEmpty) {
         return _selectSteamFiles();
       }
-      Get.dialog(
-        AlertDialog(
-          content: Container(
-            width: 120,
-            height: 120,
-            child: CircularProgressIndicator(),
-          ),
-        ),
-        barrierDismissible: false,
-      );
+      GlobalProgressIndicatorDialog.show(UI.steamUploading.tr);
       final collection = SteamCollection(
         id: 0,
         ownerId: 0,
@@ -285,18 +278,7 @@ class PageCreateChallenge extends GetView<CreateChallengeController> {
           visibility: ERemoteStoragePublishedFileVisibility.public,
         );
         Get.back();
-        Get.dialog(
-          AlertDialog(
-            title: Text(UI.steamUploadSuccess.tr),
-            actions: [
-              TextButton(
-                child: Text('open'),
-                onPressed: () => SteamClient.instance.openUrl(
-                    'steam://url/CommunityFilePage/${res.publishedFileId}'),
-              )
-            ],
-          ),
-        );
+        SteamUploadSuccessDialog.show(result: res);
       } catch (e) {
         Get.back();
         showToast(UI.failed.tr);

@@ -12,6 +12,7 @@ import 'game_state.dart';
 import 'hint_controller.dart';
 import 'layer.dart';
 import 'level.dart';
+import 'loading_controller.dart';
 import 'offset_scale_controller.dart';
 import 'seed_controller.dart';
 import 'sound_controller.dart';
@@ -23,10 +24,13 @@ abstract class LevelController extends GetxController
         OffsetScaleController,
         SoundController,
         SeedController,
-        HintController {
+        HintController,LoadingController {
   final List<Level> levels = [];
   int current = 0;
+
+  /// for debug
   bool debug = false;
+  bool showDebugWidget = false;
 
   final tapPositions = <Offset>[];
 
@@ -48,6 +52,7 @@ abstract class LevelController extends GetxController
     if (current < levels.length - 1) {
       current++;
       tapPositions.clear();
+      resetBytes();
       loadCurrentLevel();
     } else {
       onLevelFinish();
@@ -153,20 +158,30 @@ abstract class LevelController extends GetxController
     _controller.dispose();
   }
 
-  int get allLayers => currentLevel!.layers.length;
+  int get allLayers => currentLevel!.allLayers;
 
-  int get unTappedLayers => currentLevel!.layers.where((l) => !l.tapped).length;
+  int get foundLayers => currentLevel!.foundLayers;
 
   String get time => currentLevel!.time.toSemanticString();
 
   onCompleted() {
-    /// 通关
-    playConfetti();
-    state = GameState.completed;
+    final hasFailed = levels.firstWhereOrNull(
+            (element) => element.state == LevelState.failed) !=
+        null;
+    if (hasFailed) {
+      state = GameState.failed;
+    } else {
+      /// 通关
+      playConfetti();
+      state = GameState.completed;
 
-    /// store unlocked layers id
-    final id = levels.map((e) => e.tappedLayerId).flattened.toSet();
-    print('unlocked ${id.length}');
-    Data.layersId.addAll(id);
+      /// store unlocked layers id
+      final id = levels.map((e) => e.tappedLayerId).flattened.toSet();
+      print('unlocked ${id.length}');
+      Data.layersId.addAll(id);
+    }
+    update(['ui', 'game']);
   }
+
+  void exit();
 }

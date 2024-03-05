@@ -12,8 +12,10 @@ import 'package:game/data.dart';
 import 'package:game/discord_link.dart';
 import 'package:game/explorer/ilp_file.dart';
 import 'package:game/game/page_game_entry.dart';
+import 'package:game/game/ui/steam_downloading_indicator.dart';
 import 'package:game/http/http.dart';
 import 'package:get/get.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:oktoast/oktoast.dart';
@@ -22,11 +24,11 @@ import 'package:window_manager/window_manager.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
 
 import 'pages/challenge/page_challenge_explorer.dart';
-import 'pages/challenge/page_create_challenge.dart';
+import 'pages/challenge/page_challenge_editor.dart';
 import 'pages/challenge/page_play_challenge.dart';
+import 'pages/challenge/pc_game_controller.dart';
 import 'pages/explorer/ilp_explorer_controller.dart';
 import 'pages/explorer/page_ilp_explorer.dart';
-import 'pages/challenge/pc_game_controller.dart';
 import 'pages/ilp_editor/ilp_editor_controller.dart';
 import 'pages/ilp_editor/page_ilp_editor.dart';
 import 'pages/page_about.dart';
@@ -47,6 +49,7 @@ Future runMain(List<String> args) async {
   }
   print('启动参数 $args');
   WidgetsFlutterBinding.ensureInitialized();
+  await hotKeyManager.unregisterAll();
   await WindowsSingleInstance.ensureSingleInstance(
     args,
     "gzlock.find_up.windows",
@@ -300,7 +303,7 @@ class MyHomePage extends StatelessWidget {
                               text: UI.steamChallenge.tr,
                               children: [
                                 TextSpan(
-                                  text: 'Beta',
+                                  text: ' Beta',
                                   style: TextStyle(
                                     color: Colors.red,
                                     fontSize: 12,

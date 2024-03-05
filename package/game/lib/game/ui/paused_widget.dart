@@ -100,8 +100,7 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
                     ),
                     onPressed: () async {
                       if (!controller.isCompleted) {
-                        final foundLayers =
-                            controller.allLayers - controller.unTappedLayers;
+                        final foundLayers = controller.foundLayers;
                         if (foundLayers > 0) {
                           final sure = await Get.dialog(AlertDialog(
                             title: Text(UI.restartConfirm
@@ -187,8 +186,8 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
                       ),
                       onPressed: () async {
                         Get.toNamed('/save', arguments: {
-                          'info': controller.currentLevel!.info!,
-                          'layer': controller.currentLevel!.layer!,
+                          'file': controller.currentLevel!.file,
+                          'index': controller.current,
                         });
                       },
                     ),

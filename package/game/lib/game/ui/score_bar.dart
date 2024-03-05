@@ -112,7 +112,7 @@ class TopBar<T extends LevelController> extends GetView<T> {
                     ),
                   ),
                   StrokeShadow.text(
-                    '${controller.allLayers - controller.unTappedLayers}/${controller.allLayers}',
+                    '${controller.foundLayers} / ${controller.allLayers}',
                     style: GoogleFonts.lilitaOne(
                       fontSize: 20,
                       color: Colors.white,

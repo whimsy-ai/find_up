@@ -65,13 +65,7 @@ abstract class SteamFilterController extends GetxController {
   Set<TagShape> get shapes => _shapes;
 
   /// 搜索
-  String _search = '';
-
-  String get search => _search;
-
-  set search(String value) {
-    _search = value;
-  }
+  String search = '';
 
   void clearAgeRating() async {
     if (!await isAdult()) return;
@@ -254,6 +248,7 @@ abstract class SteamFilterController extends GetxController {
     TextStyle chipStyle = const TextStyle(fontSize: 12),
     enabledExpand = true,
     showPageWidget = true,
+    showSubscribed = true,
   }) {
     return GetBuilder<T>(
       tag: tag,
@@ -302,6 +297,17 @@ abstract class SteamFilterController extends GetxController {
               onChanged: (v) => search = v,
             ),
           ),
+
+          if (showSubscribed)
+            ListTile(
+              leading: Icon(_subscribed
+                  ? Icons.check_box
+                  : Icons.check_box_outline_blank_rounded),
+              title: Text(UI.steamSubscribed.tr),
+              onTap: () {
+                subscribed = !_subscribed;
+              },
+            ),
 
           /// 排序
           ListTile(

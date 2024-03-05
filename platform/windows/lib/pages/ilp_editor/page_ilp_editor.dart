@@ -222,8 +222,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                                 if (sure != true) return;
                               }
 
-                              GlobalProgressIndicatorDialog.show(
-                                  UI.steamUploading.tr);
+                              GlobalProgressIndicatorDialog.show(UI.steamUploading.tr);
                               final res = await controller.uploadToSteam();
 
                               /// hide indicator dialog

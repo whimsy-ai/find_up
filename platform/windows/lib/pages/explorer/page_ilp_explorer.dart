@@ -151,12 +151,8 @@ class PageILPExplorer extends GetView<ILPExplorerController> {
   }
 
   _steamFile(SteamFile file) async {
-    if (file.ilpFile != null) {
-      await PageGameEntry.play([file]);
-      await file.load(force: true);
-      controller.update(['files']);
-    } else {
-      await SteamFileBottomSheet.show<ILPExplorerController>(file);
-    }
+    await PageGameEntry.play([file]);
+    await file.load(force: true);
+    controller.update(['files']);
   }
 }
