@@ -32,7 +32,7 @@ dependencies:
   path_drawing: ^1.0.1
   xml: ^6.5.0
   borders: 0.3.0
-  google_fonts: ^6.1.0
+  google_fonts: ^6.2.1
   oktoast: ^3.4.0
   image: ^4.1.7
   collection: ^1.18.0
