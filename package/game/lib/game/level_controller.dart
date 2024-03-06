@@ -57,12 +57,10 @@ abstract class LevelController extends GetxController
 
     super.stop();
 
-    /// 读取游戏资源
-    await Resources.init();
-
     tapPositions.clear();
 
     current = 0;
+    state = GameState.loading;
     update(['ui', 'game']);
 
     await loadFile(files.first, random);

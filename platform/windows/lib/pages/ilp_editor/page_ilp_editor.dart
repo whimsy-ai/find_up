@@ -25,7 +25,7 @@ import 'ilp_editor_controller.dart';
 import 'ilp_editor_tips_dialog.dart';
 import 'ilp_layer_editor_list_tile.dart';
 import 'link_editor.dart';
-import 'steam/upload_success_dialog.dart';
+import 'steam/steam_result_dialog.dart';
 
 class PageILPEditor extends GetView<ILPEditorController> {
   final _formKey = GlobalKey<FormState>();
@@ -229,7 +229,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                               Get.back();
 
                               if (res == null) return;
-                              SteamUploadSuccessDialog.show(result: res);
+                              SteamResultDialog.show(result: res);
                             }
                           },
                         ),

@@ -7,9 +7,12 @@ import 'package:collection/collection.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:steamworks/steamworks.dart';
 
 import '../pages/explorer/steam/steam_file.dart';
+import 'compress_image.dart';
 import 'steam_ex.dart';
 import 'steam_tags.dart';
 
@@ -259,6 +262,7 @@ extension SteamFileEX on SteamClient {
     void Function(int handle)? onUpdate,
     required Set<String> tags,
   }) async {
+    final tempDir = await getTemporaryDirectory();
     itemId ??= await createItemReturnId();
     final completer = Completer<SubmitResult>();
     final handle = steamUgc.startItemUpdate(steamUtils.getAppId(), itemId);
@@ -283,9 +287,10 @@ extension SteamFileEX on SteamClient {
       steamUgc.setItemDescription(handle, description.toNativeUtf8());
     }
     if (previewImagePath != null) {
-      final res =
-          steamUgc.setItemPreview(handle, previewImagePath.toNativeUtf8());
-      debugPrint('预览图片 $previewImagePath $res');
+      final file = File(path.join(tempDir.path, 'preview.png'));
+      await file.writeAsBytes(await compressImage(File(previewImagePath)));
+      // print('预览图片 ${file.path}');
+      steamUgc.setItemPreview(handle, file.path.toNativeUtf8());
     }
     if (contentFolder != null) {
       steamUgc.setItemContent(handle, contentFolder.toNativeUtf8());

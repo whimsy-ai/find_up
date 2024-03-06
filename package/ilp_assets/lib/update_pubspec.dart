@@ -4,11 +4,12 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:yaml_edit/yaml_edit.dart';
 
+late String _assetsPath;
 String _oldPubspec = '';
 
-Future<Completer<void>> updateILPAssetsPubspec(String assetsPath) async {
-  final ilpAssetsPackagePubspecFile =
-      File(path.join(assetsPath, 'pubspec.yaml'));
+Future<void> updateILPAssetsPubspec(String assetsPath) async {
+  _assetsPath = path.join(assetsPath, 'pubspec.yaml');
+  final ilpAssetsPackagePubspecFile = File(_assetsPath);
   final ilpAssetsPackageAssetsFolder =
       Directory(path.join(assetsPath, 'assets'));
 
@@ -24,9 +25,8 @@ Future<Completer<void>> updateILPAssetsPubspec(String assetsPath) async {
   editor.update(['flutter', 'assets'], folders.toList());
   ilpAssetsPackagePubspecFile.writeAsString(editor.toString());
   stdout.writeln('ilp files length: ${folders.length}');
-  final completer = Completer();
-  completer.future.then((value) {
-    ilpAssetsPackagePubspecFile.writeAsStringSync(_oldPubspec);
-  });
-  return completer;
+}
+
+void resetILPAssetsPackagePubspecFile() {
+  File(_assetsPath).writeAsStringSync(_oldPubspec);
 }

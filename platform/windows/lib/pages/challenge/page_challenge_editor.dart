@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:collection/collection.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -9,19 +8,16 @@ import 'package:game/info_table.dart';
 import 'package:game/utils/input_decoration_outline_collapsed.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
-import 'package:oktoast/oktoast.dart';
 import 'package:steamworks/steamworks.dart';
 
-import '../../utils/steam_collection_ex.dart';
-import '../../utils/steam_ex.dart';
-import '../../utils/steam_tags.dart';
 import '../challenge/gallery_dialog.dart';
 import '../explorer/steam/steam_cached_image.dart';
 import '../explorer/steam/steam_file.dart';
-import '../ilp_editor/steam/upload_success_dialog.dart';
-import 'steam_challenge.dart';
+import '../ilp_editor/steam/steam_result_dialog.dart';
+import 'challenge_editor_controller.dart';
 
-class PageCreateChallenge extends GetView<CreateChallengeController> {
+class PageCreateChallenge<T extends ChallengeEditorController>
+    extends GetView<T> {
   final _form = GlobalKey<FormState>();
 
   @override
@@ -35,7 +31,7 @@ class PageCreateChallenge extends GetView<CreateChallengeController> {
           Form(
             key: _form,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: GetBuilder<CreateChallengeController>(
+            child: GetBuilder<T>(
               id: 'form',
               builder: (c) {
                 return Row(
@@ -54,7 +50,7 @@ class PageCreateChallenge extends GetView<CreateChallengeController> {
                               minHeight: 200,
                               maxHeight: 300,
                             ),
-                            child: controller._image == null
+                            child: controller.image == null
                                 ? Icon(Icons.image_search_rounded)
                                 : Image.file(File(controller.image!)),
                           ),
@@ -70,7 +66,7 @@ class PageCreateChallenge extends GetView<CreateChallengeController> {
                         children: [
                           ListTile(
                             title: TextFormField(
-                              initialValue: controller.name,
+                              initialValue: controller.title,
                               decoration: inputDecorationOutlineCollapsed(
                                 hintText: UI.challengeName.tr,
                               ),
@@ -80,15 +76,15 @@ class PageCreateChallenge extends GetView<CreateChallengeController> {
                                 }
                                 return null;
                               },
-                              onChanged: (c) => controller.name = c,
+                              onChanged: (c) => controller.title = c,
                             ),
                           ),
                           ListTile(
                             title: TextFormField(
                               minLines: 3,
                               maxLines: 3,
-                              initialValue: controller.desc,
-                              onChanged: (c) => controller.desc = c,
+                              initialValue: controller.description,
+                              onChanged: (c) => controller.description = c,
                               decoration: inputDecorationOutlineCollapsed(
                                 hintText: UI.ilpDesc.tr,
                               ),
@@ -128,7 +124,7 @@ class PageCreateChallenge extends GetView<CreateChallengeController> {
             ),
           ),
           Expanded(
-            child: GetBuilder<CreateChallengeController>(
+            child: GetBuilder<T>(
                 id: 'list',
                 builder: (c) {
                   return Column(
@@ -248,40 +244,11 @@ class PageCreateChallenge extends GetView<CreateChallengeController> {
         return _selectSteamFiles();
       }
       GlobalProgressIndicatorDialog.show(UI.steamUploading.tr);
-      final collection = SteamCollection(
-        id: 0,
-        ownerId: 0,
-        name: controller.name,
-        description: controller._desc,
-        version: 1,
-        publishTime: DateTime.now(),
-        updateTime: DateTime.now(),
-        image: controller.image,
-        ageRating: controller.ageRating!,
-        styles: controller.styles.toList(),
-        shapes: controller.shapes.toList(),
-        childrenItemId: controller.list.keys.toList(),
-        items: controller.list.values
-            .map((e) => CollectionItem(
-                id: e.id,
-                name: e.name,
-                image: e.cover,
-                ownerId: e.steamIdOwner))
-            .toList(),
-      );
-      print(
-          'name ${collection.name}, desc ${collection.description}, children ${collection.childrenItemId},'
-          ' age ${collection.ageRating}, style ${collection.styles}, shape ${collection.shapes}');
-      try {
-        final res = await SteamClient.instance.createCollection(
-          collection,
-          visibility: ERemoteStoragePublishedFileVisibility.public,
-        );
-        Get.back();
-        SteamUploadSuccessDialog.show(result: res);
-      } catch (e) {
-        Get.back();
-        showToast(UI.failed.tr);
+      final res = await controller.submit();
+      print('res $res');
+      Get.back();
+      if (res.result == EResult.eResultOK) {
+        SteamResultDialog.show(result: res);
       }
     }
   }
@@ -302,61 +269,5 @@ class PageCreateChallenge extends GetView<CreateChallengeController> {
       ],
     ));
     if (sure == true) controller.list.clear();
-  }
-}
-
-class CreateChallengeController extends GetxController {
-  String? _image;
-  String _name = '', _desc = '';
-  int imageLength = 0;
-  TagAgeRating? ageRating;
-  final shapes = <TagShape>{};
-  final styles = <TagStyle>{};
-  late final list = <int, SteamFile>{}.obs
-    ..listen((v) {
-      final ageRatings = v.values.map((e) => e.ageRating).nonNulls;
-      if (ageRatings.contains(TagAgeRating.mature)) {
-        ageRating = TagAgeRating.mature;
-      } else if (ageRatings.contains(TagAgeRating.questionable)) {
-        ageRating = TagAgeRating.questionable;
-      } else {
-        ageRating = ageRatings.isEmpty ? null : TagAgeRating.everyone;
-      }
-
-      shapes
-        ..clear()
-        ..addAll(v.values.map((e) => e.shape).nonNulls);
-      styles
-        ..clear()
-        ..addAll(v.values.map((e) => e.style).nonNulls);
-      imageLength = v.values.map((e) => e.infos.length).sum;
-      update(['form', 'list']);
-    });
-
-  String? get image => _image;
-
-  set image(String? value) {
-    _image = value;
-    update(['form']);
-  }
-
-  String get name => _name;
-
-  set name(String value) {
-    _name = value;
-    update(['form']);
-  }
-
-  get desc => _desc;
-
-  set desc(value) {
-    _desc = value;
-    update(['form']);
-  }
-
-  /// 从steam下载选择的ugc文件
-  downloadAll() async {
-    await Future.wait(list.values
-        .map((file) => SteamClient.instance.downloadUGCItem(file.id)));
   }
 }

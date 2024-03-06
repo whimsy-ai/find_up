@@ -156,7 +156,7 @@ class NewGameUI<T extends LevelController> extends GetView<T> {
                       'seed:${controller.seed}',
                       'scale:${controller.scale}',
                       'level:${controller.current + 1} / ${controller.levels.length}',
-                      'layers: ${controller.currentLevel!.layers.where((l) => !l.tapped).length} / ${controller.currentLevel!.layers.length - 1}'
+                      'layers: ${controller.currentLevel?.layers.where((l) => !l.tapped).length} / ${controller.currentLevel?.layers.length ?? 0 - 1}'
                     ].join('\n')),
                     Wrap(
                       children: [

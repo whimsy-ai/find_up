@@ -18,6 +18,11 @@ enum LevelDifferentType {
       .values[random.nextInt(LevelDifferentType.values.length)];
 }
 
+const _TypeAndTimes = {
+  LevelDifferentType.single: 20,
+  LevelDifferentType.multi: 120,
+};
+
 enum Flip {
   no,
   left,
@@ -49,10 +54,7 @@ class LevelFindDifferences extends Level with LevelLoader {
     this.flip = Flip.no,
   }) {
     flip = Flip.no;
-    time = switch (type) {
-      LevelDifferentType.single => Duration(seconds: 10),
-      LevelDifferentType.multi => Duration(seconds: 120),
-    };
+    time = Duration(seconds: 1) * _TypeAndTimes[type]!;
     time += switch (flip) {
       Flip.no => Duration.zero,
       Flip.left ||

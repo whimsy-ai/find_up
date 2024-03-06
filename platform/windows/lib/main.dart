@@ -26,6 +26,7 @@ import 'package:steamworks/steamworks.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
 
+import 'pages/challenge/challenge_editor_controller.dart';
 import 'pages/challenge/page_challenge_editor.dart';
 import 'pages/challenge/page_challenge_explorer.dart';
 import 'pages/challenge/page_play_challenge.dart';
@@ -40,6 +41,7 @@ import 'pages/page_test2.dart';
 import 'pages/save_image/page_save_image.dart';
 import 'pages/save_image/pc_save_image_controller.dart';
 import 'utils/asset_path.dart';
+import 'utils/compress_image.dart';
 import 'utils/update_window_title.dart';
 
 const steamAppId = 2550370;
@@ -176,7 +178,7 @@ class MyApp extends StatelessWidget {
               name: '/create_challenge',
               page: () => PageCreateChallenge(),
               binding: BindingsBuilder(() {
-                Get.put(CreateChallengeController());
+                Get.put(ChallengeEditorController());
               }),
             ),
             GetPage(

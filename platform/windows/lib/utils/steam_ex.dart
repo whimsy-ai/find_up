@@ -88,6 +88,10 @@ class SubmitResult {
     required this.publishedFileId,
     required this.userNeedsToAcceptWorkshopLegalAgreement,
   });
+
+  @override
+  String toString() =>
+      'SubmitResult{result: $result, publishedFileId: $publishedFileId, userNeedsToAcceptWorkshopLegalAgreement: $userNeedsToAcceptWorkshopLegalAgreement}';
 }
 
 extension SteamClientEx on SteamClient {
@@ -187,6 +191,10 @@ extension SteamClientEx on SteamClient {
     openUrl(
       'https://steamcommunity.com/sharedfiles/workshoplegalagreement?appid=${SteamClient.instance.appId}',
     );
+  }
+
+  openUGCItemUrl(int publishedFileId) {
+    openUrl('steam://url/CommunityFilePage/$publishedFileId');
   }
 }
 

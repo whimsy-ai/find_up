@@ -50,7 +50,7 @@ class SteamCollection {
   final int id;
   final String name, description;
   final int ownerId;
-  final String image; // 封面
+  final String? previewImage; // 封面
   final int version, votesUp, votesDown;
   final List<int> childrenItemId;
   final DateTime publishTime, updateTime;
@@ -73,10 +73,10 @@ class SteamCollection {
     required this.shapes,
     this.votesUp = 0,
     this.votesDown = 0,
-    String? image,
+    this.previewImage,
     this.description = '',
     this.items,
-  }) : image = image ?? '';
+  });
 }
 
 class ChallengeScore {

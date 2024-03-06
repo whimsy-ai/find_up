@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:ilp_assets/update_pubspec.dart';
 import 'package:path/path.dart' as path;
-import 'package:yaml_edit/yaml_edit.dart';
 
 final buildPath = path.join(
   Directory.current.path,
@@ -18,7 +17,7 @@ void main() async {
   print('当前文件夹 ${Directory.current.path}');
 
   /// 更新游戏资源索引
-  final wait = await updateILPAssetsPubspec(path.join(
+  await updateILPAssetsPubspec(path.join(
     Directory.current.path,
     '..',
     '..',
@@ -74,7 +73,7 @@ void main() async {
   );
 
   /// 还原资源package
-  wait.complete();
+  resetILPAssetsPackagePubspecFile();
   print('成功, 位置$buildPath');
 }
 

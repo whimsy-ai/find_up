@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
@@ -7,6 +8,7 @@ import 'package:steamworks/steamworks.dart';
 import '../../utils/datetime_format.dart';
 import '../../utils/empty_list_widget.dart';
 import '../../utils/steam_collection_ex.dart';
+import '../../utils/steam_ex.dart';
 import '../../utils/steam_filter.dart';
 import '../explorer/steam/steam_file.dart';
 import 'steam_challenge.dart';
@@ -81,24 +83,39 @@ class PageChallengeExplorer extends GetView<SteamExplorerController> {
                     : ListView.separated(
                         itemCount: controller.collections.length,
                         separatorBuilder: (_, i) => Divider(),
-                        itemBuilder: (_, i) => ListTile(
-                          leading: controller.collections[i].image.isEmpty
-                              ? CircleAvatar()
-                              : Image.network(controller.collections[i].image),
-                          title: Text(controller.collections[i].name),
-                          subtitle: Text(
-                              '${controller.collections[i].description}\n'
-                              // 'children id ${controller.collections[i].childrenItemId}\n'
-                              // 'images: ${controller.collections[i].childrenItemId.length}\n'
-                              '${UI.updateTime.tr}: ${formatDate(controller.collections[i].updateTime)}'),
-                          trailing: Icon(Icons.play_circle_rounded),
-                          onTap: () {
-                            PageGameEntry.play(controller
-                                .collections[i].childrenItemId
-                                .map((e) => SteamSimpleFile(id: e))
-                                .toList());
-                          },
-                        ),
+                        itemBuilder: (_, i) {
+                          final c = controller.collections[i];
+                          return ListTile(
+                            leading: c.previewImage == null
+                                ? CircleAvatar()
+                                : Image.network(c.previewImage!),
+                            title: Text(c.name),
+                            subtitle: Text('${c.description}\n'
+                                // 'children id ${c.childrenItemId}\n'
+                                // 'images: ${c.childrenItemId.length}\n'
+                                '${UI.updateTime.tr}: ${formatDate(c.updateTime)}'),
+                            trailing: Wrap(
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    c.ownerId == SteamClient.instance.userId
+                                        ? Icons.edit
+                                        : FontAwesomeIcons.steam,
+                                  ),
+                                  onPressed: () {
+                                    SteamClient.instance.openUGCItemUrl(c.id);
+                                  },
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              PageGameEntry.play(controller
+                                  .collections[i].childrenItemId
+                                  .map((e) => SteamSimpleFile(id: e))
+                                  .toList());
+                            },
+                          );
+                        },
                       );
               },
             ),

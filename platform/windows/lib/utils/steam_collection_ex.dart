@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 
@@ -10,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:steamworks/steamworks.dart';
 
 import '../pages/challenge/steam_challenge.dart';
+import 'compress_image.dart';
 import 'steam_ex.dart';
 import 'steam_tags.dart';
 
@@ -95,7 +95,7 @@ extension SteamCollectionEX on SteamClient {
                   id: detail.publishedFileId,
                   ownerId: detail.steamIdOwner,
                   name: detail.title.toDartString(),
-                  image: previewUrl.toDartString(),
+                  previewImage: previewUrl.toDartString(),
                   version: 0,
                   votesUp: detail.votesUp,
                   votesDown: detail.votesDown,
@@ -126,9 +126,17 @@ extension SteamCollectionEX on SteamClient {
     return completer.future;
   }
 
-  Future<SubmitResult> createCollection(
-    SteamCollection collection, {
+  Future<SubmitResult> createCollection({
+    required ApiLanguage language,
     visibility = ERemoteStoragePublishedFileVisibility.public,
+    required Set<int> childrenIds,
+    required String title,
+    required TagAgeRating ageRating,
+    required Set<TagStyle> styles,
+    required Set<TagShape> shapes,
+    String? description,
+    String? contentFolder,
+    String? previewImagePath,
   }) async {
     final completer = Completer<SubmitResult>();
     final itemId = await createItemReturnId();
@@ -136,16 +144,20 @@ extension SteamCollectionEX on SteamClient {
     final itemDir =
         await Directory(path.join(tempDir.path, itemId.toString())).create();
     await File(path.join(itemDir.path, 'challenge.txt')).create();
+    // print('挑战 目录 ${itemDir.path}');
 
     final handle = steamUgc.startItemUpdate(steamUtils.getAppId(), itemId);
+    steamUgc.setLanguage(handle, ApiLanguage.english.name.toNativeUtf8());
     steamUgc.setItemTitle(
       handle,
-      collection.name.toNativeUtf8(),
+      title.toNativeUtf8(),
     );
-    steamUgc.setItemDescription(
-      handle,
-      collection.description.toNativeUtf8(),
-    );
+    if (description != null) {
+      steamUgc.setItemDescription(
+        handle,
+        description.toNativeUtf8(),
+      );
+    }
     steamUgc.setItemVisibility(
       handle,
       visibility,
@@ -156,9 +168,9 @@ extension SteamCollectionEX on SteamClient {
     {
       final tags = {
         TagType.challenge.value,
-        collection.ageRating.value,
-        ...collection.styles.map((e) => e.value),
-        ...collection.shapes.map((e) => e.value),
+        ageRating.value,
+        ...styles.map((e) => e.value),
+        ...shapes.map((e) => e.value),
       };
       final tag = calloc<SteamParamStringArray>();
       tag.ref.strings = calloc<Pointer<Utf8>>(tags.length);
@@ -170,35 +182,37 @@ extension SteamCollectionEX on SteamClient {
       print('set tags $setTags $tags');
     }
 
-    print('set image ${collection.image}');
-    if (collection.image.isNotEmpty) {
-      steamUgc.setItemPreview(handle, collection.image.toNativeUtf8());
+    if (previewImagePath != null) {
+      final file = File(path.join(tempDir.path, 'preview.png'));
+      await file.writeAsBytes(await compressImage(File(previewImagePath)));
+      print('预览图片 ${file.path}');
+      steamUgc.setItemPreview(handle, file.path.toNativeUtf8());
     }
-    for (var fileId in collection.childrenItemId) {
+    for (var fileId in childrenIds) {
       steamUgc.addDependency(itemId, fileId);
     }
 
     /// meta data
-    {
-      final metaData = [
-        for (var e in collection.items!) [e.id.toString(), e.name, e.image]
-      ];
-      final keyValue = <String, String>{};
-      print('metadata $metaData');
-      final json = jsonEncode(metaData);
-      // steamUgc.setItemDescription(handle, json.toNativeUtf8());
-      final meta = base64Encode(gzip.encode(utf8.encode(json)));
-      keyValue['metaDataLength'] = meta.length.toString();
-      steamUgc.setItemMetadata(handle, meta.toNativeUtf8());
-      for (var key in keyValue.keys) {
-        steamUgc.removeItemKeyValueTags(handle, key.toNativeUtf8());
-        steamUgc.addItemKeyValueTag(
-          handle,
-          key.toNativeUtf8(),
-          keyValue[key]!.toNativeUtf8(),
-        );
-      }
-    }
+    // {
+    //   final metaData = [
+    //     for (var e in collection.items!) [e.id.toString(), e.name, e.image]
+    //   ];
+    //   final keyValue = <String, String>{};
+    //   print('metadata $metaData');
+    //   final json = jsonEncode(metaData);
+    //   // steamUgc.setItemDescription(handle, json.toNativeUtf8());
+    //   final meta = base64Encode(gzip.encode(utf8.encode(json)));
+    //   keyValue['metaDataLength'] = meta.length.toString();
+    //   steamUgc.setItemMetadata(handle, meta.toNativeUtf8());
+    //   for (var key in keyValue.keys) {
+    //     steamUgc.removeItemKeyValueTags(handle, key.toNativeUtf8());
+    //     steamUgc.addItemKeyValueTag(
+    //       handle,
+    //       key.toNativeUtf8(),
+    //       keyValue[key]!.toNativeUtf8(),
+    //     );
+    //   }
+    // }
 
     registerCallResult<SubmitItemUpdateResult>(
         asyncCallId: steamUgc.submitItemUpdate(handle, ''.toNativeUtf8()),
