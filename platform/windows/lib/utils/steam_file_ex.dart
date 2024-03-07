@@ -20,6 +20,7 @@ extension SteamFileEX on SteamClient {
   Future<SteamFiles> getAllItems({
     required int page,
     required SteamUGCSort sort,
+    required TagType type,
     bool subscribed = false,
     int? userId,
     String? search,
@@ -80,9 +81,10 @@ extension SteamFileEX on SteamClient {
     steamUgc.setReturnMetadata(query, true);
     steamUgc.setAllowCachedResponse(query, 0);
     steamUgc.setReturnLongDescription(query, true);
+    steamUgc.setReturnChildren(query, true);
 
     tags ??= {};
-    tags.add(TagType.file.value);
+    tags.add(type.value);
     for (var tag in tags) {
       steamUgc.addRequiredTag(query, tag.toNativeUtf8());
     }
@@ -91,13 +93,13 @@ extension SteamFileEX on SteamClient {
     registerCallResult<SteamUgcQueryCompleted>(
         asyncCallId: steamUgc.sendQueryUgcRequest(query),
         cb: (result, failed) {
-          // debugPrint('Query ugc items result ${{
-          //   'query_handle': query,
-          //   'result_handle': result.handle,
-          //   'result': result.result,
-          //   'total': result.totalMatchingResults,
-          //   'current': result.numResultsReturned,
-          // }}');
+          debugPrint('Query ugc items result ${{
+            'query_handle': query,
+            'result_handle': result.handle,
+            'result': result.result,
+            'total': result.totalMatchingResults,
+            'current': result.numResultsReturned,
+          }}');
           final List<SteamFile> details = [];
           if (result.result == EResult.eResultOK) {
             for (var i = 0; i < result.numResultsReturned; i++) {
@@ -120,7 +122,8 @@ extension SteamFileEX on SteamClient {
                   256,
                 );
                 // debugPrint('$i previewUrl ${previewUrl.toDartString()}');
-                int? version;
+
+                int? version, levelCount;
                 dynamic infos;
 
                 /// get key value
@@ -147,6 +150,9 @@ extension SteamFileEX on SteamClient {
                     // );
                     if (key.toDartString() == 'metaDataLength') {
                       metaDataLength = int.parse(value.toDartString()) + 10;
+                    }
+                    if (key.toDartString() == 'levelCount') {
+                      levelCount = int.parse(value.toDartString());
                     }
                   }
                   if (metaDataLength != null) {
@@ -176,6 +182,14 @@ extension SteamFileEX on SteamClient {
                   }
                 }
 
+                final children = arena<Uint64>(detail.numChildren);
+                steamUgc.getQueryUgcChildren(
+                  query,
+                  i,
+                  children.cast<UnsignedLongLong>(),
+                  detail.numChildren,
+                );
+
                 /// get tags
                 late TagStyle style;
                 late TagShape shape;
@@ -194,6 +208,11 @@ extension SteamFileEX on SteamClient {
                 }
                 // debugPrint('data $data');
                 details.add(SteamFile(
+                  type: type,
+                  childrenId: List.generate(
+                    detail.numChildren,
+                    (i) => children[i],
+                  ),
                   comments: commentsNumber.value,
                   publishTime: DateTime.fromMillisecondsSinceEpoch(
                       detail.timeCreated * 1000,
@@ -218,6 +237,7 @@ extension SteamFileEX on SteamClient {
                       : List.from(
                           infos.map((map) => ILPInfo.fromJson(map)),
                         ),
+                  levelCount: levelCount,
                 ));
               });
             }
@@ -235,22 +255,10 @@ extension SteamFileEX on SteamClient {
     return completer.future;
   }
 
-  Future<List<int>> getAllSubscribeItems() async {
-    final list = <int>[];
-    final total = steamUgc.getNumSubscribedItems();
-
-    using((arena) {
-      final list = arena<UnsignedLongLong>();
-      final res = steamUgc.getSubscribedItems(list, total);
-
-      // debugPrint('getSubscribedItems $res ${list[0]}');
-    });
-    return list;
-  }
-
   Future<SubmitResult> createItem({
     int? itemId,
     required ApiLanguage language,
+    required TagType type,
     visibility = ERemoteStoragePublishedFileVisibility.public,
     String? title,
     String? description,
@@ -261,7 +269,10 @@ extension SteamFileEX on SteamClient {
     String? updateNote,
     void Function(int handle)? onUpdate,
     required Set<String> tags,
+    Set<int>? childrenId,
+    int? levelCount,
   }) async {
+    assert(type == TagType.challenge && childrenId?.isNotEmpty == true);
     final tempDir = await getTemporaryDirectory();
     itemId ??= await createItemReturnId();
     final completer = Completer<SubmitResult>();
@@ -270,7 +281,16 @@ extension SteamFileEX on SteamClient {
     steamUgc.setItemVisibility(handle, visibility);
     steamUgc.setItemUpdateLanguage(handle, language.name.toNativeUtf8());
 
-    tags.add(TagType.file.value);
+    tags.add(type.value);
+
+    if (type == TagType.challenge) {
+      final tempDir = await getTemporaryDirectory();
+      final itemDir =
+          await Directory(path.join(tempDir.path, itemId.toString())).create();
+      await File(path.join(itemDir.path, 'challenge.txt')).create();
+      contentFolder = itemDir.path;
+    }
+
     final tag = calloc<SteamParamStringArray>();
     tag.ref.strings = calloc<Pointer<Utf8>>(tags.length);
     tags.forEachIndexed((index, element) {
@@ -292,30 +312,37 @@ extension SteamFileEX on SteamClient {
       // print('预览图片 ${file.path}');
       steamUgc.setItemPreview(handle, file.path.toNativeUtf8());
     }
+    if (childrenId != null) {
+      for (var id in childrenId) {
+        steamUgc.addDependency(itemId, id);
+      }
+    }
     if (contentFolder != null) {
       steamUgc.setItemContent(handle, contentFolder.toNativeUtf8());
     }
+    keyValue ??= {};
+    if (levelCount != null) {
+      keyValue.add(('levelCount', levelCount.toString()));
+    }
     if (metaData != null) {
-      keyValue ??= {};
       metaData = base64Encode(gzip.encode(utf8.encode(metaData)));
       keyValue.add(('metaDataLength', metaData.length.toString()));
       // debugPrint('metadata $metaData');
       steamUgc.setItemMetadata(handle, metaData.toNativeUtf8());
     }
-    if (keyValue != null) {
-      /// 必须删除旧key，
-      keyValue.map((e) => e.$1).toSet().forEach((key) {
-        final res = steamUgc.removeItemKeyValueTags(handle, key.toNativeUtf8());
-        debugPrint('remove kv $key $res');
-      });
-      for (var kv in keyValue) {
-        final (key, value) = kv;
-        steamUgc.addItemKeyValueTag(
-          handle,
-          key.toNativeUtf8(),
-          value.toNativeUtf8(),
-        );
-      }
+
+    /// 必须删除旧key，
+    keyValue.map((e) => e.$1).toSet().forEach((key) {
+      final res = steamUgc.removeItemKeyValueTags(handle, key.toNativeUtf8());
+      debugPrint('remove kv $key $res');
+    });
+    for (var kv in keyValue) {
+      final (key, value) = kv;
+      steamUgc.addItemKeyValueTag(
+        handle,
+        key.toNativeUtf8(),
+        value.toNativeUtf8(),
+      );
     }
 
     onUpdate?.call(handle);

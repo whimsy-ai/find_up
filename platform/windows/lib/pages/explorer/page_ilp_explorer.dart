@@ -10,11 +10,10 @@ import '../../utils/empty_list_widget.dart';
 import 'folder_list_tile.dart';
 import 'ilp_explorer_controller.dart';
 import 'steam/steam_file.dart';
-import 'steam/steam_file_bottom_sheet.dart';
 import 'steam/steam_file_list_tile.dart';
 import 'steam/steam_folder_list_tile.dart';
 
-class PageILPExplorer extends GetView<ILPExplorerController> {
+class PageILPExplorer<T extends ILPExplorerController> extends GetView<T> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +35,7 @@ class PageILPExplorer extends GetView<ILPExplorerController> {
                   ],
                 ),
                 Expanded(
-                  child: GetBuilder<ILPExplorerController>(
+                  child: GetBuilder<T>(
                     id: 'folders',
                     builder: (controller) {
                       return ListView.separated(
@@ -46,7 +45,7 @@ class PageILPExplorer extends GetView<ILPExplorerController> {
                             final folder = controller.folders.elementAt(i);
                             if (folder.$2 == 'steam') {
                               return controller
-                                  .filterForum<ILPExplorerController>(
+                                  .filterForum<T>(
                                 showPageWidget: false,
                               );
                               return SteamFolderListTile();
@@ -73,7 +72,7 @@ class PageILPExplorer extends GetView<ILPExplorerController> {
           /// 文件列表
           Expanded(
             flex: 350,
-            child: GetBuilder<ILPExplorerController>(
+            child: GetBuilder<T>(
                 id: 'files',
                 builder: (controller) {
                   return Column(
@@ -91,7 +90,7 @@ class PageILPExplorer extends GetView<ILPExplorerController> {
                               ),
                             ),
                             if (controller.currentPath == 'steam')
-                              controller.pageWidget<ILPExplorerController>(
+                              controller.pageWidget<T>(
                                   id: 'filter'),
                           ],
                         ),
@@ -126,7 +125,7 @@ class PageILPExplorer extends GetView<ILPExplorerController> {
           if (file is ILPFile) {
             child = ILPFileGridTile(file: file);
           } else {
-            child = SteamFileGirdTile(file: file as SteamFile);
+            child = SteamFileGirdTile<T>(file: file as SteamFile);
           }
           return Card(
             clipBehavior: Clip.antiAlias,

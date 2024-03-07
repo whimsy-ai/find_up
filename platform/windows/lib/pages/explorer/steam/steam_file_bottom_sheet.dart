@@ -18,6 +18,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import '../../../utils/datetime_format.dart';
 import '../../../utils/steam_ex.dart';
 import '../../../utils/steam_filter.dart';
+import '../../../utils/steam_tags.dart';
 import 'steam_file.dart';
 
 class SteamFileBottomSheet<T extends SteamFilterController>
@@ -104,19 +105,23 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
         tag: widget.tag,
         builder: (controller) => Column(
           children: [
-            /// file info title
+            /// 标题栏
             ListTile(
               trailing: Wrap(
                 spacing: 10,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                    ElevatedButton(
-                      child: Icon(Icons.play_arrow_rounded),
-                      onPressed: () async {
-                        await PageGameEntry.play([widget.file]);
-                        controller.update([widget.file.id, 'bottomSheet']);
-                      },
-                    ),
+                  ElevatedButton(
+                    child: Icon(Icons.play_arrow_rounded),
+                    onPressed: () async {
+                      await PageGameEntry.play(
+                        widget.file.type == TagType.file
+                            ? [widget.file]
+                            : widget.file.children,
+                      );
+                      controller.update([widget.file.id, 'bottomSheet']);
+                    },
+                  ),
                   Obx(
                     () => ElevatedButton.icon(
                       icon: Icon(Icons.thumb_up_rounded),
@@ -146,7 +151,9 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                     ),
                   ),
                   ElevatedButton.icon(
-                    icon: Icon(widget.file.isSubscribed?Icons.heart_broken_rounded:Icons.favorite_border_rounded),
+                    icon: Icon(widget.file.isSubscribed
+                        ? Icons.heart_broken_rounded
+                        : Icons.favorite_border_rounded),
                     label: widget.file.isSubscribed
                         ? Text(UI.steamUnSubscribe.tr)
                         : Text(UI.steamSubscribe.tr),
@@ -229,10 +236,11 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                   ),
 
                   /// 版本
-                  ListTile(
-                    title: Text(UI.ilpVersion.tr),
-                    subtitle: Text(widget.file.version.toString()),
-                  ),
+                  if (widget.file.type == TagType.file)
+                    ListTile(
+                      title: Text(UI.ilpVersion.tr),
+                      subtitle: Text(widget.file.version.toString()),
+                    ),
 
                   /// 描述
                   ListTile(
@@ -243,28 +251,31 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                   ),
 
                   /// 文件大小
-                  ListTile(
-                    title: Text(UI.fileSize.tr),
-                    subtitle: Text(bytesSize(widget.file.fileSize, 2)),
-                  ),
+                  if (widget.file.type == TagType.file)
+                    ListTile(
+                      title: Text(UI.fileSize.tr),
+                      subtitle: Text(bytesSize(widget.file.fileSize, 2)),
+                    ),
 
-                  ListTile(
-                    title: Text(UI.link.tr),
-                    subtitle: _links.isEmpty
-                        ? Text(UI.empty.tr)
-                        : Wrap(
-                            spacing: 10,
-                            runSpacing: 10,
-                            children: _links
-                                .map(
-                                  (link) => TextButton(
-                                    onPressed: () => launchUrlString(link.$2),
-                                    child: Text(link.$1),
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                  ),
+                  /// 链接
+                  if (widget.file.type == TagType.file)
+                    ListTile(
+                      title: Text(UI.link.tr),
+                      subtitle: _links.isEmpty
+                          ? Text(UI.empty.tr)
+                          : Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children: _links
+                                  .map(
+                                    (link) => TextButton(
+                                      onPressed: () => launchUrlString(link.$2),
+                                      child: Text(link.$1),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                    ),
 
                   ListTile(
                     title: Text(UI.publishTime.tr),
@@ -277,12 +288,13 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                   ),
 
                   /// image length
-                  ListTile(
-                    title: Text(
-                      UI.imageLengthStr
-                          .trArgs([widget.file.infos.length.toString()]),
+                  if (widget.file.type == TagType.file)
+                    ListTile(
+                      title: Text(
+                        UI.imageLengthStr
+                            .trArgs([widget.file.infos.length.toString()]),
+                      ),
                     ),
-                  ),
                   _infoList(),
                 ],
               ),

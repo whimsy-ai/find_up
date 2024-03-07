@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:get/get.dart';
 import 'package:steamworks/steamworks.dart';
 
-import '../../utils/steam_collection_ex.dart';
 import '../../utils/steam_ex.dart';
+import '../../utils/steam_file_ex.dart';
 import '../../utils/steam_tags.dart';
 import '../explorer/steam/steam_file.dart';
 
@@ -58,15 +58,19 @@ class ChallengeEditorController extends GetxController {
   }
 
   Future<SubmitResult> submit() async {
-    return SteamClient.instance.createCollection(
+    return SteamClient.instance.createItem(
+      type: TagType.challenge,
       language: ApiLanguage.english,
       title: title,
       description: description,
       previewImagePath: _image,
-      childrenIds: list.keys.toSet(),
-      ageRating: ageRating!,
-      styles: styles,
-      shapes: shapes,
+      childrenId: list.keys.toSet(),
+      tags: {
+        ageRating!.value,
+        ...styles.map((e) => e.value),
+        ...shapes.map((e) => e.value),
+      },
+      levelCount: imageLength,
     );
   }
 }

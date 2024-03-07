@@ -10,8 +10,6 @@ import 'package:game/build_flavor.dart';
 import 'package:game/explorer/file.dart';
 import 'package:game/explorer/ilp_file.dart';
 import 'package:game/game/page_game_entry.dart';
-import 'package:game/global_progress_indicator_dialog.dart';
-import 'package:game/info_table.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
@@ -511,6 +509,7 @@ class ILPEditorController extends GetxController {
 
     /// 多处复用
     return SteamClient.instance.createItem(
+      type: TagType.file,
       itemId: itemId,
       language: ApiLanguage.english,
       title: name,

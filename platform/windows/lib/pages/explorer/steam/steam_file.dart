@@ -30,6 +30,7 @@ class SteamFiles {
 class SteamSimpleFile implements ExplorerFile {
   static Pointer<ISteamUgc> get ugc => SteamClient.instance.steamUgc;
   final int id;
+  final TagType type;
   int downloadedBytes = 0, totalBytes = 0;
 
   @override
@@ -37,7 +38,10 @@ class SteamSimpleFile implements ExplorerFile {
 
   String? ilpFile;
 
-  SteamSimpleFile({required this.id});
+  SteamSimpleFile({
+    required this.id,
+    this.type = TagType.file,
+  });
 
   Future<void> updateDownloadBytes() async {
     final c = Completer();
@@ -100,6 +104,7 @@ class SteamFile extends SteamSimpleFile {
   TagShape? shape;
   TagStyle? style;
   TagAgeRating? ageRating;
+  int? levelCount;
 
   @override
   String cover;
@@ -128,8 +133,14 @@ class SteamFile extends SteamSimpleFile {
 
   List<ILPInfo> infos;
 
+  final List<int> childrenId;
+
+  List<SteamSimpleFile> get children =>
+      childrenId.map((e) => SteamSimpleFile(id: e)).toList();
+
   SteamFile({
     required super.id,
+    required super.type,
     required this.name,
     required this.cover,
     required this.version,
@@ -140,11 +151,13 @@ class SteamFile extends SteamSimpleFile {
     required this.updateTime,
     required this.publishTime,
     required this.comments,
+    required this.childrenId,
     this.voteUp = 0,
     this.voteDown = 0,
     this.ageRating,
     this.style,
     this.shape,
+    this.levelCount,
   }) {
     unlock = infos.map((e) => getIlpInfoUnlock(e)).toList().sum / infos.length;
   }
@@ -158,6 +171,7 @@ class SteamFile extends SteamSimpleFile {
     SteamClient.instance.steamUgc.downloadItem(id, true);
     load();
   }
+
   Future subscribe() async {
     await SteamClient.instance.subscribe(id);
   }

@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:collection/collection.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:game/game/resources.dart';
 import 'package:get/get.dart';
 
 import '../data.dart';

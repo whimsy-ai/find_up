@@ -226,6 +226,7 @@ final zh = {
   'findOneLayer': '找出一个不同之处',
   'findAllLayers': '找出所有不同之处',
   'findPuzzles': '找出拼图的不同之处',
+  'levelCount': '关卡数量',
 };
 
 final fix = {

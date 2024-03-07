@@ -48,7 +48,12 @@ class ILPFileGridTile extends StatelessWidget {
       }
       return Column(
         children: [
-          Image.memory(file.cover),
+          LayoutBuilder(builder: (context, c) {
+            return Image.memory(
+              file.cover,
+              width: c.maxWidth,
+            );
+          }),
           Row(
             children: [
               Expanded(

@@ -7,6 +7,7 @@ import 'package:steamworks/steamworks.dart';
 import '../../utils/empty_list_widget.dart';
 import '../../utils/steam_file_ex.dart';
 import '../../utils/steam_filter.dart';
+import '../../utils/steam_tags.dart';
 import '../explorer/steam/steam_cached_image.dart';
 import '../explorer/steam/steam_file.dart';
 import '../explorer/steam/steam_file_bottom_sheet.dart';
@@ -50,6 +51,7 @@ class SteamGalleryController extends SteamFilterController {
     update(['list']);
 
     final res = await SteamClient.instance.getAllItems(
+      type: TagType.file,
       page: page,
       sort: sort,
       search: search,

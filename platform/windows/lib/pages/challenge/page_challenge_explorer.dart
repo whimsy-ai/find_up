@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:steamworks/steamworks.dart';
 
-import '../../utils/datetime_format.dart';
 import '../../utils/empty_list_widget.dart';
-import '../../utils/steam_collection_ex.dart';
-import '../../utils/steam_ex.dart';
+import '../../utils/steam_file_ex.dart';
 import '../../utils/steam_filter.dart';
+import '../../utils/steam_tags.dart';
 import '../explorer/steam/steam_file.dart';
-import 'steam_challenge.dart';
+import '../explorer/steam/steam_file_list_tile.dart';
 
 class SteamExplorerController extends SteamFilterController {
   SteamExplorerController({super.multipleSelect = true});
 
-  final collections = <SteamCollection>[];
+  late SteamFiles files;
 
   @override
   void onChanged() async {
@@ -26,15 +25,19 @@ class SteamExplorerController extends SteamFilterController {
   load() async {
     loading = true;
     update(['list']);
-    final res = await SteamClient.instance.getCollections(page: page, tags: {
-      if (ageRating != null) ageRating!.value,
-      ...shapes.map((e) => e.value),
-      ...styles.map((e) => e.value),
-    });
+    final res = await SteamClient.instance.getAllItems(
+      type: TagType.challenge,
+      subscribed: subscribed,
+      page: page,
+      sort: sort,
+      tags: {
+        if (ageRating != null) ageRating!.value,
+        ...shapes.map((e) => e.value),
+        ...styles.map((e) => e.value),
+      },
+    );
     totalPage = (res.total / 50).ceil();
-    collections
-      ..clear()
-      ..addAll(res.list);
+    files = res;
     loading = false;
     update(['filter', 'list']);
   }
@@ -78,45 +81,9 @@ class PageChallengeExplorer extends GetView<SteamExplorerController> {
                     child: CircularProgressIndicator(),
                   );
                 }
-                return controller.collections.isEmpty
+                return controller.files.files.isEmpty
                     ? EmptyListWidget()
-                    : ListView.separated(
-                        itemCount: controller.collections.length,
-                        separatorBuilder: (_, i) => Divider(),
-                        itemBuilder: (_, i) {
-                          final c = controller.collections[i];
-                          return ListTile(
-                            leading: c.previewImage == null
-                                ? CircleAvatar()
-                                : Image.network(c.previewImage!),
-                            title: Text(c.name),
-                            subtitle: Text('${c.description}\n'
-                                // 'children id ${c.childrenItemId}\n'
-                                // 'images: ${c.childrenItemId.length}\n'
-                                '${UI.updateTime.tr}: ${formatDate(c.updateTime)}'),
-                            trailing: Wrap(
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    c.ownerId == SteamClient.instance.userId
-                                        ? Icons.edit
-                                        : FontAwesomeIcons.steam,
-                                  ),
-                                  onPressed: () {
-                                    SteamClient.instance.openUGCItemUrl(c.id);
-                                  },
-                                ),
-                              ],
-                            ),
-                            onTap: () {
-                              PageGameEntry.play(controller
-                                  .collections[i].childrenItemId
-                                  .map((e) => SteamSimpleFile(id: e))
-                                  .toList());
-                            },
-                          );
-                        },
-                      );
+                    : _fileList();
               },
             ),
           ),
@@ -131,4 +98,24 @@ class PageChallengeExplorer extends GetView<SteamExplorerController> {
       ),
     );
   }
+
+  Widget _fileList() => MasonryGridView.extent(
+        itemCount: controller.files.current,
+        maxCrossAxisExtent: 200,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+        itemBuilder: (context, i) {
+          final file = controller.files.files[i];
+          print('${file.name} ${file.type}');
+          return Card(
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              child: SteamFileGirdTile<SteamExplorerController>(file: file),
+              onTap: () {
+                PageGameEntry.play(file.children);
+              },
+            ),
+          );
+        },
+      );
 }

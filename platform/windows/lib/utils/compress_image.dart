@@ -6,7 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-Future<Uint8List> compressImage(File file, {int max = 200}) async {
+Future<Uint8List> compressImage(File file, {int max = 300}) async {
   final bytes = await file.readAsBytes();
   final c = Completer<ui.Image>();
   ui.decodeImageFromList(bytes, (result) {

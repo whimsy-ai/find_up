@@ -16,8 +16,9 @@ import 'package:steamworks/steamworks.dart';
 
 import '../../utils/asset_path.dart';
 import '../../utils/steam_ex.dart';
-import '../../utils/steam_filter.dart';
 import '../../utils/steam_file_ex.dart';
+import '../../utils/steam_filter.dart';
+import '../../utils/steam_tags.dart';
 
 enum ExplorerMode { openFile, selectSteamFile }
 
@@ -156,6 +157,7 @@ class ILPExplorerController extends SteamFilterController
         ? SteamUGCSort.publishTime
         : this.sort;
     final res = await SteamClient.instance.getAllItems(
+      type: TagType.file,
       page: page,
       userId: userId,
       search: search,
