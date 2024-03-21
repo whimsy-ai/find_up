@@ -35,8 +35,8 @@ class SteamResultDialog extends StatelessWidget {
                 WidgetSpan(
                   child: Icon(Icons.info_outline_rounded, color: Colors.red),
                 ),
-                TextSpan(text: UI.steamEulaContent.tr),
-                TextSpan(text: '\n'),
+                TextSpan(text: '${UI.steamEulaContent1.tr}\n'),
+                TextSpan(text: UI.steamEulaContent2.tr),
               ]),
             ),
           Text.rich(
@@ -46,7 +46,7 @@ class SteamResultDialog extends StatelessWidget {
               ),
               TextSpan(
                 text: UI.steamLimitedAccountDesc1
-                    .trParams({'s': UI.steamLimitedAccount.tr}),
+                    .replaceAll('%s', UI.steamLimitedAccount.tr),
               ),
               TextSpan(text: '\n'),
               WidgetSpan(
@@ -58,8 +58,9 @@ class SteamResultDialog extends StatelessWidget {
                   SteamClient.instance.openUrl(url);
                 },
                 child: Text(
-                  UI.steamLimitedAccountDesc2.trParams(
-                    {'s': UI.steamLimitedAccount.tr},
+                  UI.steamLimitedAccountDesc2.tr.replaceFirst(
+                    '%s',
+                    UI.steamLimitedAccount.tr,
                   ),
                   style: TextStyle(color: Colors.lightBlue),
                 ),

@@ -15,8 +15,8 @@ class NewILPCanvas<T extends LevelController> extends GetView<T> {
 
   @override
   Widget build(BuildContext context) {
-    final hintRect =
-        controller.hintLayer?.leftRect ?? controller.hintLayer?.rightRect;
+    final hintTarget = controller.currentLevel?.hintTarget as ILPCanvasLayer?;
+    final hintRect = hintTarget?.leftRect ?? hintTarget?.rightRect;
     final child = GestureDetector(
       onTapUp: (e) => controller.onTap(layout, e),
       child: CustomPaint(

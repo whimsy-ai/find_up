@@ -156,7 +156,7 @@ class NewGameUI<T extends LevelController> extends GetView<T> {
                       'seed:${controller.seed}',
                       'scale:${controller.scale}',
                       'level:${controller.current + 1} / ${controller.levels.length}',
-                      'layers: ${controller.currentLevel?.layers.where((l) => !l.tapped).length} / ${controller.currentLevel?.layers.length ?? 0 - 1}'
+                      'layers: ${controller.currentLevel?.allLayers}'
                     ].join('\n')),
                     Wrap(
                       children: [
@@ -210,7 +210,17 @@ class NewGameUI<T extends LevelController> extends GetView<T> {
           Positioned(
             bottom: 10,
             right: 10,
-            child: TipToolWidget<T>(),
+            child: Wrap(
+              spacing: 10,
+              children: [
+                if (controller.debug)
+                  ElevatedButton(
+                    onPressed: controller.setFail,
+                    child: Text('使失败'),
+                  ),
+                TipToolWidget<T>(),
+              ],
+            ),
           ),
 
         /// 暂停界面

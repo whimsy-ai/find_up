@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:game/build_flavor.dart';
-import 'package:game/duration_extension.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
 
+import '../../extension_duration.dart';
 import '../level_controller.dart';
+import '../puzzle/level_puzzle.dart';
 import '../resources.dart';
 import '../stroke_shadow.dart';
 
@@ -35,28 +35,21 @@ class TipToolWidget<T extends LevelController> extends StatelessWidget {
                       offset: Offset(0, 2),
                     ),
                   ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (env.isDev)
-                      ElevatedButton(
-                        onPressed: controller.setFail,
-                        child: Text('测试失败'),
-                      ),
-                    FloatingActionButton(
-                      onPressed: () {
-                        if (controller.showHint(controller.currentLevel)) {
-                          showToast(UI.showATip.tr);
-                        }
-                      },
-                      child: StrokeShadow.path(
-                        Resources.iconFocus,
-                        color: controller.nextHintTime.inMilliseconds > 0
-                            ? Colors.grey
-                            : Colors.black,
-                      ),
-                    ),
-                  ],
+                FloatingActionButton(
+                  onPressed: () {
+                    if (controller.showHint(controller.currentLevel)) {
+                      final level = controller.currentLevel!;
+                      showToast(level is LevelPuzzle
+                          ? UI.puzzleHint.tr
+                          : UI.findDifferencesHint.tr);
+                    }
+                  },
+                  child: StrokeShadow.path(
+                    Resources.iconFocus,
+                    color: controller.nextHintTime.inMilliseconds > 0
+                        ? Colors.grey
+                        : Colors.black,
+                  ),
                 ),
               ],
             );

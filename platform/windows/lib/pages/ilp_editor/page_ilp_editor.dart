@@ -222,7 +222,8 @@ class PageILPEditor extends GetView<ILPEditorController> {
                                 if (sure != true) return;
                               }
 
-                              GlobalProgressIndicatorDialog.show(UI.steamUploading.tr);
+                              GlobalProgressIndicatorDialog.show(
+                                  UI.steamUploading.tr);
                               final res = await controller.uploadToSteam();
 
                               /// hide indicator dialog
@@ -548,15 +549,13 @@ class EditFileTab extends GetView<ILPEditorController> {
                                 (controller.file as SteamFile).id:
                                     controller.file as SteamFile,
                             });
-                        final file = files?.values.first;
-                        debugPrint('选择文件 ${files?.length}');
-                        if (file != null) {
-                          if (file.steamIdOwner ==
-                              SteamClient.instance.userId) {
-                            controller.file = files?.values.first;
-                          } else {
-                            showToast(UI.steamNotYourFile.tr);
-                          }
+                        if (files == null || files.isEmpty) return;
+                        final file = files.values.first;
+                        debugPrint('选择文件 ${files.length}');
+                        if (file.steamIdOwner == SteamClient.instance.userId) {
+                          controller.file = file;
+                        } else {
+                          showToast(UI.steamNotYourFile.tr);
                         }
                       },
                     ),

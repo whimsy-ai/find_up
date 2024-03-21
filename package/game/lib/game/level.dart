@@ -25,9 +25,7 @@ enum LevelMode {
   findDifferences,
   puzzle;
 
-  ///todo
-  static LevelMode random(math.Random random) => LevelMode.findDifferences;
-  // static LevelMode random(math.Random random) =>
+  static LevelMode random(math.Random random) => LevelMode.puzzle;
   // LevelMode.values[random.nextInt(LevelMode.values.length)];
 }
 
@@ -39,18 +37,18 @@ mixin LevelLoader on Level {
   Future<void> drawContent();
 }
 
-abstract class Level {
+abstract class Level<T> {
   LevelState state = LevelState.loading;
   final Set<String> tappedLayerId = {};
   final LevelController controller;
   final ExplorerFile file;
   final int ilpIndex;
-  final List<ILPCanvasLayer> layers = [];
   final LevelMode mode;
   late double width, height;
 
+  dynamic hintTarget;
   late Duration time;
-  ILPLayer? layer;
+  ILPLayer? rootLayer;
   ILP? ilp;
   ILPInfo? info;
 
@@ -70,9 +68,9 @@ abstract class Level {
     return Future.wait([
       loader.loadILPInfo().then((value) => info = value),
       loader.loadILPLayer().then((value) {
-        layer = value;
-        width = layer!.width.toDouble();
-        height = layer!.height.toDouble();
+        rootLayer = value;
+        width = rootLayer!.width.toDouble();
+        height = rootLayer!.height.toDouble();
       }),
     ]);
   }
@@ -83,18 +81,12 @@ abstract class Level {
     state = LevelState.already;
   }
 
-  ILPCanvasLayer? hint();
+  /// 显示提示，成功返回true，失败返回false
+  bool hint();
 
   void randomLayers(math.Random random);
 
-  List<String> unlockedLayersId() {
-    final list = <String>[];
-    for (var layer in layers) {
-      if (layer.left?.id != null) list.add(layer.left!.id);
-      if (layer.right?.id != null) list.add(layer.right!.id);
-    }
-    return list;
-  }
+  List<String> unlockedLayersId();
 
   Future<ILPCanvasLayer?> onTap(LayerLayout layout, Offset position);
 

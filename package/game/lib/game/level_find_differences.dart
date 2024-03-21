@@ -33,6 +33,7 @@ enum Flip {
 }
 
 class LevelFindDifferences extends Level with LevelLoader {
+  final List<ILPCanvasLayer> layers = [];
   final LevelDifferentType type;
 
   ui.Image? left;
@@ -89,19 +90,20 @@ class LevelFindDifferences extends Level with LevelLoader {
   randomLayers(math.Random random) {
     layers
       ..clear()
-      ..addAll(layer!.randomList(
+      ..addAll(rootLayer!.randomList(
         random: random,
         max: type == LevelDifferentType.single ? 1 : 10,
       ));
   }
 
   @override
-  ILPCanvasLayer? hint() {
+  bool hint() {
     for (var layer in layers) {
       if (layer.isBackground || layer.tapped) continue;
-      return layer;
+      hintTarget = layer;
+      return true;
     }
-    return null;
+    return false;
   }
 
   @override
@@ -140,6 +142,16 @@ class LevelFindDifferences extends Level with LevelLoader {
       }
     }
     return null;
+  }
+
+  @override
+  List<String> unlockedLayersId() {
+    final list = <String>[];
+    for (var layer in layers) {
+      if (layer.left?.id != null) list.add(layer.left!.id);
+      if (layer.right?.id != null) list.add(layer.right!.id);
+    }
+    return list;
   }
 }
 

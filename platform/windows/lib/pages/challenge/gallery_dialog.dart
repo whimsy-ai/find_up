@@ -24,7 +24,6 @@ class SteamGalleryController extends SteamFilterController {
   }) {
     if (selected != null) _selected.addAll(selected);
     super.userId = userId;
-    load();
   }
 
   void add(SteamFile file) {
@@ -42,13 +41,16 @@ class SteamGalleryController extends SteamFilterController {
 
   @override
   void onChanged() {
-    load();
+    _load();
   }
 
-  void load() async {
+  void _load() async {
+    if (loading) return;
     loading = true;
     files.clear();
     update(['list']);
+
+    print('load $page');
 
     final res = await SteamClient.instance.getAllItems(
       type: TagType.file,

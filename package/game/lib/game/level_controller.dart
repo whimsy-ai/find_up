@@ -6,17 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../data.dart';
-import '../duration_extension.dart';
 import '../explorer/file.dart';
+import '../extension_duration.dart';
 import 'core_controller.dart';
 import 'game_state.dart';
 import 'hint_controller.dart';
 import 'layer.dart';
 import 'level.dart';
 import 'level_find_differences.dart';
-import 'level_puzzle.dart';
 import 'loading_controller.dart';
 import 'offset_scale_controller.dart';
+import 'puzzle/level_puzzle.dart';
+import 'puzzle/puzzle.dart';
 import 'seed_controller.dart';
 import 'sound_controller.dart';
 
@@ -120,13 +121,17 @@ abstract class LevelController extends GetxController
       playCorrectAudio();
       tapPositions.add(tapPosition);
       found.tappedSide = layout;
-      if (found == hintLayer) hintLayer = null;
+      if (found == currentLevel?.hintTarget) {
+        currentLevel?.hintTarget = null;
+      }
       update(['ui', 'game']);
     }
-    if (currentLevel!.layers.whereNot((l) => l.tapped).isEmpty) {
-      currentLevel!.onCompleted();
-      onLevelFinish();
-    }
+
+    /// todo
+    // if (currentLevel!.layers.whereNot((l) => l.tapped).isEmpty) {
+    //   currentLevel!.onCompleted();
+    //   onLevelFinish();
+    // }
   }
 
   void onLevelFinish() {
@@ -190,7 +195,7 @@ abstract class LevelController extends GetxController
     height = level.height;
     level.randomLayers(math.Random(seed));
     await level.draw();
-    resetHint();
+    resetHint(level);
     resetScaleAndOffset();
     update(['ui', 'game']);
   }
@@ -264,7 +269,7 @@ abstract class LevelController extends GetxController
             controller: this,
             file: file,
             ilpIndex: i,
-            type: LevelPuzzleType.random(random),
+            targetsCount: random.nextInt(3)+1,
           ));
       }
     }

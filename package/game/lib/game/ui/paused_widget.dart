@@ -8,6 +8,8 @@ import '../../explorer/ilp_info_bottom_sheet.dart';
 import '../../explorer/test_ilp_file.dart';
 import '../../utils/textfield_number_formatter.dart';
 import '../level_controller.dart';
+import '../level_find_differences.dart';
+import '../puzzle/level_puzzle.dart';
 import '../resources.dart';
 import '../stroke_shadow.dart';
 import 'levels_indicator.dart';
@@ -23,6 +25,16 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
     final level = controller.currentLevel!;
     final isTestFile = level.file is TestILPFile;
     var title = isTestFile ? UI.test.tr : this.title;
+    if (controller.isPaused && title == null) {
+      final level = controller.currentLevel;
+      if (level is LevelPuzzle) {
+        title = UI.findPuzzles.tr;
+      } else if (level is LevelFindDifferences) {
+        title = level.type == LevelDifferentType.single
+            ? UI.findOneLayer.tr
+            : UI.findAllLayers.tr;
+      }
+    }
     return Container(
       height: height,
       color: Color.fromRGBO(5, 13, 24, 0.5),

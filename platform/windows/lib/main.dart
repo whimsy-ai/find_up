@@ -37,11 +37,11 @@ import 'pages/ilp_editor/ilp_editor_controller.dart';
 import 'pages/ilp_editor/page_ilp_editor.dart';
 import 'pages/page_about.dart';
 import 'pages/page_settings.dart';
+import 'pages/page_test.dart';
 import 'pages/page_test2.dart';
 import 'pages/save_image/page_save_image.dart';
 import 'pages/save_image/pc_save_image_controller.dart';
 import 'utils/asset_path.dart';
-import 'utils/compress_image.dart';
 import 'utils/update_window_title.dart';
 
 const steamAppId = 2550370;
@@ -171,7 +171,8 @@ class MyApp extends StatelessWidget {
             ),
             GetPage(name: '/about', page: () => PageAbout()),
             GetPage(name: '/settings', page: () => PageSettings()),
-            GetPage(name: '/test', page: () => PageTest2()),
+            GetPage(name: '/test', page: () => PageTest()),
+            GetPage(name: '/test2', page: () => PageTest2()),
 
             /// for steam
             GetPage(
@@ -362,12 +363,19 @@ class MyHomePage extends StatelessWidget {
         floatingActionButton: env.isProd
             ? null
             : Wrap(
+                spacing: 10,
                 children: [
                   FloatingActionButton(
                     onPressed: () async {
                       Get.toNamed('/test');
                     },
-                    child: Text('test'),
+                    child: Text('test1'),
+                  ),
+                  FloatingActionButton(
+                    onPressed: () async {
+                      Get.toNamed('/test2');
+                    },
+                    child: Text('test2'),
                   ),
                 ],
               ),

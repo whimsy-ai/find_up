@@ -3,7 +3,11 @@ import 'dart:ui';
 
 enum PuzzleEdgeType {
   knob, // 凸
-  hole, // 凹
+  hole // 凹
+  ;
+
+  static PuzzleEdgeType random(math.Random random) =>
+      PuzzleEdgeType.values[random.nextInt(PuzzleEdgeType.values.length)];
 }
 
 extension PathExtension on Path {
@@ -88,5 +92,6 @@ extension PathExtension on Path {
         )
         ..lineTo(0, 0);
     }
+    close();
   }
 }

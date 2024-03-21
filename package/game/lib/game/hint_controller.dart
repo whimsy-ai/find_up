@@ -1,23 +1,21 @@
 import 'package:get/get.dart';
 
-import 'layer.dart';
 import 'level.dart';
 
 mixin HintController on GetxController {
   final divider = const Duration(seconds: 20);
-  ILPCanvasLayer? hintLayer;
 
   int _times = 0;
   Duration _time = Duration.zero;
 
   Duration get nextHintTime => _time;
 
-  bool showHint(Level? currentLevel) {
+  bool showHint(Level? level) {
     if (_time > Duration.zero) return false;
-    if (currentLevel != null) {
-      hintLayer = currentLevel.hint();
+    if (level != null) {
+      final res = level.hint();
       update(['game', 'ui']);
-      if (hintLayer != null) {
+      if (res) {
         _times++;
         _setTimer();
         return true;
@@ -26,10 +24,12 @@ mixin HintController on GetxController {
     return false;
   }
 
-  void resetHint() {
+  void resetHint(Level? level) {
+    if (level != null) {
+      level.hintTarget = null;
+    }
     _times = 0;
     _time = Duration.zero;
-    hintLayer = null;
     update(['game', 'ui']);
   }
 

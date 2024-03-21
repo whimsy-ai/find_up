@@ -64,8 +64,12 @@ class PageChallengeExplorer extends GetView<SteamExplorerController> {
                     ),
                   ],
                 ),
-                controller.filterForum<SteamExplorerController>(
-                  enabledExpand: false,
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: controller.filterForum<SteamExplorerController>(
+                      enabledExpand: false,
+                    ),
+                  ),
                 ),
               ],
             ),

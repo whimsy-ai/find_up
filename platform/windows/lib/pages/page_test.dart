@@ -3,9 +3,12 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:game/extension_path.dart';
-import 'package:game/game/level_puzzle.dart';
+import 'package:game/game/puzzle/puzzle.dart';
+import 'package:game/utils/utf8list_to_image.dart';
+import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
 class PageTest extends StatefulWidget {
@@ -14,15 +17,17 @@ class PageTest extends StatefulWidget {
 }
 
 class _PageTestState extends State<PageTest> {
-  final ilpPath =
-      'E:\\SteamLibrary\\steamapps\\workshop\\content\\2550370\\3154914212\\main.ilp';
-  final List<List<PuzzlePiece>> _puzzles = [];
+  final ilpPath = r"C:\Users\user\Desktop\dev_chef.ilp";
+  final List<List<PuzzlePiece>> pieces = [];
+  final List<PuzzlePiece> targets = [];
 
   final int rows = 5, columns = 4;
 
   ui.Image? _bg;
   final random = math.Random();
-  double opacity = 0;
+  double scale = 0;
+
+  double x = 0, y = 0;
 
   @override
   void initState() {
@@ -31,58 +36,61 @@ class _PageTestState extends State<PageTest> {
   }
 
   _load() async {
-    _puzzles.clear();
+    x = y = 0;
+    pieces.clear();
+    targets.clear();
     setState(() {});
     late ILPLayer layer;
     await Future.wait([
       ILP.fromFile(ilpPath).then((ilp) => ilp.layer(0)).then((v) {
         layer = v;
-        return _loadImage(layer.content as Uint8List);
+        return utf8ListToImage(layer.content as Uint8List);
       }).then((value) => _bg = value),
       Future.delayed(Duration(milliseconds: 1500)),
     ]);
-    final types = [PuzzleEdgeType.knob, PuzzleEdgeType.hole];
+    final pieceWidth = _bg!.width / columns, pieceHeight = _bg!.height / rows;
+
+    scale = (math.min(Get.width / 2, Get.height) - 50) /
+        math.max(_bg!.width, _bg!.height);
+    print('w $pieceHeight, h $pieceWidth');
     for (var row = 0; row < rows; row++) {
       final rowPieces = <PuzzlePiece>[];
-      _puzzles.add(rowPieces);
+      pieces.add(rowPieces);
       for (var column = 0; column < columns; column++) {
         PuzzleEdgeType? top, right, bottom, left;
         PuzzlePiece? leftPiece, upPiece;
         if (row > 0) {
-          upPiece = _puzzles[row - 1][column];
+          upPiece = pieces[row - 1][column];
         }
         if (rowPieces.isNotEmpty) {
           leftPiece = rowPieces.last;
         }
         if (leftPiece == null) {
-          types.shuffle(random);
-          right = types.first;
+          right = PuzzleEdgeType.random(random);
         } else {
           left = leftPiece.right == PuzzleEdgeType.hole
               ? PuzzleEdgeType.knob
               : PuzzleEdgeType.hole;
           // print('lastP ${leftPiece.right}=>$left');
           if ((column + 1) < columns) {
-            types.shuffle(random);
-            right = types.first;
+            right = PuzzleEdgeType.random(random);
           }
         }
         if (upPiece == null) {
-          types.shuffle(random);
-          bottom = types.first;
+          bottom = PuzzleEdgeType.random(random);
         } else {
           top = upPiece.bottom == PuzzleEdgeType.hole
               ? PuzzleEdgeType.knob
               : PuzzleEdgeType.hole;
           if ((row + 1) < rows) {
-            types.shuffle(random);
-            bottom = types.first;
+            bottom = PuzzleEdgeType.random(random);
           }
         }
-
         rowPieces.add(PuzzlePiece(
-          layer: layer,
-          image: _bg!,
+          pieceWidth: pieceWidth,
+          pieceHeight: pieceHeight,
+          row: row,
+          column: column,
           left: left,
           top: top,
           right: right,
@@ -90,16 +98,71 @@ class _PageTestState extends State<PageTest> {
         ));
       }
     }
-    opacity = 1;
+
+    /// make the target and fake puzzles
+    {
+      targets.clear();
+      final randomList = pieces.flattened.toList();
+      randomList.shuffle(random);
+      final totalTarget = random.nextInt(3) + 1;
+      for (var i = 0; i < totalTarget; i++) {
+        var puzzle = randomList[i]
+          ..isTarget = true
+          ..rotate = _randomRadian(random);
+        targets.add(puzzle);
+      }
+      final target = totalTarget == 1
+          ? targets.first
+          : targets[random.nextInt(targets.length)];
+
+      /// random fake piece's left top right bottom edges
+      final edges = List.from([0, 1, 2, 3]..shuffle(random))
+          .sublist(0, random.nextInt(4) + 1);
+      PuzzleEdgeType? left, top, right, bottom;
+      if (edges.contains(0)) {
+        left = target.column == 0 ? null : _edgeType(random, target.left);
+      }
+      if (edges.contains(1)) {
+        top = target.row == 0 ? null : _edgeType(random, target.top);
+      }
+      if (edges.contains(2)) {
+        right = target.column == columns - 1
+            ? null
+            : _edgeType(random, target.right);
+      }
+      if (edges.contains(3)) {
+        bottom =
+            target.row == rows - 1 ? null : _edgeType(random, target.bottom);
+      }
+      final fake = target.copyWith(
+        pieceWidth: pieceWidth,
+        pieceHeight: pieceHeight,
+      )
+        ..left = left
+        ..top = top
+        ..right = right
+        ..bottom = bottom
+        ..isTarget = true
+        ..isFake = true
+        ..rotate = _randomRadian(random);
+      targets..add(fake)
+          // ..shuffle(random)
+          ;
+    }
+    for (var p in targets) {
+      await p.draw(_bg!, pieceWidth, pieceHeight);
+    }
+    for (var rows in pieces) {
+      for (var p in rows) {
+        if (!p.isTarget) await p.draw(_bg!, pieceWidth, pieceHeight);
+      }
+    }
     setState(() {});
   }
-
-  double x = 0, y = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Test')),
       floatingActionButton: FloatingActionButton(
         onPressed: _load,
         child: Text('新的'),
@@ -111,32 +174,38 @@ class _PageTestState extends State<PageTest> {
             y += _.delta.dy;
           });
         },
-        child: Row(
+        child: Stack(
           children: [
-            Expanded(
-              child: Stack(
+            RepaintBoundary(
+              child: Row(
                 children: [
-                  Positioned(
-                    left: x,
-                    top: y,
-                    child: AnimatedOpacity(
-                      opacity: _puzzles.isEmpty ? 0 : 1,
-                      duration: Duration(milliseconds: 200),
-                      child: RepaintBoundary(
-                        child: CustomPaint(
-                          isComplex: true,
-                          size: Size(_bg!.width.toDouble(),
-                                  _bg!.height.toDouble()) *
-                              0.2,
-                          painter: _Painter(
-                            puzzles: _puzzles,
-                            bg: _bg,
-                          ),
-                          // painter: _Painter(
-                          //   puzzles: _puzzles,
-                          //   bg: _bg,
-                          //   scale: 0.2,
-                          // ),
+                  Expanded(
+                    child: ClipRect(
+                      child: CustomPaint(
+                        size: Size.infinite,
+                        painter: _PuzzlePainter(
+                          puzzles: pieces,
+                          bg: _bg,
+                          scale: scale,
+                          x: x,
+                          y: y,
+                          isLeft: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                  VerticalDivider(width: 2),
+                  Expanded(
+                    child: ClipRect(
+                      child: CustomPaint(
+                        size: Size.infinite,
+                        painter: _PuzzlePainter(
+                          puzzles: [targets],
+                          bg: _bg,
+                          scale: scale,
+                          x: x,
+                          y: y,
+                          isLeft: false,
                         ),
                       ),
                     ),
@@ -144,6 +213,9 @@ class _PageTestState extends State<PageTest> {
                 ],
               ),
             ),
+            IconButton(
+                onPressed: () => Get.back(),
+                icon: Icon(Icons.align_horizontal_left)),
           ],
         ),
       ),
@@ -151,24 +223,75 @@ class _PageTestState extends State<PageTest> {
   }
 }
 
-class _Painter extends CustomPainter {
+class _PuzzlePainter extends CustomPainter {
   final List<List<PuzzlePiece>> puzzles;
-
+  final double scale, x, y;
   final ui.Image? bg;
+  final bool isLeft;
+  final _padding = 50.0;
+  late final _linePaint = Paint()
+    ..style = ui.PaintingStyle.stroke
+    ..isAntiAlias = true
+    ..color = Colors.black
+    ..strokeWidth = 1 / scale;
 
-  _Painter({
+  _PuzzlePainter({
     super.repaint,
     required this.puzzles,
+    required this.scale,
+    required this.x,
+    required this.y,
+    required this.isLeft,
     this.bg,
   });
 
-  Offset offset = Offset.zero;
+  @override
+  bool shouldRepaint(_PuzzlePainter oldDelegate) => true;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (puzzles.isEmpty) return;
-    print('painter draw');
-    canvas.drawColor(Colors.blueGrey, BlendMode.src);
+    isLeft ? _paintLeft(canvas, size) : _paintRight(canvas, size);
+  }
+
+  void _paintLeft(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.translate(x, y);
+    canvas.scale(scale);
+    final rows = puzzles.length, columns = puzzles.first.length;
+    final width = bg!.width / columns, height = bg!.height / rows;
+    for (var row in puzzles) {
+      for (var piece in row) {
+        if (!piece.isTarget) {
+          canvas
+            ..drawImage(
+              piece.image,
+              Offset(piece.offsetX, piece.offsetY),
+              PuzzlePiece.imagePaint,
+            )
+            ..drawPath(piece.path, _linePaint);
+        }
+        canvas.translate(width, 0);
+      }
+      canvas.translate(-row.length * width, height);
+    }
+
+    canvas.restore();
+    TextPainter(
+      text: TextSpan(
+        text: 'Left',
+        style: TextStyle(color: Colors.black, fontSize: 20),
+      ),
+      textDirection: ui.TextDirection.ltr,
+    )
+      ..layout()
+      ..paint(canvas, Offset.zero);
+  }
+
+  void _paintRight(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.translate(x, y);
+    canvas.scale(scale);
 
     final imgPaint = Paint()
       ..isAntiAlias = true
@@ -179,53 +302,45 @@ class _Painter extends CustomPainter {
         linePaint = Paint()
           ..isAntiAlias = true
           ..filterQuality = FilterQuality.high
-          ..color = Colors.white
+          ..color = Colors.black
           ..style = PaintingStyle.stroke
-          ..blendMode = BlendMode.softLight
-          ..strokeWidth = 4;
-    for (var row = 0; row < rows; row++) {
-      for (var column = 0; column < columns; column++) {
-        final piece = puzzles[row][column];
-        canvas.save();
-        var path = Path()
-          ..puzzle(
-            width: width,
-            height: height,
-            top: piece.top,
-            right: piece.right,
-            bottom: piece.bottom,
-            left: piece.left,
-          );
-        final offset = Offset(column * width, row * height);
-        canvas.translate(offset.dx + column * (20), offset.dy + row * (20));
-        canvas.clipPath(path);
+          ..strokeWidth = 1 / scale;
 
-        /// bg
-        canvas.drawImage(bg!, -offset, imgPaint);
-        canvas.drawPath(path, linePaint);
-
-        canvas.restore();
-        TextPainter(
-          text: TextSpan(
-            text: 'row:$row\ncolumn:$column',
-            style: TextStyle(color: Colors.white, fontSize: 14),
-          ),
-          textDirection: ui.TextDirection.ltr,
-        )
-          ..layout()
-          ..paint(canvas, offset);
+    var currentRow = 0;
+    for (var i = 0; i < puzzles.first.length; i++) {
+      final piece = puzzles.first[i];
+      canvas.save();
+      var x = i * (width) + i * (_padding / scale);
+      if (x > bg!.width) {
+        x = 0;
+        currentRow++;
       }
+      var y = currentRow * height + currentRow * (_padding / scale);
+      canvas.translate(x, y);
+      canvas.drawImage(
+        piece.image,
+        Offset.zero,
+        PuzzlePiece.imagePaint,
+      );
+      canvas.drawPath(piece.path, linePaint);
+      canvas.restore();
     }
+
+    canvas.restore();
   }
-
-  @override
-  bool shouldRepaint(_Painter oldDelegate) => true;
 }
 
-Future<ui.Image> _loadImage(Uint8List bytes) async {
-  final Completer<ui.Image> completer = Completer();
-  ui.decodeImageFromList(bytes, (ui.Image img) {
-    return completer.complete(img);
-  });
-  return completer.future;
+final _allTypes = [null, ...PuzzleEdgeType.values];
+
+PuzzleEdgeType? _edgeType(math.Random random, PuzzleEdgeType? type) {
+  final list = _allTypes.toList()
+    ..remove(type)
+    ..shuffle(random);
+  return list.first;
 }
+
+final _angles = [0, 90, 180, 270];
+
+int _randomRadian(math.Random random) => 90
+// _angles[random.nextInt(_angles.length)]
+    ;

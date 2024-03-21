@@ -4,10 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:game/core.dart';
 import 'package:game/data.dart';
 import 'package:game/game/canvas_new.dart';
+import 'package:game/game/puzzle/canvas.dart';
 import 'package:game/game/drag_and_scale_widget_new.dart';
 import 'package:game/game/game_state.dart';
 import 'package:game/game/game_ui_new.dart';
 import 'package:game/game/layer.dart';
+import 'package:game/game/level_find_differences.dart';
+import 'package:game/game/puzzle/level_puzzle.dart';
 import 'package:get/get.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 
@@ -49,6 +52,26 @@ class PagePlayChallenge<T extends PCGameController> extends GetView<T> {
               child: GetBuilder<T>(
                 id: 'game',
                 builder: (c) {
+                  late Widget left, right;
+                  if (controller.currentLevel != null) {
+                    if (controller.currentLevel is LevelFindDifferences) {
+                      left = NewILPCanvas<T>(
+                        layout: LayerLayout.left,
+                      );
+                      right = NewILPCanvas<T>(
+                        layout: LayerLayout.right,
+                      );
+                    } else if (controller.currentLevel is LevelPuzzle) {
+                      left = PuzzleCanvas<T>(
+                        isLeft: true,
+                        level: controller.currentLevel as LevelPuzzle,
+                      );
+                      right = PuzzleCanvas<T>(
+                        isLeft: false,
+                        level: controller.currentLevel as LevelPuzzle,
+                      );
+                    }
+                  }
                   if (c.state == GameState.started) {
                     return NewDragAndScaleWidget<T>(
                       builder: (context) => Row(
@@ -56,18 +79,14 @@ class PagePlayChallenge<T extends PCGameController> extends GetView<T> {
                           Expanded(
                             child: ClipRect(
                               clipBehavior: Clip.hardEdge,
-                              child: NewILPCanvas<T>(
-                                layout: LayerLayout.left,
-                              ),
+                              child: left,
                             ),
                           ),
                           VerticalDivider(width: 2),
                           Expanded(
                             child: ClipRect(
                               clipBehavior: Clip.hardEdge,
-                              child: NewILPCanvas<T>(
-                                layout: LayerLayout.right,
-                              ),
+                              child: right,
                             ),
                           ),
                         ],

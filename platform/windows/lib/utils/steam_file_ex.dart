@@ -272,7 +272,6 @@ extension SteamFileEX on SteamClient {
     Set<int>? childrenId,
     int? levelCount,
   }) async {
-    assert(type == TagType.challenge && childrenId?.isNotEmpty == true);
     final tempDir = await getTemporaryDirectory();
     itemId ??= await createItemReturnId();
     final completer = Completer<SubmitResult>();
@@ -297,7 +296,7 @@ extension SteamFileEX on SteamClient {
       tag.ref.strings[index] = element.toNativeUtf8();
     });
     tag.ref.numStrings = tags.length;
-    final setTags = steamUgc.setItemTags(handle, tag);
+    final setTags = steamUgc.setItemTags(handle, tag, false);
     debugPrint('set tags $setTags $tags');
 
     if (title != null) {

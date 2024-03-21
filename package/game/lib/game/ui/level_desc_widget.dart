@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 
-import '../../duration_extension.dart';
+import '../../extension_duration.dart';
 import '../game_state.dart';
 import '../level.dart';
 import '../level_controller.dart';
@@ -45,8 +45,10 @@ class LevelDescriptionBuilder<T extends LevelController> extends GetView<T> {
   }
 
   String get _title {
-    final inSeconds = UI.inSeconds.trParams(
-        {'seconds': controller.currentLevel!.time.toSemanticString()});
+    final inSeconds = UI.inSeconds.tr.replaceFirst(
+      '%s',
+      controller.currentLevel!.time.toSemanticString(),
+    );
     return switch (controller.currentLevel!.mode) {
       LevelMode.findDifferences =>
         (controller.currentLevel as LevelFindDifferences).type ==
