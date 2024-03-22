@@ -4,11 +4,11 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:ilp_file_codec/ilp_codec.dart';
 
-import '../ilp_layer_extend.dart';
-import 'is_transparent_pixel.dart';
+import '../is_transparent_pixel.dart';
+import '../level.dart';
 import 'layer.dart';
-import 'level.dart';
 
 enum LevelDifferentType {
   single,
@@ -81,7 +81,6 @@ class LevelFindDifferences extends Level with LevelLoader {
 
   @override
   reset() {
-    tappedLayerId.clear();
     layers.clear();
     left = right = null;
   }
@@ -90,7 +89,8 @@ class LevelFindDifferences extends Level with LevelLoader {
   randomLayers(math.Random random) {
     layers
       ..clear()
-      ..addAll(rootLayer!.randomList(
+      ..addAll(_randomList(
+        rootLayer: rootLayer!,
         random: random,
         max: type == LevelDifferentType.single ? 1 : 10,
       ));
@@ -107,7 +107,7 @@ class LevelFindDifferences extends Level with LevelLoader {
   }
 
   @override
-  Future<ILPCanvasLayer?> onTap(LayerLayout layout, Offset position) async {
+  Future<Duration?> onTap(LayerLayout layout, Offset position) async {
     print('==================');
     print('鼠标 $position');
     for (var i = 1; i < layers.length; i++) {
@@ -121,9 +121,7 @@ class LevelFindDifferences extends Level with LevelLoader {
           var content =
               (layout == LayerLayout.left ? layer.left : layer.right) ??
                   (layout == LayerLayout.left ? layer.right : layer.left);
-          if (content == null) return null;
-          tappedLayerId.add(content.id);
-          if (content.hasContent()) {
+          if (content != null && content.hasContent()) {
             final x = (position.dx - rect.topLeft.dx).toInt();
             final y = (position.dy - rect.topLeft.dy).toInt();
             print('相对坐标 $x, $y');
@@ -133,15 +131,21 @@ class LevelFindDifferences extends Level with LevelLoader {
               y: y,
             );
             print('是否透明 $isTransparent');
+
+            /// 点击到图层的不透明部分，判断为成功点击
             if (!isTransparent) {
               foundLayers++;
-              return layer;
+              layer.tappedSide = layout;
+              if (layer == hintTarget) {
+                hintTarget = null;
+              }
+              return null;
             }
           }
         }
       }
     }
-    return null;
+    return Duration(seconds: 8);
   }
 
   @override
@@ -201,4 +205,89 @@ Future<ui.Image> _loadImage(Uint8List bytes) async {
   final Completer<ui.Image> completer = Completer();
   ui.decodeImageFromList(bytes, (ui.Image img) => completer.complete(img));
   return completer.future;
+}
+
+List<ILPCanvasLayer> _randomList({
+  required ILPLayer rootLayer,
+  required math.Random random,
+  int? max,
+}) {
+  final list = <ILPCanvasLayer>[];
+
+  /// the root layers set isGroup = false
+  loop(List<ILPLayer> layers, {isGroup = false}) {
+    final List<ILPLayer> contents = [];
+    for (var layer in layers) {
+      if (layer.content.isNotEmpty) {
+        contents.add(layer);
+      } else if (layer.layers.isNotEmpty) {
+        loop(layer.layers, isGroup: true);
+      }
+    }
+    if (contents.isNotEmpty) {
+      if (isGroup) {
+        final isShow = random.nextBool();
+        if (isShow) {
+          final layer = contents[random.nextInt(contents.length)];
+          ILPLayer? otherLayer;
+
+          /// if show other side layer
+          /// 如果另外一边也要显示内容
+          if (random.nextBool()) {
+            contents.remove(layer);
+            if (contents.isNotEmpty) {
+              otherLayer = contents[random.nextInt(contents.length)];
+            }
+          }
+          final leftSide = random.nextBool();
+          final canvasLayer = ILPCanvasLayer(
+            name: layer.name,
+            layout: leftSide ? LayerLayout.left : LayerLayout.right,
+            left: leftSide ? layer : otherLayer,
+            right: leftSide ? otherLayer : layer,
+          );
+          list.add(canvasLayer);
+        }
+      } else {
+        for (var layer in contents) {
+          final isShow = random.nextBool();
+          if (isShow) {
+            final leftSide = random.nextBool();
+            final canvasLayer = ILPCanvasLayer(
+              name: layer.name,
+              layout: leftSide ? LayerLayout.left : LayerLayout.right,
+              left: leftSide ? layer : null,
+              right: leftSide ? null : layer,
+            );
+            list.add(canvasLayer);
+          }
+        }
+      }
+    }
+  }
+
+  /// 其余图层
+  while (list.isEmpty) {
+    loop(rootLayer.layers);
+  }
+  list.shuffle(random);
+  if (max != null && list.length > max) {
+    final newList = list.sublist(0, max);
+    list
+      ..clear()
+      ..addAll(newList);
+  }
+
+  /// 背景图层
+  list.insert(
+      0,
+      ILPCanvasLayer(
+        name: '背景层',
+        layout: LayerLayout.all,
+        tappedSide: LayerLayout.all,
+        left: rootLayer,
+        right: rootLayer,
+      ));
+
+  return list;
 }

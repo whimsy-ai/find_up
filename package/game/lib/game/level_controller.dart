@@ -4,20 +4,21 @@ import 'package:collection/collection.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:i18n/ui.dart';
+import 'package:oktoast/oktoast.dart';
 
 import '../data.dart';
 import '../explorer/file.dart';
 import '../extension_duration.dart';
 import 'core_controller.dart';
+import 'find_differences/layer.dart';
+import 'find_differences/level_find_differences.dart';
 import 'game_state.dart';
 import 'hint_controller.dart';
-import 'layer.dart';
 import 'level.dart';
-import 'level_find_differences.dart';
 import 'loading_controller.dart';
 import 'offset_scale_controller.dart';
 import 'puzzle/level_puzzle.dart';
-import 'puzzle/puzzle.dart';
 import 'seed_controller.dart';
 import 'sound_controller.dart';
 
@@ -103,35 +104,39 @@ abstract class LevelController extends GetxController
   @override
   void onUpdate(Duration lastFrame) {
     if (state == GameState.started) {
-      countdown(lastFrame);
+      hintCountdown(lastFrame);
       currentLevel!.onUpdate(lastFrame);
       update(['ui']);
     }
   }
 
   void onTap(LayerLayout layout, TapUpDetails details) async {
-    final offset = Offset(offsetX, offsetY);
-    final tapPosition = (details.localPosition - offset) / scale;
-
-    final found = await currentLevel?.onTap(layout, tapPosition);
-
-    if (found == null) {
-      playDuckAudio();
-    } else {
-      playCorrectAudio();
-      tapPositions.add(tapPosition);
-      found.tappedSide = layout;
-      if (found == currentLevel?.hintTarget) {
-        currentLevel?.hintTarget = null;
-      }
-      update(['ui', 'game']);
+    final level = currentLevel;
+    if (level == null) return;
+    late Offset tapPosition;
+    if (level is LevelPuzzle) {
+      tapPosition = details.localPosition;
+    } else if (level is LevelFindDifferences) {
+      final offset = Offset(offsetX, offsetY);
+      tapPosition = (details.localPosition - offset) / scale;
     }
 
-    /// todo
-    // if (currentLevel!.layers.whereNot((l) => l.tapped).isEmpty) {
-    //   currentLevel!.onCompleted();
-    //   onLevelFinish();
-    // }
+    final duration = await level.onTap(layout, tapPosition);
+
+    /// 点击成功
+    if (duration == null) {
+      playCorrectAudio();
+      tapPositions.add(tapPosition);
+      if (currentLevel!.layers.whereNot((l) => l.tapped).isEmpty) {
+        currentLevel!.onCompleted();
+        onLevelFinish();
+      }
+    } else {
+      showToast(UI.tapWrong.tr.replaceFirst('%s', duration.toSemanticString()));
+      currentLevel!.time -= duration;
+      playDuckAudio();
+    }
+    update(['ui', 'game']);
   }
 
   void onLevelFinish() {
@@ -214,6 +219,8 @@ abstract class LevelController extends GetxController
 
   String get time => currentLevel!.time.toSemanticString();
 
+  int unlocked = 0;
+
   onCompleted() {
     final hasFailed = levels.firstWhereOrNull(
             (element) => element.state == LevelState.failed) !=
@@ -226,8 +233,13 @@ abstract class LevelController extends GetxController
       state = GameState.completed;
 
       /// store unlocked layers id
-      final id = levels.map((e) => e.tappedLayerId).flattened.toSet();
-      print('unlocked ${id.length}');
+      final id = levels
+          .where((l) => l.state == LevelState.completed)
+          .map((e) => e.unlockedLayersId())
+          .flattened
+          .toSet();
+      unlocked = id.difference(Data.layersId).length;
+      print('unlocked layers length: $unlocked');
       Data.layersId.addAll(id);
     }
     update(['ui', 'game']);
@@ -269,7 +281,7 @@ abstract class LevelController extends GetxController
             controller: this,
             file: file,
             ilpIndex: i,
-            targetsCount: random.nextInt(3)+1,
+            targetsCount: random.nextInt(3) + 1,
           ));
       }
     }

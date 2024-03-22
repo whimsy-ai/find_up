@@ -30,6 +30,7 @@ class SteamExplorerController extends SteamFilterController {
       subscribed: subscribed,
       page: page,
       sort: sort,
+      search: search,
       tags: {
         if (ageRating != null) ageRating!.value,
         ...shapes.map((e) => e.value),

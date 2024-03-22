@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import '../bytes_size.dart';
 import '../game/unlock_progress_bar.dart';
 import '../info_table.dart';
+import '../save_image/page_save_image_entry.dart';
 import 'file.dart';
 import 'ilp_file.dart';
 
@@ -200,11 +201,8 @@ class _InfoListTile extends StatelessWidget {
                   child: Icon(Icons.play_arrow_rounded)),
             TextButton(
               child: Icon(Icons.save_outlined),
-              onPressed: () async {
-                Get.toNamed('/save', arguments: {
-                  'file': file,
-                  'index': index,
-                });
+              onPressed: () {
+                PageSaveImageEntry.open(file!, index);
               },
             ),
           ],

@@ -3,15 +3,16 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../level_controller.dart';
+import '../mouse_controller.dart';
+import 'hint_widget.dart';
 import 'layer.dart';
-import 'level_controller.dart';
 import 'level_find_differences.dart';
-import 'mouse_controller.dart';
 
-class NewILPCanvas<T extends LevelController> extends GetView<T> {
+class FindDiffCanvas<T extends LevelController> extends GetView<T> {
   final LayerLayout layout;
 
-  const NewILPCanvas({super.key, required this.layout});
+  const FindDiffCanvas({super.key, required this.layout});
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +28,8 @@ class NewILPCanvas<T extends LevelController> extends GetView<T> {
           controller: controller,
           layout: layout,
         ),
+
+        /// 显示提示组件
         child: Stack(
           children: [
             if (hintRect != null)
@@ -35,8 +38,9 @@ class NewILPCanvas<T extends LevelController> extends GetView<T> {
                 top: controller.offsetY + (hintRect.top * controller.scale),
                 width: hintRect.width * controller.scale,
                 height: hintRect.height * controller.scale,
-                child: Container(
-                  color: Colors.green.withOpacity(0.7),
+                child: CircleAnimateWidget(
+                  color: Colors.white,
+                  radius: hintRect.width,
                 ),
               )
           ],

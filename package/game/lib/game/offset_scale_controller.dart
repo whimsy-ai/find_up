@@ -8,7 +8,7 @@ mixin OffsetScaleController on GetxController {
 
   double get scale => _scale;
 
-  set scale(v) {
+  set scale(double v) {
     _scale = v;
     update(['game']);
   }

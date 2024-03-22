@@ -9,6 +9,7 @@ import 'package:game/game/page_game_entry.dart';
 import 'package:game/game/unlock_progress_bar.dart';
 import 'package:game/get_ilp_info_unlock.dart';
 import 'package:game/info_table.dart';
+import 'package:game/save_image/page_save_image_entry.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
@@ -402,14 +403,7 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                         TextButton(
                           child: Icon(Icons.save_outlined),
                           onPressed: () {
-                            Get.toNamed(
-                              '/save',
-                              arguments: {
-                                'file': widget.file,
-                                'index': i,
-                              },
-                              preventDuplicates: true,
-                            );
+                            PageSaveImageEntry.open(widget.file, i);
                           },
                         ),
                       ],

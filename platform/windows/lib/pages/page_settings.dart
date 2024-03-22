@@ -5,7 +5,6 @@ import 'package:game/http/http.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 import '../utils/update_window_title.dart';
 

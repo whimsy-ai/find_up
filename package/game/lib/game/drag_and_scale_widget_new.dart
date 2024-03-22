@@ -1,6 +1,8 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:math' as math;
 
 import 'mouse_controller.dart';
 import 'offset_scale_controller.dart';
@@ -61,13 +63,16 @@ class DragAndScaleWidgetState<T extends OffsetScaleController>
         if (event is PointerScrollEvent) {
           // final half = Get.width / 2;
           // final pos = event.localPosition;
+          // print('滚轮 ${event.distance} ${event.scrollDelta}');
+          final max = math.max(controller.minScale, controller.maxScale),
+              min = math.min(controller.minScale, controller.maxScale);
+          print('min ${controller.minScale}, max ${controller.maxScale}');
           _eventPosition = controller.onScalePosition(event.localPosition);
           final isZoomIn = event.scrollDelta.dy > 0;
           final step = widget.scaleStep * (isZoomIn ? -1 : 1);
           _lastScale = controller.scale;
-          controller.scale = (controller.scale + step)
-              .clamp(controller.minScale, controller.maxScale);
-          // print('滚轮 ${controller.scale}');
+          controller.scale =
+              (controller.scale + step).toDouble().clamp(min, max);
           _scaleOffset();
         }
       },
@@ -85,7 +90,7 @@ class DragAndScaleWidgetState<T extends OffsetScaleController>
     controller.offsetY += details.focalPointDelta.dy;
 
     /// 单指移动，包括鼠标
-    if (details.pointerCount == 1 &&controller is MouseController) {
+    if (details.pointerCount == 1 && controller is MouseController) {
       (controller as MouseController).position += details.focalPointDelta;
     }
 

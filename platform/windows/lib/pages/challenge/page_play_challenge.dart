@@ -3,13 +3,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:game/core.dart';
 import 'package:game/data.dart';
-import 'package:game/game/canvas_new.dart';
-import 'package:game/game/puzzle/canvas.dart';
 import 'package:game/game/drag_and_scale_widget_new.dart';
+import 'package:game/game/find_differences/canvas.dart';
+import 'package:game/game/find_differences/layer.dart';
+import 'package:game/game/find_differences/level_find_differences.dart';
 import 'package:game/game/game_state.dart';
 import 'package:game/game/game_ui_new.dart';
-import 'package:game/game/layer.dart';
-import 'package:game/game/level_find_differences.dart';
+import 'package:game/game/puzzle/canvas.dart';
 import 'package:game/game/puzzle/level_puzzle.dart';
 import 'package:get/get.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
@@ -55,10 +55,10 @@ class PagePlayChallenge<T extends PCGameController> extends GetView<T> {
                   late Widget left, right;
                   if (controller.currentLevel != null) {
                     if (controller.currentLevel is LevelFindDifferences) {
-                      left = NewILPCanvas<T>(
+                      left = FindDiffCanvas<T>(
                         layout: LayerLayout.left,
                       );
-                      right = NewILPCanvas<T>(
+                      right = FindDiffCanvas<T>(
                         layout: LayerLayout.right,
                       );
                     } else if (controller.currentLevel is LevelPuzzle) {

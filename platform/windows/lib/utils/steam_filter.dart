@@ -65,7 +65,14 @@ abstract class SteamFilterController extends GetxController {
   Set<TagShape> get shapes => _shapes;
 
   /// 搜索
-  String search = '';
+  String _search = '';
+
+  String get search => _search;
+
+  set search(String value) {
+    _search = value;
+    _onChanged();
+  }
 
   void clearAgeRating() async {
     if (!await isAdult()) return;

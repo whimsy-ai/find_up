@@ -6,9 +6,10 @@ import 'package:i18n/ui.dart';
 
 import '../../explorer/ilp_info_bottom_sheet.dart';
 import '../../explorer/test_ilp_file.dart';
+import '../../save_image/page_save_image_entry.dart';
 import '../../utils/textfield_number_formatter.dart';
+import '../find_differences/level_find_differences.dart';
 import '../level_controller.dart';
-import '../level_find_differences.dart';
 import '../puzzle/level_puzzle.dart';
 import '../resources.dart';
 import '../stroke_shadow.dart';
@@ -34,6 +35,10 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
             ? UI.findOneLayer.tr
             : UI.findAllLayers.tr;
       }
+    } else if (controller.isCompleted) {
+      final unlock = UI.unlockedLayers.tr
+          .replaceFirst('%s', controller.unlocked.toString());
+      title = '$title, $unlock';
     }
     return Container(
       height: height,
@@ -197,10 +202,8 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
                         color: Colors.white,
                       ),
                       onPressed: () async {
-                        Get.toNamed('/save', arguments: {
-                          'file': controller.currentLevel!.file,
-                          'index': controller.current,
-                        });
+                        final level = controller.currentLevel!;
+                        PageSaveImageEntry.open(level.file, level.ilpIndex);
                       },
                     ),
                   ),

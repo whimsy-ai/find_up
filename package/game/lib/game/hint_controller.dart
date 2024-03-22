@@ -37,7 +37,7 @@ mixin HintController on GetxController {
     _time = divider * _times;
   }
 
-  void countdown(Duration frame) {
+  void hintCountdown(Duration frame) {
     if (_time < Duration.zero) return;
     _time -= frame;
   }

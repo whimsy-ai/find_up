@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:game/game/canvas_new.dart';
 import 'package:game/game/drag_and_scale_widget_new.dart';
+import 'package:game/game/find_differences/canvas.dart';
+import 'package:game/game/find_differences/layer.dart';
 import 'package:game/game/game_state.dart';
 import 'package:game/game/game_ui_new.dart';
-import 'package:game/game/layer.dart';
 import 'package:game/game/level_controller.dart';
 import 'package:get/get.dart';
 
 class PagePlayChallenge<T extends LevelController> extends GetView<T> {
-  PagePlayChallenge() {
+  PagePlayChallenge({super.key}) {
     controller.start();
   }
 
@@ -29,7 +29,7 @@ class PagePlayChallenge<T extends LevelController> extends GetView<T> {
                           Expanded(
                             child: ClipRect(
                               clipBehavior: Clip.hardEdge,
-                              child: NewILPCanvas<T>(
+                              child: FindDiffCanvas<T>(
                                 layout: LayerLayout.left,
                               ),
                             ),
@@ -38,7 +38,7 @@ class PagePlayChallenge<T extends LevelController> extends GetView<T> {
                           Expanded(
                             child: ClipRect(
                               clipBehavior: Clip.hardEdge,
-                              child: NewILPCanvas<T>(
+                              child: FindDiffCanvas<T>(
                                 layout: LayerLayout.right,
                               ),
                             ),

@@ -4,14 +4,19 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import '../../extension_path.dart';
+import '../level.dart';
 
-class PuzzlePiece {
+class PuzzlePiece extends Tapped {
   final int row, column;
   late ui.Path _path;
   late ui.Image image;
   late double width, height;
   static double peakHeight = 0;
-  bool isTarget = false, isFake = false;
+  bool rightSide = false, highlight = false;
+  @override
+  bool isTarget = false;
+  @override
+  bool tapped = false;
   PuzzleEdgeType? left, top, right, bottom;
 
   double offsetX = 0, offsetY = 0;
@@ -111,8 +116,7 @@ class PuzzlePiece {
     final pictureRecorder = ui.PictureRecorder();
     final canvas = ui.Canvas(pictureRecorder);
     double x, y;
-    if (piece.isTarget) {
-      print('target piece fake:${piece.isFake}, ${piece.left} ${piece.top} ${piece.right} ${piece.bottom}');
+    if (piece.rightSide) {
       canvas.rotate(piece.rotate * math.pi / 180);
       if (piece.rotate == 90) {
         x = piece.left == PuzzleEdgeType.knob ? peakHeight : 0;
@@ -150,8 +154,13 @@ class PuzzlePiece {
         y = piece.offsetY;
         canvas.translate(-x, -y);
         canvas.clipPath(piece.path);
-        canvas.drawImage(bg, -Offset(piece.column * pieceWidth, piece.row * pieceHeight), imagePaint);
+        canvas.drawImage(
+            bg,
+            -Offset(piece.column * pieceWidth, piece.row * pieceHeight),
+            imagePaint);
       }
+
+      /// 在canvas画边框
       // canvas.drawPath(
       //   piece.path,
       //   Paint()

@@ -107,7 +107,7 @@ class _PageTestState extends State<PageTest> {
       final totalTarget = random.nextInt(3) + 1;
       for (var i = 0; i < totalTarget; i++) {
         var puzzle = randomList[i]
-          ..isTarget = true
+          ..rightSide = true
           ..rotate = _randomRadian(random);
         targets.add(puzzle);
       }
@@ -143,7 +143,7 @@ class _PageTestState extends State<PageTest> {
         ..right = right
         ..bottom = bottom
         ..isTarget = true
-        ..isFake = true
+        ..rightSide = true
         ..rotate = _randomRadian(random);
       targets..add(fake)
           // ..shuffle(random)

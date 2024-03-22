@@ -3,12 +3,13 @@ description: A new Flutter project.
 version: 0.0.1
 publish_to: none
 
+
 environment:
   sdk: '>=3.0.5 <4.0.0'
   flutter: ">=1.17.0"
 
 dependencies:
-  audioplayers: ^5.2.1
+  audioplayers: ^6.0.0
   confetti: ^0.7.0
   dio: ^5.4.1
   dio_cache_interceptor: ^3.5.0
@@ -36,6 +37,7 @@ dependencies:
   oktoast: ^3.4.0
   image: ^4.1.7
   collection: ^1.18.0
+  dotted_border: ^2.1.0
 
 dev_dependencies:
   flutter_test:

@@ -6,7 +6,7 @@ import '../../extension_duration.dart';
 import '../game_state.dart';
 import '../level.dart';
 import '../level_controller.dart';
-import '../level_find_differences.dart';
+import '../find_differences/level_find_differences.dart';
 import 'levels_indicator.dart';
 
 class LevelDescriptionBuilder<T extends LevelController> extends GetView<T> {
@@ -20,7 +20,7 @@ class LevelDescriptionBuilder<T extends LevelController> extends GetView<T> {
     final loading = level.state != LevelState.already;
     return AlertDialog(
       title: Text(_title),
-      content: _content(),
+      content: _content,
       actions: [
         if (loading)
           SizedBox(
@@ -45,10 +45,10 @@ class LevelDescriptionBuilder<T extends LevelController> extends GetView<T> {
   }
 
   String get _title {
-    final inSeconds = UI.inSeconds.tr.replaceFirst(
+    final inSeconds = '${UI.inSeconds.tr.replaceFirst(
       '%s',
       controller.currentLevel!.time.toSemanticString(),
-    );
+    )}, ';
     return switch (controller.currentLevel!.mode) {
       LevelMode.findDifferences =>
         (controller.currentLevel as LevelFindDifferences).type ==
@@ -59,15 +59,16 @@ class LevelDescriptionBuilder<T extends LevelController> extends GetView<T> {
     };
   }
 
-  Widget _content() {
+  Widget get _content {
     final level = controller.currentLevel!;
-    final desc = switch (level.mode) {
-      LevelMode.findDifferences => SizedBox(
-          height: 100,
-          child: _imageRow((level as LevelFindDifferences).type),
-        ),
-      LevelMode.puzzle => SizedBox.shrink(),
-    };
+    final desc = SizedBox(
+      height: 120,
+      child: switch (level.mode) {
+        LevelMode.findDifferences =>
+          _findDiffImages((level as LevelFindDifferences).type),
+        LevelMode.puzzle => _puzzleImages(),
+      },
+    );
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -88,21 +89,43 @@ class LevelDescriptionBuilder<T extends LevelController> extends GetView<T> {
   }
 }
 
-Widget _imageRow(LevelDifferentType tpe) {
+Widget _findDiffImages(LevelDifferentType type) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Image.asset(
-        tpe == LevelDifferentType.single
+        type == LevelDifferentType.single
             ? 'assets/images/monalisa_left.png'
             : 'assets/images/monalisa_left_multi.png',
         package: 'game',
       ),
+      SizedBox(width: 8),
       VerticalDivider(width: 1),
+      SizedBox(width: 8),
       Image.asset(
-        tpe == LevelDifferentType.single
+        type == LevelDifferentType.single
             ? 'assets/images/monalisa_right.png'
             : 'assets/images/monalisa_right_multi.png',
+        package: 'game',
+      ),
+    ],
+  );
+}
+
+Widget _puzzleImages() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Image.asset(
+        'assets/images/monalisa_puzzle_left.png',
+        package: 'game',
+      ),
+      SizedBox(width: 8),
+      VerticalDivider(width: 1),
+      SizedBox(width: 8),
+      Image.asset(
+        'assets/images/monalisa_puzzle_right.png',
+        width: 160,
         package: 'game',
       ),
     ],

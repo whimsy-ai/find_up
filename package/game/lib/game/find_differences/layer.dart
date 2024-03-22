@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
+import '../level.dart';
+
 enum LayerLayout {
   all,
   left,
   right,
 }
 
-class ILPCanvasLayer{
+class ILPCanvasLayer extends Tapped {
   final LayerLayout layout;
   LayerLayout? tappedSide;
 
+  @override
+  bool get isTarget => true;
+
+  @override
   bool get tapped => tappedSide != null;
   final bool isBackground;
   final String name;

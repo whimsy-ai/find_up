@@ -209,6 +209,10 @@ void main(List<String> args) async {
     languages[targetLanguage] = data;
     for (var key in zh.keys) {
       final rawText = zh[key]!;
+      if(key == 'findUp'){
+        data[key] = 'Find Up!';
+        continue;
+      }
       queue.add(() async {
         if (rawText.isEmpty) {
           data[key] = rawText;

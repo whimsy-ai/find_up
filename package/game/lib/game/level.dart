@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 
 import '../explorer/file.dart';
-import 'layer.dart';
+import 'find_differences/layer.dart';
 import 'level_controller.dart';
 
 typedef OnTapLayer = void Function(LayerLayout layou, TapUpDetails e);
@@ -21,12 +21,17 @@ enum LevelState {
   const LevelState(this.value);
 }
 
+abstract class Tapped {
+  bool get tapped;
+  bool get isTarget;
+}
+
 enum LevelMode {
   findDifferences,
   puzzle;
 
-  static LevelMode random(math.Random random) => LevelMode.puzzle;
-  // LevelMode.values[random.nextInt(LevelMode.values.length)];
+  static LevelMode random(math.Random random) =>
+      LevelMode.values[random.nextInt(LevelMode.values.length)];
 }
 
 mixin LevelLoader on Level {
@@ -37,9 +42,8 @@ mixin LevelLoader on Level {
   Future<void> drawContent();
 }
 
-abstract class Level<T> {
+abstract class Level {
   LevelState state = LevelState.loading;
-  final Set<String> tappedLayerId = {};
   final LevelController controller;
   final ExplorerFile file;
   final int ilpIndex;
@@ -84,13 +88,16 @@ abstract class Level<T> {
   /// 显示提示，成功返回true，失败返回false
   bool hint();
 
+  List<Tapped> get layers;
+
   void randomLayers(math.Random random);
 
   List<String> unlockedLayersId();
 
-  Future<ILPCanvasLayer?> onTap(LayerLayout layout, Offset position);
+  Future<Duration?> onTap(LayerLayout layout, Offset position);
 
   void onUpdate(Duration frame) {
+    if (controller.debug) return;
     time -= frame;
     if (time < Duration.zero) {
       state = LevelState.failed;
