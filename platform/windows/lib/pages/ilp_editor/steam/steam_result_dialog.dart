@@ -45,14 +45,14 @@ class SteamResultDialog extends StatelessWidget {
                 child: Icon(Icons.tips_and_updates_outlined, color: Colors.red),
               ),
               TextSpan(
-                text: UI.steamLimitedAccountDesc1
+                text: UI.steamLimitedAccountDesc1.tr
                     .replaceAll('%s', UI.steamLimitedAccount.tr),
               ),
               TextSpan(text: '\n'),
               WidgetSpan(
                   child: InkWell(
                 onTap: () {
-                  final url = Data.locale.languageCode == 'zh'
+                  final url = Data.locale.languageCode.startsWith('zh')
                       ? 'https://help.steampowered.com/zh-cn/faqs/view/71D3-35C2-AD96-AA3A'
                       : 'https://help.steampowered.com/en/faqs/view/71D3-35C2-AD96-AA3A';
                   SteamClient.instance.openUrl(url);

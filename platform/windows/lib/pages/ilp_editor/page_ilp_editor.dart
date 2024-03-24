@@ -362,14 +362,13 @@ class PageILPEditor extends GetView<ILPEditorController> {
                   ),
                 ),
               ),
-              if (Data.locale.languageCode == 'zh')
+              if (Data.locale.languageCode.startsWith('zh'))
                 ListTile(
                   leading: Icon(FontAwesomeIcons.bilibili, color: Colors.blue),
                   title: Text('使用stable diffusion制作游戏内容的教程视频'),
                   onTap: () => launchUrlString(
                       'https://www.bilibili.com/video/BV1Qj411p76M'),
                 ),
-              if (Data.locale.languageCode != 'zh')
                 ListTile(
                   leading: Icon(FontAwesomeIcons.youtube, color: Colors.red),
                   title: Text(
