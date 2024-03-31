@@ -28,7 +28,7 @@ class ILPEditorInfoListTile extends GetView<ILPEditorController> {
         final removeWidget = Tooltip(
           message: UI.remove.tr,
           child: InkWell(
-            onTap: () => controller.removeFile(file),
+            onTap: () => controller.removeConfigFile(file),
             child: Padding(
               padding: EdgeInsets.all(8.0),
               child: Icon(

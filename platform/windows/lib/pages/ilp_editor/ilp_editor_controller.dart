@@ -143,7 +143,7 @@ class ILPEditorController extends GetxController {
     );
   }
 
-  save() async {
+  saveToLocalFile() async {
     late String savePath;
     if (_file is ILPFile) {
       final file = _file as ILPFile;
@@ -331,7 +331,7 @@ class ILPEditorController extends GetxController {
     );
   }
 
-  removeFile(ILPInfoFile file) async {
+  removeConfigFile(ILPInfoFile file) async {
     final index = configs.indexOf(file);
     if (index == -1) return;
     bool? sure = false;

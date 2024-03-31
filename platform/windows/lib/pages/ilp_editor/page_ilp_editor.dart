@@ -179,7 +179,7 @@ class PageILPEditor extends GetView<ILPEditorController> {
                             return;
                           }
                           if (_formKey.currentState!.validate()) {
-                            controller.save();
+                            controller.saveToLocalFile();
                           }
                         },
                       ),
