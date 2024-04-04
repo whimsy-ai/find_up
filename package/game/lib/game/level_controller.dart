@@ -221,7 +221,7 @@ abstract class LevelController extends GetxController
 
   int unlocked = 0;
 
-  onCompleted() {
+  void onCompleted() {
     final hasFailed = levels.firstWhereOrNull(
             (element) => element.state == LevelState.failed) !=
         null;

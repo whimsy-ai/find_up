@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:crypto/crypto.dart';
 import 'package:csv/csv.dart';
 import 'package:dynamic_parallel_queue/dynamic_parallel_queue.dart';
 
 import 'bin/caches.dart';
+import 'bin/core.dart';
 import 'bin/ui.dart';
 
 const input = './bin/ui.dart';
@@ -189,12 +189,12 @@ void main(List<String> args) async {
 
   /// 通过code匹配语种名称
   for (var value in rankedLanguages.keys) {
-    rankedLanguages[value] = languagesName[value]!;
+    rankedLanguages[value] = languagesName[value]!.last;
   }
   for (var value in targetLanguages) {
     if (languagesName.containsKey(value)) {
       if (rankedLanguages.containsKey(value)) continue;
-      rankedLanguages[value] = languagesName[value]!;
+      rankedLanguages[value] = languagesName[value]!.last;
     }
   }
   text.writeln(
@@ -209,7 +209,7 @@ void main(List<String> args) async {
     languages[targetLanguage] = data;
     for (var key in zh.keys) {
       final rawText = zh[key]!;
-      if(key == 'findUp'){
+      if (key == 'findUp') {
         data[key] = 'Find Up!';
         continue;
       }
@@ -218,7 +218,7 @@ void main(List<String> args) async {
           data[key] = rawText;
           return;
         }
-        if(fix[targetLanguage]?[key] != null){
+        if (fix[targetLanguage]?[key] != null) {
           data[key] = fix[targetLanguage]![key]!;
           return;
         }
@@ -228,14 +228,11 @@ void main(List<String> args) async {
         } else {
           String text;
           try {
-            text = await trans([
-              '-b',
-              '-e',
-              'google',
-              '$sourceLanguage:$targetLanguage',
-              '-j',
+            text = await translate(
               rawText,
-            ]).then((value) => value.replaceAll('"', ''));
+              sourceLanguage: sourceLanguage,
+              targetLanguage: targetLanguage,
+            ).then((value) => value.replaceAll('"', ''));
 
             if (text.isNotEmpty) {
               caches[md5] = text;
@@ -289,38 +286,3 @@ void main(List<String> args) async {
   }
   exit(0);
 }
-
-Future<Map<String, String>> languagesMap() async {
-  final languages =
-      await trans(['-list-all']).then((value) => value.split('\n'));
-
-  // final languages =
-  //     File('../py_translate/list.txt').readAsStringSync().split('\n');
-
-  // print('languages: ${languages.length}');
-  final res = <String, String>{};
-  for (var line in languages) {
-    line = line.trim();
-    if (line.isEmpty) continue;
-    // print("${line.indexOf(' ')},${line.lastIndexOf(' ')} |${line}");
-    final code = line.substring(0, line.indexOf(' '));
-    final name = line.substring(line.lastIndexOf(' ') + 1);
-    // print('${code} ${name}');
-    res[code] = name;
-  }
-  return res;
-}
-
-Future<String> trans(List<String> command, [int timeoutSeconds = 14]) {
-  print('command: wsl /home/trans ${command.join(' ')}');
-  return Process.run(
-    'wsl',
-    ['/home/trans', ...command],
-    runInShell: true,
-    stdoutEncoding: utf8,
-  ).timeout(Duration(seconds: timeoutSeconds)).then((res) {
-    return res.stdout.trim();
-  });
-}
-
-String toMD5(String input) => md5.convert(utf8.encode(input)).toString();

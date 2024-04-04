@@ -17,6 +17,7 @@ dependencies:
   puppeteer: ^3.6.0
   args: ^2.4.2
   csv: ^5.1.1
+  vdf: ^1.1.0
   # path: ^1.8.0
 
 dev_dependencies:
