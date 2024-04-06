@@ -52,6 +52,7 @@ Future runMain(List<String> args) async {
     if (steamAppId != SteamClient.instance.steamUtils.getAppId()) {
       return exit(-1);
     }
+    SteamClient.instance.steamUserStats.requestCurrentStats();
   }
   print('启动参数 $args');
   WidgetsFlutterBinding.ensureInitialized();
