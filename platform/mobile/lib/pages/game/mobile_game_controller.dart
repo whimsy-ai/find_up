@@ -4,7 +4,11 @@ import 'package:get/get.dart';
 
 /// for mobile
 class MobileGameController extends LevelController {
-  MobileGameController({required super.files, super.ilpIndex});
+  MobileGameController({
+    required super.files,
+    required super.mode,
+    super.ilpIndex,
+  });
 
   @override
   void exit() {

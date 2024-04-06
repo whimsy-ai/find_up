@@ -8,6 +8,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/bundle_files.dart';
 import 'package:game/data.dart';
+import 'package:game/game/game_mode.dart';
+import 'package:game/game/page_game_entry.dart';
 import 'package:game/game/resources.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -97,6 +99,7 @@ class HomePage extends StatelessWidget {
               page: () => PagePlayChallenge<MobileGameController>(),
               binding: BindingsBuilder(() {
                 Get.put(MobileGameController(
+                  mode: Get.arguments['mode'],
                   files: Get.arguments['files'],
                 ));
               }),
@@ -203,12 +206,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           final files = await getBundleFiles();
                           files.shuffle();
                           print('files length: ${files.length}');
-                          Get.toNamed('/play_challenge', arguments: {
-                            'files': files.sublist(
+                          PageGameEntry.play(
+                            files.sublist(
                               0,
                               math.min(files.length, 5),
-                            )
-                          });
+                            ),
+                            mode: GameMode.challenge,
+                          );
                         },
                       ),
                       ListTile(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
@@ -117,7 +118,10 @@ class PageChallengeExplorer extends GetView<SteamExplorerController> {
             child: InkWell(
               child: SteamFileGirdTile<SteamExplorerController>(file: file),
               onTap: () {
-                PageGameEntry.play(file.children);
+                PageGameEntry.play(
+                  file.children,
+                  mode: GameMode.challenge,
+                );
               },
             ),
           );

@@ -231,6 +231,9 @@ final zh = {
   'findAllLayers': '找出所有不同之处',
   'findPuzzles': '找出右侧多余的拼图',
   'levelCount': '关卡数量',
+  'steamResetAchievements': '清空Steam成就',
+  'steamResetAchievementsConfirm': '请确认，清空Steam成就？',
+  'steamResetAchievementsSuccess': '成功清空Steam成就',
 };
 
 final fix = {

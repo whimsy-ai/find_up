@@ -12,5 +12,14 @@ class TestILPFile extends ExplorerFile {
   Future<void> load({force = false}) => Future.value();
 
   @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+  get cover => throw UnimplementedError();
+
+  @override
+  int get fileSize => throw UnimplementedError();
+
+  @override
+  String get name => throw UnimplementedError();
+
+  @override
+  int get version => throw UnimplementedError();
 }

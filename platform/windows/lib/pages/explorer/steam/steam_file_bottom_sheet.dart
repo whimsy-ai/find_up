@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/bytes_size.dart';
 import 'package:game/core.dart';
 import 'package:game/data.dart';
+import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/game/unlock_progress_bar.dart';
 import 'package:game/get_ilp_info_unlock.dart';
@@ -116,8 +117,8 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                     child: Text('测试成就【强迫症玩家】'),
                     onPressed: () {
                       for (var ilp in widget.file.infos) {
-                        var unlockedAll =
-                        ilp.contentLayerIdList.every((id) => Data.layersId.contains(id));
+                        var unlockedAll = ilp.contentLayerIdList
+                            .every((id) => Data.layersId.contains(id));
                         print('unlockedAll $unlockedAll');
                       }
                     },
@@ -138,6 +139,7 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                         widget.file.type == TagType.file
                             ? [widget.file]
                             : widget.file.children,
+                        mode: GameMode.gallery,
                       );
                       controller.update([widget.file.id, 'bottomSheet']);
                     },
@@ -414,6 +416,7 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                         TextButton(
                           onPressed: () => PageGameEntry.play(
                             [widget.file],
+                            mode: GameMode.gallery,
                             ilpIndex: i,
                           ),
                           child: Icon(Icons.play_arrow_rounded),

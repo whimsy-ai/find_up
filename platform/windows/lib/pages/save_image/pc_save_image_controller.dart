@@ -10,6 +10,8 @@ import 'package:i18n/ui.dart';
 import 'package:path/path.dart' as path;
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../../utils/steam_achievement.dart';
+
 /// builder id: ui, layers, image
 class PCSaveImageController extends SaveImageController with MouseController {
   PCSaveImageController({
@@ -34,7 +36,8 @@ class PCSaveImageController extends SaveImageController with MouseController {
         ]);
     if (file == null) return;
     await File(file.path).writeAsBytes(data);
-    Get.dialog(AlertDialog(
+    SteamAchievement.saveImage.achieved();
+    return Get.dialog(AlertDialog(
       title: Text(UI.saved.tr),
       content: Text(file.path),
       actions: [

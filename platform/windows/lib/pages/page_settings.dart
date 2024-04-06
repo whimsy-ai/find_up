@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
 import 'package:game/discord_link.dart';
 import 'package:game/http/http.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:steamworks/steamworks.dart';
 
 import '../utils/update_window_title.dart';
 
@@ -29,7 +32,8 @@ class PageSettings extends StatelessWidget {
               shrinkWrap: true,
               children: [
                 ListTile(
-                  title: Text('${UI.language.tr}${Data.locale.languageCode=='en'?'':' / Language'} (${UI.languages.length})'),
+                  title: Text(
+                      '${UI.language.tr}${Data.locale.languageCode == 'en' ? '' : ' / Language'} (${UI.languages.length})'),
                   trailing: Obx(() => DropdownButton<String>(
                         value: _language.value,
                         items: UI.languages.keys.map((key) {
@@ -93,6 +97,28 @@ class PageSettings extends StatelessWidget {
                     }
                   },
                 ),
+                if (env.isSteam)
+                  ListTile(
+                    leading: Icon(Icons.warning_amber_rounded),
+                    title: Text(UI.steamResetAchievements.tr),
+                    trailing: Icon(FontAwesomeIcons.steam),
+                    onTap: () async {
+                      final sure = await Get.dialog(AlertDialog(
+                        title: Text(UI.steamResetAchievementsConfirm.tr),
+                        actions: [
+                          ElevatedButton(
+                            child: Text(UI.confirm.tr),
+                            onPressed: () => Get.back(result: true),
+                          ),
+                        ],
+                      ));
+                      if (sure != true) return;
+                      SteamClient.instance.steamUserStats
+                        ..resetAllStats(true)
+                        ..storeStats();
+                      showToast(UI.steamResetAchievementsSuccess.tr);
+                    },
+                  ),
               ],
             ),
           ),

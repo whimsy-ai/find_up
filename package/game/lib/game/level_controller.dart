@@ -14,6 +14,7 @@ import '../extension_duration.dart';
 import 'core_controller.dart';
 import 'find_differences/layer.dart';
 import 'find_differences/level_find_differences.dart';
+import 'game_mode.dart';
 import 'game_state.dart';
 import 'hint_controller.dart';
 import 'level.dart';
@@ -38,6 +39,7 @@ abstract class LevelController extends GetxController
   /// for debug
   bool debug = false;
   bool showDebugWidget = false;
+  final GameMode mode;
 
   final tapPositions = <Offset>[];
 
@@ -46,7 +48,7 @@ abstract class LevelController extends GetxController
   final List<ExplorerFile> files;
   final int? ilpIndex;
 
-  LevelController({required this.files, this.ilpIndex});
+  LevelController({required this.files, required this.mode, this.ilpIndex});
 
   @override
   void start({int? seed}) async {
@@ -222,7 +224,7 @@ abstract class LevelController extends GetxController
 
   int unlocked = 0;
 
-  bool get isTest => files.every((f) => f is TestILPFile);
+  bool get isTest => mode == GameMode.test;
 
   void onCompleted() {
     final hasFailed = levels.firstWhereOrNull(

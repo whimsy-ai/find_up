@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:game/explorer/asset_ilp_file.dart';
+import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
@@ -71,6 +72,6 @@ class PageILPExplorer extends StatelessWidget {
   }
 
   _tap(AssetILPFile file) async {
-    await PageGameEntry.play([file]);
+    await PageGameEntry.play([file], mode: GameMode.gallery);
   }
 }

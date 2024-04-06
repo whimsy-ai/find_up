@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:game/explorer/ilp_file.dart';
 import 'package:game/explorer/ilp_file_list_tile.dart';
+import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
@@ -44,8 +45,7 @@ class PageILPExplorer<T extends ILPExplorerController> extends GetView<T> {
                           itemBuilder: (_, i) {
                             final folder = controller.folders.elementAt(i);
                             if (folder.$2 == 'steam') {
-                              return controller
-                                  .filterForum<T>(
+                              return controller.filterForum<T>(
                                 showPageWidget: false,
                               );
                               return SteamFolderListTile();
@@ -90,8 +90,7 @@ class PageILPExplorer<T extends ILPExplorerController> extends GetView<T> {
                               ),
                             ),
                             if (controller.currentPath == 'steam')
-                              controller.pageWidget<T>(
-                                  id: 'filter'),
+                              controller.pageWidget<T>(id: 'filter'),
                           ],
                         ),
                       ),
@@ -144,13 +143,13 @@ class PageILPExplorer<T extends ILPExplorerController> extends GetView<T> {
       );
 
   _play(ILPFile file) async {
-    await PageGameEntry.play([file]);
+    await PageGameEntry.play([file], mode: GameMode.gallery);
     await file.load(force: true);
     controller.update(['files']);
   }
 
   _steamFile(SteamFile file) async {
-    await PageGameEntry.play([file]);
+    await PageGameEntry.play([file], mode: GameMode.gallery);
     await file.load(force: true);
     controller.update(['files']);
   }

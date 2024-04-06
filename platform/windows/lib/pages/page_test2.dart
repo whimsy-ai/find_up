@@ -13,13 +13,29 @@ class _PageTest2State extends State<PageTest2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final res = SteamClient.instance.steamUserStats.setAchievement(
-              SteamAchievement.gamer.value.toNativeUtf8());
-          print('设置成就，结果: $res');
-        },
-        child: Text('测试成就'),
+      appBar: AppBar(),
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              SteamAchievement.updateInt('unlocked_layers', 15);
+            },
+            child: Text('设置统计数值'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final layers = SteamAchievement.getInt('unlocked_layers');
+              print('Steam统计 unlocked_layers $layers');
+            },
+            child: Text('读取统计数值'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              SteamClient.instance.steamUserStats.resetAllStats(true);
+            },
+            child: Text('清空统计'),
+          ),
+        ],
       ),
     );
   }

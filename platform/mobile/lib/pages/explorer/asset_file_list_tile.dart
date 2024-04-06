@@ -3,6 +3,7 @@ import 'package:game/explorer/asset_ilp_file.dart';
 import 'package:game/explorer/file.dart';
 import 'package:game/explorer/ilp_info_bottom_sheet.dart';
 import 'package:game/game/animated_unlock_progress_bar.dart';
+import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
@@ -70,6 +71,7 @@ Widget _infoButton({
         ilp: ilp,
         onTapPlay: (int index) => PageGameEntry.play(
           [file],
+          mode: GameMode.gallery,
           ilpIndex: index,
         ),
       ),

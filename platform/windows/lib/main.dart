@@ -13,6 +13,7 @@ import 'package:game/bundle_files.dart';
 import 'package:game/data.dart';
 import 'package:game/discord_link.dart';
 import 'package:game/explorer/ilp_file.dart';
+import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/game/resources.dart';
 import 'package:game/http/http.dart';
@@ -195,6 +196,7 @@ class MyApp extends StatelessWidget {
               binding: BindingsBuilder(() {
                 Get.put(PCGameController(
                   files: Get.arguments['files'],
+                  mode: Get.arguments['mode'],
                   ilpIndex: Get.arguments['ilpIndex'],
                 ));
               }),
@@ -393,7 +395,7 @@ _openILP(String path) async {
   final ilp = await ILP.fromFile(path);
   try {
     if (await ilp.isILP) {
-      PageGameEntry.play([ILPFile(File(path))]);
+      PageGameEntry.play([ILPFile(File(path))], mode: GameMode.gallery);
     } else {
       showToast('只支持ilp格式文件');
     }

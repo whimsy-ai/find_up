@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/explorer/file.dart';
 import 'package:game/explorer/ilp_file.dart';
+import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
 import 'package:i18n/ui.dart';
@@ -261,7 +262,10 @@ class ILPEditorController extends GetxController {
             child: Text(UI.open.tr, style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
-            onPressed: () => PageGameEntry.play([ILPFile(File(filePath))]),
+            onPressed: () => PageGameEntry.play(
+              [ILPFile(File(filePath))],
+              mode: GameMode.test,
+            ),
             child: Text(UI.test.tr),
           ),
           ElevatedButton(
@@ -541,7 +545,6 @@ class _ValidatorListTile extends StatelessWidget {
   final _result = RxString(UI.ilpEditorValidating.tr);
 
   _ValidatorListTile({
-    super.key,
     required this.name,
     required this.validator,
   }) {

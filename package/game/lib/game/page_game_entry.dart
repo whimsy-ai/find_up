@@ -1,10 +1,16 @@
 import 'package:get/get.dart';
 
 import '../explorer/file.dart';
+import 'game_mode.dart';
 
 class PageGameEntry {
-  static Future<dynamic>? play(List<ExplorerFile> files, {int ilpIndex = 0}) {
+  static Future<dynamic>? play(
+    List<ExplorerFile> files, {
+    required GameMode mode,
+    int ilpIndex = 0,
+  }) {
     return Get.toNamed('/play_challenge', arguments: {
+      'mode': mode,
       'files': files,
       'ilpIndex': ilpIndex,
     });

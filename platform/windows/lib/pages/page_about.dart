@@ -8,7 +8,8 @@ import '../utils/update_window_title.dart';
 class PageAbout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final buildNumber = packageInfo.buildNumber.isEmpty?'':'_${packageInfo.buildNumber}';
+    final buildNumber =
+        packageInfo.buildNumber.isEmpty ? '' : '_${packageInfo.buildNumber}';
     return Scaffold(
       appBar: AppBar(
         title: Text(UI.about.tr),

@@ -6,8 +6,13 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 class AboutCard extends StatelessWidget {
   final String version;
+  final List<Widget> others;
 
-  const AboutCard({super.key, required this.version});
+  const AboutCard({
+    super.key,
+    required this.version,
+    this.others = const [],
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +56,7 @@ class AboutCard extends StatelessWidget {
                   'https://www.microsoft.com/store/productid/9N99R98Z0QR3?ocid=pdpshare');
             },
           ),
+          ...others,
           Divider(),
           ListTile(
             title: Text(UI.contactMe.tr),
