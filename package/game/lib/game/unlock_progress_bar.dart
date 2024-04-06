@@ -11,7 +11,6 @@ class UnlockProgressBar extends StatelessWidget {
   final double? width;
   final double height;
   final double value;
-  final String text;
 
   UnlockProgressBar({
     super.key,
@@ -19,7 +18,6 @@ class UnlockProgressBar extends StatelessWidget {
     double? height,
     this.color = Colors.blue,
     required double value,
-    required this.text,
   })  : height = height ?? 20,
         value = value.clamp(0.0, 1.0);
 
@@ -33,7 +31,6 @@ class UnlockProgressBar extends StatelessWidget {
       value: v,
       width: width,
       height: height,
-      text: UI.unlock.tr,
     );
   }
 
@@ -58,7 +55,7 @@ class UnlockProgressBar extends StatelessWidget {
             ),
             Center(
               child: Text(
-                '$text ${convertToPercentage(value)}%',
+                '${UI.unlocked.tr} ${convertToPercentage(value)}%',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12,

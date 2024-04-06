@@ -3,7 +3,7 @@ import 'package:ilp_file_codec/ilp_codec.dart';
 abstract class ExplorerFile {
   String get name;
 
-  double get unlock;
+  double unlock = 0.0;
 
   dynamic get cover;
 

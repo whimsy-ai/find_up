@@ -6,14 +6,18 @@ import 'dart:math' as math;
 import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:game/core.dart';
+import 'package:game/data.dart';
 import 'package:game/explorer/file.dart';
 import 'package:game/explorer/ilp_file.dart';
+import 'package:game/explorer/test_ilp_file.dart';
 import 'package:game/game/level_controller.dart';
 import 'package:game/game/mouse_controller.dart';
 import 'package:get/get.dart';
+import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:path/path.dart' as path;
 import 'package:steamworks/steamworks.dart';
 
+import '../../utils/steam_achievement.dart';
 import '../../utils/steam_ex.dart';
 import '../explorer/steam/steam_file.dart';
 
@@ -73,9 +77,54 @@ class PCGameController extends LevelController with MouseController {
 
   @override
   void exit() {
+    /// 让steam停止下载创意工坊文件
     if (env.isSteam) {
       SteamClient.instance.steamUgc.suspendDownloads(true);
     }
     Get.back();
+  }
+
+  @override
+  void onCompleted() {
+    print('是否在玩测试文件 $isTest');
+    print('level controller onCompleted, id层数量${Data.layersId.length}');
+    super.onCompleted();
+    print('pc game controller onCompleted, id层数量${Data.layersId.length}');
+    if (isTest) return;
+    _checkAchievements();
+  }
+
+  void _checkAchievements() async {
+    if (!isCompleted) return;
+
+    /// 激活 普通玩家 成就
+    SteamAchievement.gamer.achieved();
+
+    /// 图层数量成就
+    if (Data.layersId.length >= 10) {
+      SteamAchievement.layers10.achieved();
+    }
+    if (Data.layersId.length >= 50) {
+      SteamAchievement.layers50.achieved();
+    }
+    if (Data.layersId.length >= 100) {
+      SteamAchievement.layers100.achieved();
+    }
+
+    /// 检查是否满足 强迫症玩家 成就
+    final infos = <ILPInfo>[];
+    for (var file in files) {
+      infos.addAll(await file.ilp!.infos);
+    }
+    print('infos length ${infos.length}');
+    for (var ilp in infos) {
+      var unlockedAll =
+          ilp.contentLayerIdList.every((id) => Data.layersId.contains(id));
+      print('unlockedAll $unlockedAll');
+      if (unlockedAll) {
+        SteamAchievement.ocdGamer.achieved();
+        break;
+      }
+    }
   }
 }

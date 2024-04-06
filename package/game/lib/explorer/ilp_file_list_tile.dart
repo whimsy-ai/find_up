@@ -72,7 +72,6 @@ class ILPFileGridTile extends StatelessWidget {
             width: 300,
             from: 0,
             to: file.unlock,
-            text: UI.unlock.tr,
           ),
         ],
       );

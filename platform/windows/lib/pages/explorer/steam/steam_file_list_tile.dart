@@ -81,7 +81,6 @@ class SteamFileGirdTile<T extends SteamFilterController>
                 duration: Duration(milliseconds: 300),
                 from: 0,
                 to: unlock,
-                text: UI.unlock.tr,
               ),
           ],
         );

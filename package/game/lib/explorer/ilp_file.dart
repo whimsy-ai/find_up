@@ -8,7 +8,7 @@ import 'package:ilp_file_codec/ilp_codec.dart';
 import '../get_ilp_info_unlock.dart';
 import 'file.dart';
 
-class ILPFile implements ExplorerFile {
+class ILPFile extends ExplorerFile {
   final File file;
 
   ILPConfigException? get exception => _exception.value;
@@ -30,8 +30,6 @@ class ILPFile implements ExplorerFile {
   @override
   late int fileSize;
 
-  @override
-  double unlock = 0.0;
   late int infoLength;
 
   ILPFile(this.file);

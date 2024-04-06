@@ -44,7 +44,6 @@ class SaveImageEditor<T extends SaveImageController> extends GetView<T> {
                       title: AnimatedUnlockProgressBar(
                         to: getIlpInfoUnlock(controller.info),
                         height: 24,
-                        text: UI.unlock.tr,
                       ),
                     ),
                     Expanded(

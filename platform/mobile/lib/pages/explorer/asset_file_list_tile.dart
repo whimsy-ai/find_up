@@ -48,7 +48,6 @@ class AssetFileListTile extends StatelessWidget {
           AnimatedUnlockProgressBar(
             from: 0,
             to: file.unlock,
-            text: UI.unlock.tr,
           ),
         ],
       );

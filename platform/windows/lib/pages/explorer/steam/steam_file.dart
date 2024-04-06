@@ -27,7 +27,7 @@ class SteamFiles {
   });
 }
 
-class SteamSimpleFile implements ExplorerFile {
+class SteamSimpleFile extends ExplorerFile {
   static Pointer<ISteamUgc> get ugc => SteamClient.instance.steamUgc;
   final int id;
   final TagType type;
@@ -97,7 +97,16 @@ class SteamSimpleFile implements ExplorerFile {
   bool get isNeedsUpdate => hasFlag(_state, EItemState.needsUpdate.value);
 
   @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+  get cover => throw UnimplementedError();
+
+  @override
+  int get fileSize => throw UnimplementedError();
+
+  @override
+  String get name => throw UnimplementedError();
+
+  @override
+  int get version => throw UnimplementedError();
 }
 
 class SteamFile extends SteamSimpleFile {
@@ -127,9 +136,6 @@ class SteamFile extends SteamSimpleFile {
   int voteUp, voteDown;
 
   String? description;
-
-  @override
-  double unlock = 0.0;
 
   List<ILPInfo> infos;
 

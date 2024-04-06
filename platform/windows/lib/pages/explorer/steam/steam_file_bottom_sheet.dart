@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/bytes_size.dart';
+import 'package:game/core.dart';
+import 'package:game/data.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:game/game/unlock_progress_bar.dart';
 import 'package:game/get_ilp_info_unlock.dart';
@@ -106,6 +108,23 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
         tag: widget.tag,
         builder: (controller) => Column(
           children: [
+            if (env.isDev && env.isSteam)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text('测试成就【强迫症玩家】'),
+                    onPressed: () {
+                      for (var ilp in widget.file.infos) {
+                        var unlockedAll =
+                        ilp.contentLayerIdList.every((id) => Data.layersId.contains(id));
+                        print('unlockedAll $unlockedAll');
+                      }
+                    },
+                  ),
+                ],
+              ),
+
             /// 标题栏
             ListTile(
               trailing: Wrap(
@@ -383,7 +402,6 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                   ),
                   UnlockProgressBar(
                     width: 300,
-                    text: UI.unlock.tr,
                     value: getIlpInfoUnlock(info),
                   ),
                 ],

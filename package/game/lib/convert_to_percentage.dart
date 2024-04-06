@@ -1,1 +1,1 @@
-String convertToPercentage(double value) => (value * 100).ceil().toString();
+String convertToPercentage(double value) => (value * 100).floor().toString();

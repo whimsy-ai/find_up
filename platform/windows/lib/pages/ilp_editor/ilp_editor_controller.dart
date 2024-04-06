@@ -278,6 +278,7 @@ class ILPEditorController extends GetxController {
     final formKey = GlobalKey<FormState>();
     final info = file.config!;
     String name = infoNameCaches[file.file] ?? info.name;
+    final controller = TextEditingController(text: name);
 
     check() {
       if (formKey.currentState!.validate()) {
@@ -307,9 +308,12 @@ class ILPEditorController extends GetxController {
               SizedBox(height: 10),
               ListTile(
                 title: TextFormField(
+                  autofocus: true,
+                  controller: controller
+                    ..selection = TextSelection(
+                        baseOffset: 0, extentOffset: controller.text.length),
                   decoration:
                       InputDecoration(labelText: UI.ilpEditorImageName.tr),
-                  initialValue: name,
                   onChanged: (v) => name = v,
                   onFieldSubmitted: (v) => check(),
                   validator: (v) {

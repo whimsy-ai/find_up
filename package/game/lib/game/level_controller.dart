@@ -9,6 +9,7 @@ import 'package:oktoast/oktoast.dart';
 
 import '../data.dart';
 import '../explorer/file.dart';
+import '../explorer/test_ilp_file.dart';
 import '../extension_duration.dart';
 import 'core_controller.dart';
 import 'find_differences/layer.dart';
@@ -221,6 +222,8 @@ abstract class LevelController extends GetxController
 
   int unlocked = 0;
 
+  bool get isTest => files.every((f) => f is TestILPFile);
+
   void onCompleted() {
     final hasFailed = levels.firstWhereOrNull(
             (element) => element.state == LevelState.failed) !=
@@ -232,15 +235,17 @@ abstract class LevelController extends GetxController
       playConfetti();
       state = GameState.completed;
 
-      /// store unlocked layers id
-      final id = levels
-          .where((l) => l.state == LevelState.completed)
-          .map((e) => e.unlockedLayersId())
-          .flattened
-          .toSet();
-      unlocked = id.difference(Data.layersId).length;
-      print('unlocked layers length: $unlocked');
-      Data.layersId.addAll(id);
+      /// 存储解锁的 图层id
+      if (!isTest) {
+        final id = levels
+            .where((l) => l.state == LevelState.completed)
+            .map((e) => e.unlockedLayersId())
+            .flattened
+            .toSet();
+        unlocked = id.difference(Data.layersId).length;
+        print('unlocked layers length: $unlocked');
+        Data.layersId.addAll(id);
+      }
     }
     update(['ui', 'game']);
   }

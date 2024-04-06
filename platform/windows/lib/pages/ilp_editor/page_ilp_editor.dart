@@ -18,6 +18,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:steamworks/steamworks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../../utils/steam_achievement.dart';
 import '../../utils/steam_ex.dart';
 import '../challenge/gallery_dialog.dart';
 import '../explorer/steam/steam_file.dart';
@@ -230,6 +231,9 @@ class PageILPEditor extends GetView<ILPEditorController> {
                               Get.back();
 
                               if (res == null) return;
+                              if (res.result == EResult.eResultOK) {
+                                SteamAchievement.contentCreator.achieved();
+                              }
                               SteamResultDialog.show(result: res);
                             }
                           },
@@ -369,13 +373,13 @@ class PageILPEditor extends GetView<ILPEditorController> {
                   onTap: () => launchUrlString(
                       'https://www.bilibili.com/video/BV1Qj411p76M'),
                 ),
-                ListTile(
-                  leading: Icon(FontAwesomeIcons.youtube, color: Colors.red),
-                  title: Text(
-                      'Tutorial video for creating game content using stable diffusion(English)'),
-                  onTap: () => launchUrlString(
-                      'https://www.youtube.com/watch?v=pI6nHgf974k'),
-                ),
+              ListTile(
+                leading: Icon(FontAwesomeIcons.youtube, color: Colors.red),
+                title: Text(
+                    'Tutorial video for creating game content using stable diffusion(English)'),
+                onTap: () => launchUrlString(
+                    'https://www.youtube.com/watch?v=pI6nHgf974k'),
+              ),
             ],
           ),
         ),

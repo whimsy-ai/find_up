@@ -55,7 +55,7 @@ final zh = {
   'unKnowError': '未知错误',
   'save': '保存',
   'dontShowAgain': '不再显示',
-  'unlock': '已经解锁',
+  'unlocked': '已解锁',
   'unlockedLayers': '新解锁了 %s 个图层',
   'reload': '刷新',
   'ilpAuthor': '作者名称',

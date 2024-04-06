@@ -1,9 +1,13 @@
 import 'dart:io';
+
+import 'package:dynamic_parallel_queue/dynamic_parallel_queue.dart';
 import 'package:vdf/vdf.dart';
 
 import 'bin/core.dart';
 
 const schinese = '简体中文', tchinese = '繁體中文', latam = 'Latina';
+
+final q = Queue(parallel: 10);
 
 void main(List<String> args) async {
   var file = File('2550370_loc_all.vdf');
@@ -36,19 +40,22 @@ void main(List<String> args) async {
     }
     if (targetLanguage == null) throw Exception('缺少$sourceLanguage');
     var data = vdf['lang'][source]['Tokens'];
-    for (var key in chinese.keys) {
-      data[key] = await translate(
-        chinese[key]!,
-        sourceLanguage: 'zh-CN',
-        targetLanguage: targetLanguage,
-      ).then((value) {
-        final l = value.split('');
-        if (l.first == '"') l.removeAt(0);
-        if (l.last == '"') l.removeLast();
-        l[0] = l[0].toUpperCase();
-        return l.join();
+    chinese.forEach((key, value) {
+      q.add(()async{
+        data[key] = await translate(
+          value,
+          sourceLanguage: 'zh-CN',
+          targetLanguage: targetLanguage!,
+        ).then((value) {
+          final l = value.split('');
+          if (l.first == '"') l.removeAt(0);
+          if (l.last == '"') l.removeLast();
+          l[0] = l[0].toUpperCase();
+          return l.join();
+        });
       });
-    }
+    });
   }
+  await q.whenComplete();
   await file.writeAsString(vdfEncode(vdf));
 }

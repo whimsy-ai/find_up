@@ -55,11 +55,9 @@ class AnimatedUnlockProgressBar extends StatelessWidget {
   final double from, to;
   final Duration duration;
   final bool showConfetti;
-  final String text;
 
   AnimatedUnlockProgressBar({
     super.key,
-    required this.text,
     this.width,
     double? height,
     double from = 0,
@@ -86,7 +84,6 @@ class AnimatedUnlockProgressBar extends StatelessWidget {
       builder: (ctx, value, _) => UnlockProgressBar(
         width: width,
         value: value,
-        text: text,
       ),
     );
     return !showConfetti
