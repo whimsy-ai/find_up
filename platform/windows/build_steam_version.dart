@@ -26,7 +26,7 @@ void main() async {
     [
       'build',
       'windows',
-      '--target=./lib/main_steam_prod.dart',
+      '--target=./lib/main_steam.dart',
     ],
     runInShell: true,
     includeParentEnvironment: true,

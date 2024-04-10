@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -14,9 +14,9 @@ import 'package:game/get_ilp_info_unlock.dart';
 import 'package:game/info_table.dart';
 import 'package:game/save_image/page_save_image_entry.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:ui/ui.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../utils/datetime_format.dart';
@@ -109,7 +109,7 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
         tag: widget.tag,
         builder: (controller) => Column(
           children: [
-            if (env.isDev && env.isSteam)
+            if (kDebugMode && env.isSteam)
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -201,13 +201,9 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                       child: Wrap(
                         spacing: 10,
                         children: [
-                          Chip(label: Text(widget.file.style!.value.tr)),
-                          Chip(
-                              label: Text(
-                                  '${UI.shape.tr}: ${widget.file.shape!.value.tr}')),
-                          Chip(
-                              label: Text(
-                                  '${UI.ageRating.tr}: ${widget.file.ageRating!.value.tr}')),
+                          ...widget.file.styles.map((e)=>Chip(label: Text(e.value.tr))),
+                          ...widget.file.shapes.map((e)=>Chip(label: Text(e.value.tr))),
+                          Chip(label: Text(widget.file.ageRating!.value.tr)),
                         ],
                       ),
                     ),

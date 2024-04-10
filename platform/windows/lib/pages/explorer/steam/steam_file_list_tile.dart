@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/game/animated_unlock_progress_bar.dart';
 import 'package:game/get_ilp_info_unlock.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
 import '../../../utils/steam_filter.dart';
 import '../../../utils/steam_tags.dart';
@@ -44,7 +44,7 @@ class SteamFileGirdTile<T extends SteamFilterController>
                       message: UI.levelCount.tr,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Theme.of(context).dialogBackgroundColor.withOpacity(0.5),
                           borderRadius:
                               BorderRadius.only(topLeft: Radius.circular(8)),
                         ),
@@ -73,7 +73,10 @@ class SteamFileGirdTile<T extends SteamFilterController>
                     ),
                   ),
                 ),
-                _infoButton(file),
+                _infoButton(
+                  file,
+                  Theme.of(context).hintColor,
+                ),
               ],
             ),
             if (file.type == TagType.file)
@@ -89,9 +92,9 @@ class SteamFileGirdTile<T extends SteamFilterController>
   }
 
   Widget _infoButton(
-    SteamFile file, {
-    Color color = Colors.black38,
-  }) =>
+    SteamFile file,
+    Color color,
+  ) =>
       InkWell(
         child: Padding(
           padding: EdgeInsets.all(8),

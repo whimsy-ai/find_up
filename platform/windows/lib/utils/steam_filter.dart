@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:game/data.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
 import 'steam_ex.dart';
 import 'steam_tags.dart';

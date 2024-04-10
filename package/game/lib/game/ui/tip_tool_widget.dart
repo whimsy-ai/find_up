@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:ui/ui.dart';
 
 import '../../extension_duration.dart';
 import '../level_controller.dart';

@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:ffi/ffi.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/explorer/file.dart';
@@ -12,12 +12,12 @@ import 'package:game/explorer/ilp_file.dart';
 import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:ui/ui.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../utils/steam_ex.dart';
@@ -140,7 +140,7 @@ class ILPEditorController extends GetxController {
       links: _linksString(),
       coverFilePath: _cover,
       version: version,
-      ignoreLayerName: env.isProd,
+      ignoreLayerName: !kDebugMode,
     );
   }
 
@@ -493,8 +493,8 @@ class ILPEditorController extends GetxController {
       if (file.steamIdOwner != SteamClient.instance.userId) return null;
       itemId = file.id;
       age = file.ageRating;
-      style = file.style;
-      shape = file.shape;
+      style = file.styles.first;
+      shape = file.shapes.first;
     }
     final tags = await SteamTagsDialog.show(
       age: age,

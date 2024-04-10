@@ -21,8 +21,8 @@ dependencies:
   get: ^4.6.6
   ilp_file_codec:
     path: ../ilp_file_codec
-  i18n:
-    path: ../i18n
+  ui:
+    path: ../ui
   path_provider: ^2.1.2
   shared_preferences: ^2.2.2
   synchronized: ^3.1.0+1

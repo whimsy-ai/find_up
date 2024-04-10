@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:ui/ui.dart';
 
 import '../../utils/empty_list_widget.dart';
 import '../../utils/steam_file_ex.dart';

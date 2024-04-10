@@ -4,12 +4,11 @@ import 'package:collection/collection.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:ui/ui.dart';
 
 import '../data.dart';
 import '../explorer/file.dart';
-import '../explorer/test_ilp_file.dart';
 import '../extension_duration.dart';
 import 'core_controller.dart';
 import 'find_differences/layer.dart';

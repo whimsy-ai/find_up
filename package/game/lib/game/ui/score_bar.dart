@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:game/game/ui/my_trapezium_border.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
 import '../level_controller.dart';
 import '../resources.dart';

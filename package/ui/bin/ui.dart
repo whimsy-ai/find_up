@@ -234,6 +234,7 @@ final zh = {
   'steamResetAchievements': '清空Steam成就',
   'steamResetAchievementsConfirm': '请确认，清空Steam成就？',
   'steamResetAchievementsSuccess': '成功清空Steam成就',
+  'themeSwitch': '切换浅色或深色主题',
 };
 
 final fix = {

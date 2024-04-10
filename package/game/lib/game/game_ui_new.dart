@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
 import 'game_state.dart';
 import 'level_controller.dart';
@@ -113,7 +113,7 @@ class NewGameUI<T extends LevelController> extends GetView<T> {
 
         /// 右上
         /// 暂停按钮
-        if (controller.state == GameState.started)
+        if ([GameState.started,GameState.paused].contains(controller.state))
           Positioned(
               top: 10,
               right: 10,

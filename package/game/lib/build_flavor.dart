@@ -1,9 +1,7 @@
 enum BuildFlavor {
-  production,
-  development,
-  staging,
-  steamDevelopment,
-  steamProduction
+  mobile,
+  microsoftStore,
+  steam,
 }
 
 BuildEnvironment get env => _env!;
@@ -17,14 +15,9 @@ class BuildEnvironment {
   static void init({required flavor}) =>
       _env ??= BuildEnvironment._(flavor: flavor);
 
-  bool get isDev =>
-      flavor == BuildFlavor.development ||
-      flavor == BuildFlavor.steamDevelopment;
+  bool get isSteam => flavor == BuildFlavor.steam;
 
-  bool get isProd =>
-      flavor == BuildFlavor.production || flavor == BuildFlavor.steamProduction;
+  bool get isMobile => flavor == BuildFlavor.mobile;
 
-  bool get isSteam =>
-      flavor == BuildFlavor.steamDevelopment ||
-      flavor == BuildFlavor.steamProduction;
+  bool get isMicrosoftStore => flavor == BuildFlavor.microsoftStore;
 }

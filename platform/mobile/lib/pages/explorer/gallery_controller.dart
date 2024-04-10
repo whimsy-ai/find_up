@@ -1,12 +1,12 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:game/build_flavor.dart';
 import 'package:game/explorer/asset_ilp_file.dart';
 import 'package:game/explorer/file.dart';
 import 'package:game/explorer/i_controller.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
 class ExplorerController extends GetxController implements IExplorerController {
   late final _fixedFolders = {
@@ -46,7 +46,7 @@ class ExplorerController extends GetxController implements IExplorerController {
         if (key.endsWith('.ilp')) {
           final String file = value.first;
           // print('file $file');
-          if (env.isProd) if (file.contains('test.ilp')) return;
+          if (kDebugMode) if (file.contains('test.ilp')) return;
           _files.add(AssetILPFile(value.first));
         }
       });

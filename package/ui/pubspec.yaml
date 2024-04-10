@@ -1,4 +1,4 @@
-name: i18n
+name: ui
 description: Find Up! multi-language package
 version: 1.0.0
 publish_to: none
@@ -10,14 +10,12 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  dio: ^5.4.0
   dynamic_parallel_queue: ^1.0.3+2
-  get: ^4.6.6
-  interact: ^2.2.0
-  puppeteer: ^3.6.0
   args: ^2.4.2
-  csv: ^5.1.1
+  csv: ^6.0.0
   vdf: ^1.1.0
+  crypto: ^3.0.3
+  get: ^4.6.6
   # path: ^1.8.0
 
 dev_dependencies:

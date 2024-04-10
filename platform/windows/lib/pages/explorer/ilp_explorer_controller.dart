@@ -8,11 +8,11 @@ import 'package:game/explorer/file.dart';
 import 'package:game/explorer/i_controller.dart';
 import 'package:game/explorer/ilp_file.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:path/path.dart' as path;
 import 'package:steamworks/steamworks.dart';
+import 'package:ui/ui.dart';
 
 import '../../utils/asset_path.dart';
 import '../../utils/steam_ex.dart';

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:game/data.dart';
 import 'package:game/http/http.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:ui/ui.dart';
 
 class PageSettings extends StatelessWidget {
   late final _language = Data.locale.languageCode.obs

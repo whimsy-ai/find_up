@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:game/about_card.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
 import '../utils/update_window_title.dart';
 

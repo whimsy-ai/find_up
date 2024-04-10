@@ -6,8 +6,8 @@ import 'package:game/game/animated_unlock_progress_bar.dart';
 import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
+import 'package:ui/ui.dart';
 
 class AssetFileListTile extends StatelessWidget {
   final AssetILPFile file;
@@ -43,7 +43,11 @@ class AssetFileListTile extends StatelessWidget {
                   ),
                 ),
               ),
-              _infoButton(file: file, ilp: file.ilp!),
+              _infoButton(
+                file,
+                file.ilp!,
+                Theme.of(context).hintColor,
+              ),
             ],
           ),
           AnimatedUnlockProgressBar(
@@ -56,11 +60,11 @@ class AssetFileListTile extends StatelessWidget {
   }
 }
 
-Widget _infoButton({
-  required ExplorerFile file,
-  required ILP ilp,
-  Color color = Colors.black38,
-}) =>
+Widget _infoButton(
+  ExplorerFile file,
+  ILP ilp,
+  Color color,
+) =>
     InkWell(
       child: Padding(
         padding: EdgeInsets.all(8),

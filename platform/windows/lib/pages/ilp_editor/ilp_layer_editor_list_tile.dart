@@ -7,8 +7,8 @@ import 'package:game/game/page_game_entry.dart';
 import 'package:game/global_progress_indicator_dialog.dart';
 import 'package:game/info_table.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
+import 'package:ui/ui.dart';
 
 import 'ilp_editor_controller.dart';
 import 'ilp_info_file.dart';

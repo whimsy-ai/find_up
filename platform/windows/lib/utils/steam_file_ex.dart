@@ -191,16 +191,16 @@ extension SteamFileEX on SteamClient {
                 );
 
                 /// get tags
-                late TagStyle style;
-                late TagShape shape;
+                var styles = <TagStyle>{};
+                var shapes = <TagShape>{};
                 late TagAgeRating ageRating;
                 {
                   final tags = getSteamItemTags(arena, result.handle, i);
                   for (var tag in tags) {
                     if (TagStyles.containsKey(tag)) {
-                      style = TagStyles[tag]!;
+                      styles.add(TagStyles[tag]!);
                     } else if (TagShapes.containsKey(tag)) {
-                      shape = TagShapes[tag]!;
+                      shapes.add(TagShapes[tag]!);
                     } else if (TagAgeRatings.containsKey(tag)) {
                       ageRating = TagAgeRatings[tag]!;
                     }
@@ -221,9 +221,9 @@ extension SteamFileEX on SteamClient {
                       detail.timeUpdated * 1000,
                       isUtc: true),
                   fileSize: detail.fileSize,
-                  style: style,
                   ageRating: ageRating,
-                  shape: shape,
+                  styles: styles,
+                  shapes: shapes,
                   id: detail.publishedFileId,
                   name: detail.title.toDartString(),
                   voteUp: detail.votesUp,

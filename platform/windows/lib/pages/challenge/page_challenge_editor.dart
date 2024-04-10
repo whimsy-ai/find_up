@@ -7,8 +7,8 @@ import 'package:game/global_progress_indicator_dialog.dart';
 import 'package:game/info_table.dart';
 import 'package:game/utils/input_decoration_outline_collapsed.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:ui/ui.dart';
 
 import '../challenge/gallery_dialog.dart';
 import '../explorer/steam/steam_cached_image.dart';

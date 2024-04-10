@@ -21,6 +21,8 @@ class Resources {
       iconDice,
       iconLeft,
       iconInfo,
+      iconSun,
+      iconMoon,
       iconKey;
 
   static bool _inited = false;
@@ -58,6 +60,8 @@ class Resources {
     iconPlay = await _loadSvg('icon_play');
     iconPause = await _loadSvg('icon_pause');
     iconInfo = await _loadSvg('icon_info');
+    iconSun = await _loadSvg('icon_sun');
+    iconMoon = await _loadSvg('icon_moon');
     _inited = true;
   }
 }

@@ -13,9 +13,9 @@ import 'package:game/global_progress_indicator_dialog.dart';
 import 'package:game/info_table.dart';
 import 'package:game/utils/textfield_number_formatter.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:ui/ui.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../utils/steam_achievement.dart';

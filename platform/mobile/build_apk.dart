@@ -65,7 +65,6 @@ void main() async {
     [
       'build',
       'appbundle',
-      '--target=./lib/main_prod.dart',
       '--verbose',
     ],
     runInShell: true,
@@ -79,7 +78,6 @@ void main() async {
     [
       'build',
       'apk',
-      '--target=./lib/main_prod.dart',
       '--release',
       '--verbose',
     ],

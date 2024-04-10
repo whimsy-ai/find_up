@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
 import '../../../utils/steam_tags.dart';
 import '../../../utils/tag_to_menu_items.dart';

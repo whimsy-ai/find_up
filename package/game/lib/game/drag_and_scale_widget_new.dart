@@ -1,8 +1,8 @@
-import 'package:collection/collection.dart';
+import 'dart:math' as math;
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:math' as math;
 
 import 'mouse_controller.dart';
 import 'offset_scale_controller.dart';

@@ -1,7 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:game/core.dart';
 import 'package:game/data.dart';
 import 'package:game/game/drag_and_scale_widget_new.dart';
 import 'package:game/game/find_differences/canvas.dart';
@@ -14,7 +14,7 @@ import 'package:game/game/puzzle/level_puzzle.dart';
 import 'package:get/get.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 
-import 'game_helper.dart';
+import '../../utils/game_helper_dialog.dart';
 import 'pc_game_controller.dart';
 
 class PagePlayChallenge<T extends PCGameController> extends GetView<T> {
@@ -27,13 +27,13 @@ class PagePlayChallenge<T extends PCGameController> extends GetView<T> {
   PagePlayChallenge() {
     if (Data.showGameHelper) {
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
-        await GameHelper.show();
+        await GameHelperDialog.show();
         controller.start();
       });
     } else {
       controller.start();
     }
-    if (env.isDev) {
+    if (kDebugMode) {
       hotKeyManager.register(_hotKey, keyDownHandler: (key) {
         controller
           ..showDebugWidget = !controller.showDebugWidget

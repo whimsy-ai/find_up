@@ -3,6 +3,6 @@ import 'package:game/build_flavor.dart';
 import 'main.dart';
 
 void main(List<String> args) async {
-  BuildEnvironment.init(flavor: BuildFlavor.development);
+  BuildEnvironment.init(flavor: BuildFlavor.microsoftStore);
   runMain(args);
 }

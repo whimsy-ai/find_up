@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:game/game/mouse_controller.dart';
 import 'package:game/save_image/save_image_controller.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:path/path.dart' as path;
+import 'package:ui/ui.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../utils/steam_achievement.dart';

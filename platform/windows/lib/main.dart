@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -20,10 +21,10 @@ import 'package:game/http/http.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
-import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:ui/ui.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
 
@@ -91,20 +92,25 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final List<String> args;
 
   const MyApp({super.key, required this.args});
 
-  static final _defaultLightColorScheme = ColorScheme.fromSwatch(
+  static final _lightScheme = ColorScheme.fromSwatch(
     primarySwatch: Colors.blueGrey,
   );
 
-  static final _defaultDarkColorScheme = ColorScheme.fromSwatch(
+  static final _darkScheme = ColorScheme.fromSwatch(
     primarySwatch: Colors.blueGrey,
     brightness: Brightness.dark,
   );
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
@@ -125,27 +131,26 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           scrollBehavior: MyCustomScrollBehavior(),
           title: UI.findUp.tr,
+          themeMode: Data.isDark ? ThemeMode.dark : ThemeMode.light,
           theme: ThemeData(
             useMaterial3: true,
-            colorScheme: lightColorScheme ?? _defaultLightColorScheme,
+            colorScheme: lightColorScheme ?? MyApp._lightScheme,
             inputDecorationTheme: InputDecorationTheme(
               border: OutlineInputBorder(),
             ),
             // fontFamily: 'Source',
-          ).useSystemChineseFont(
-              (lightColorScheme ?? _defaultLightColorScheme).brightness),
+          ).useSystemChineseFont(Brightness.light),
           darkTheme: ThemeData(
             useMaterial3: true,
-            colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
+            colorScheme: darkColorScheme ?? MyApp._darkScheme,
             inputDecorationTheme: InputDecorationTheme(
               border: OutlineInputBorder(),
             ),
-          ).useSystemChineseFont(
-              (darkColorScheme ?? _defaultDarkColorScheme).brightness),
+          ).useSystemChineseFont(Brightness.dark),
           transitionDuration: Duration.zero,
           initialRoute: '/',
           getPages: [
-            GetPage(name: '/', page: () => MyHomePage(args: args)),
+            GetPage(name: '/', page: () => MyHomePage(args: widget.args)),
             GetPage(
               name: '/explorer',
               page: () => PageILPExplorer(),
@@ -306,12 +311,13 @@ class MyHomePage extends StatelessWidget {
                             final files = await getBundleFiles();
                             files.shuffle();
                             print('files length: ${files.length}');
-                            Get.toNamed('/play_challenge', arguments: {
-                              'files': files.sublist(
+                            PageGameEntry.play(
+                              files.sublist(
                                 0,
                                 math.min(files.length, 5),
-                              )
-                            });
+                              ),
+                              mode: GameMode.challenge,
+                            );
                           },
                         ),
                         ListTile(
@@ -345,27 +351,22 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
             ),
-            if (env.isSteam)
-              Positioned(
-                bottom: 10,
-                right: 10,
-                child: Text(
-                  'Steam Version\n'
-                  'App ${SteamClient.instance.steamUtils.getAppId()}\n'
-                  // 'user ${SteamClient.instance.userId}\n'
-                  '${constrains.maxWidth} x ${constrains.maxHeight}',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: Colors.black.withOpacity(0.2),
-                    fontSize: 12,
-                  ),
+            Positioned(
+              left: 10,
+              bottom: 10,
+              child: Text(
+                '${env.isSteam ? 'Steam' : 'MS store'} version\n'
+                'window size: ${constrains.maxWidth} x ${constrains.maxHeight}',
+                style: TextStyle(
+                  color: Theme.of(context).highlightColor,
+                  fontSize: 12,
                 ),
               ),
+            ),
           ],
         ),
-        floatingActionButton: env.isProd
-            ? null
-            : Wrap(
+        floatingActionButton: kDebugMode
+            ? Wrap(
                 spacing: 10,
                 children: [
                   FloatingActionButton(
@@ -381,7 +382,8 @@ class MyHomePage extends StatelessWidget {
                     child: Text('test2'),
                   ),
                 ],
-              ),
+              )
+            : null,
       );
     });
   }

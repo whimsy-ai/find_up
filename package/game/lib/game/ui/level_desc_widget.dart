@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
 import '../../extension_duration.dart';
+import '../find_differences/level_find_differences.dart';
 import '../game_state.dart';
 import '../level.dart';
 import '../level_controller.dart';
-import '../find_differences/level_find_differences.dart';
 import 'levels_indicator.dart';
 
 class LevelDescriptionBuilder<T extends LevelController> extends GetView<T> {

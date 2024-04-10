@@ -110,8 +110,8 @@ class SteamSimpleFile extends ExplorerFile {
 }
 
 class SteamFile extends SteamSimpleFile {
-  TagShape? shape;
-  TagStyle? style;
+  Set<TagShape> shapes;
+  Set<TagStyle> styles;
   TagAgeRating? ageRating;
   int? levelCount;
 
@@ -158,11 +158,11 @@ class SteamFile extends SteamSimpleFile {
     required this.publishTime,
     required this.comments,
     required this.childrenId,
+    this.styles = const {},
+    this.shapes = const {},
     this.voteUp = 0,
     this.voteDown = 0,
     this.ageRating,
-    this.style,
-    this.shape,
     this.levelCount,
   }) {
     unlock = infos.map((e) => getIlpInfoUnlock(e)).toList().sum / infos.length;

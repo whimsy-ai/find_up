@@ -3,11 +3,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:game/build_flavor.dart';
 import 'package:game/data.dart';
 import 'package:game/discord_link.dart';
+import 'package:game/game/resources.dart';
+import 'package:game/game/stroke_shadow.dart';
 import 'package:game/http/http.dart';
+import 'package:game/brightness_widget.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:ui/ui.dart';
 
 import '../utils/update_window_title.dart';
 
@@ -31,6 +34,30 @@ class PageSettings extends StatelessWidget {
             child: ListView(
               shrinkWrap: true,
               children: [
+                Tooltip(
+                  message: UI.themeSwitch.tr,
+                  child: BrightnessWidget(
+                    builder: (isDark,switcher) => ListTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          StrokeShadow.path(
+                            size: 40,
+                            Resources.iconSun,
+                            color: Colors.red,
+                          ),
+                          IgnorePointer(child: Switch(value: isDark, onChanged: (v) {})),
+                          StrokeShadow.path(
+                            size: 40,
+                            Resources.iconMoon,
+                            color: Colors.blueGrey,
+                          ),
+                        ],
+                      ),
+                      onTap: switcher,
+                    ),
+                  ),
+                ),
                 ListTile(
                   title: Text(
                       '${UI.language.tr}${Data.locale.languageCode == 'en' ? '' : ' / Language'} (${UI.languages.length})'),

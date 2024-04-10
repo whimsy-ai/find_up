@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
+import '../../brightness_widget.dart';
 import '../../explorer/ilp_info_bottom_sheet.dart';
 import '../../explorer/test_ilp_file.dart';
 import '../../save_image/page_save_image_entry.dart';
@@ -110,7 +111,7 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
                   message: UI.gameBarRestart.tr,
                   child: FloatingActionButton(
                     elevation: 0,
-                    backgroundColor: Theme.of(context).primaryColorDark,
+                    backgroundColor: Theme.of(context).hintColor,
                     child: StrokeShadow.path(
                       Resources.iconDice,
                       color: Colors.white,
@@ -148,7 +149,7 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
                   message: UI.gameBarChangeSeed.tr,
                   child: FloatingActionButton(
                     elevation: 0,
-                    backgroundColor: Theme.of(context).primaryColorDark,
+                    backgroundColor: Theme.of(context).hintColor,
                     child: StrokeShadow.path(
                       Resources.iconKey,
                       color: Colors.white,
@@ -196,7 +197,7 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
                     message: UI.saveImage.tr,
                     child: FloatingActionButton(
                       elevation: 0,
-                      backgroundColor: Theme.of(context).primaryColorDark,
+                      backgroundColor: Theme.of(context).hintColor,
                       child: StrokeShadow.path(
                         Resources.iconSave,
                         color: Colors.white,
@@ -218,7 +219,7 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
                     message: UI.fileInfo.tr,
                     child: FloatingActionButton(
                       elevation: 0,
-                      backgroundColor: Theme.of(context).primaryColorDark,
+                      backgroundColor: Theme.of(context).hintColor,
                       child: StrokeShadow.path(
                         Resources.iconInfo,
                         color: Colors.white,
@@ -233,6 +234,26 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
                     ),
                   ),
                 ),
+
+              /// 切换光暗主题
+              SizedBox(
+                width: 80,
+                height: 80,
+                child: Tooltip(
+                  message: UI.themeSwitch.tr,
+                  child: BrightnessWidget(
+                    builder: (isDark, switcher) => FloatingActionButton(
+                      elevation: 0,
+                      onPressed: switcher,
+                      backgroundColor: Theme.of(context).hintColor,
+                      child: StrokeShadow.path(
+                        isDark ? Resources.iconSun : Resources.iconMoon,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
           if (controller.levels.length > 1)

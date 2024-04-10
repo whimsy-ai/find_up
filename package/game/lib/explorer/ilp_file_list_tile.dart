@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
+import 'package:ui/ui.dart';
 
 import '../game/animated_unlock_progress_bar.dart';
 import '../game/game_mode.dart';
@@ -66,7 +66,11 @@ class ILPFileGridTile extends StatelessWidget {
                   ),
                 ),
               ),
-              _infoButton(file: file, ilp: file.ilp!),
+              _infoButton(
+                file,
+                file.ilp!,
+                Theme.of(context).hintColor,
+              ),
             ],
           ),
           AnimatedUnlockProgressBar(
@@ -80,11 +84,11 @@ class ILPFileGridTile extends StatelessWidget {
   }
 }
 
-Widget _infoButton({
-  required ILPFile file,
-  required ILP ilp,
-  Color color = Colors.black38,
-}) =>
+Widget _infoButton(
+  ILPFile file,
+  ILP ilp,
+  Color color,
+) =>
     InkWell(
       child: Padding(
         padding: EdgeInsets.all(8),

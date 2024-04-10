@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
 import 'package:steamworks/steamworks.dart';
+import 'package:ui/ui.dart';
 
 import '../../../utils/steam_ex.dart';
 import '../../../utils/steam_tags.dart';

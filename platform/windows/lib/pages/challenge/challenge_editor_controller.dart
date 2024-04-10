@@ -28,10 +28,10 @@ class ChallengeEditorController extends GetxController {
 
       shapes
         ..clear()
-        ..addAll(v.values.map((e) => e.shape).nonNulls);
+        ..addAll(v.values.map((e) => e.shapes).flattened);
       styles
         ..clear()
-        ..addAll(v.values.map((e) => e.style).nonNulls);
+        ..addAll(v.values.map((e) => e.styles).flattened);
       imageLength = v.values.map((e) => e.infos.length).sum;
       update(['form', 'list']);
     });

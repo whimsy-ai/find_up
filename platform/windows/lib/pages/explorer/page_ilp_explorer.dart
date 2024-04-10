@@ -5,7 +5,7 @@ import 'package:game/explorer/ilp_file_list_tile.dart';
 import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
 import '../../utils/empty_list_widget.dart';
 import 'folder_list_tile.dart';

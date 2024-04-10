@@ -4,7 +4,7 @@ import 'package:game/explorer/asset_ilp_file.dart';
 import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
-import 'package:i18n/ui.dart';
+import 'package:ui/ui.dart';
 
 import 'asset_file_list_tile.dart';
 import 'gallery_controller.dart';
