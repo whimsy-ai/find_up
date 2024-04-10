@@ -48,7 +48,7 @@ class TipToolWidget<T extends LevelController> extends StatelessWidget {
                     Resources.iconFocus,
                     color: controller.nextHintTime.inMilliseconds > 0
                         ? Colors.grey
-                        : Colors.black,
+                        : Theme.of(context).hintColor,
                   ),
                 ),
               ],
