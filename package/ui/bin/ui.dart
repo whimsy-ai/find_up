@@ -235,6 +235,7 @@ final zh = {
   'steamResetAchievementsConfirm': '请确认，清空Steam成就？',
   'steamResetAchievementsSuccess': '成功清空Steam成就',
   'themeSwitch': '切换浅色或深色主题',
+  'errorNoEnoughLayers': '缺少足够的图层',
 };
 
 final fix = {

@@ -61,8 +61,8 @@ class ILPEditorInfoListTile extends GetView<ILPEditorController> {
               color: Colors.red,
               size: 20,
             ),
-            title: Text(file.file),
-            subtitle: Text(file.exception!.message),
+            title: Text(file.exception!.message),
+            subtitle: Text(file.file),
             trailing: Wrap(children: [refreshWidget, removeWidget]),
           );
         } else {

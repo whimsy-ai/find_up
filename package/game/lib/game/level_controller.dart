@@ -200,6 +200,14 @@ abstract class LevelController extends GetxController
     await load;
     width = level.width;
     height = level.height;
+    final ilp = level.ilp!;
+    final info = await ilp.info(ilpIndex!);
+    print('图层数量 $ilpIndex ${info.contentLayerIdList.length}');
+    if (info.contentLayerIdList.length <= 1) {
+      state = GameState.loadError;
+      error = UI.errorNoEnoughLayers.tr;
+      return;
+    }
     level.randomLayers(math.Random(seed));
     await level.draw();
     resetHint(level);

@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
+import 'package:ui/ui.dart';
 
 import 'ilp_editor_controller.dart';
 
@@ -16,12 +17,21 @@ class ILPInfoFile {
     load();
   }
 
-  load({force = false}) {
+  load({force = false}) async {
     if (force) _config.value = null;
     if (_config.value != null) return;
     try {
       _exception.value = null;
       _config.value = ILPInfoConfig.fromFileSync(file);
+
+      /// 检查 图层数量
+      final ilp = ILP.fromConfigFiles([file]);
+      if ((await ilp.infos).first.contentLayerIdList.length <= 1) {
+        throw ILPConfigException(
+          message: UI.errorNoEnoughLayers.tr,
+          file: file,
+        );
+      }
     } on ILPConfigException catch (e) {
       _config.value = null;
       _exception.value = e;

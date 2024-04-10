@@ -11,6 +11,7 @@ import 'package:game/explorer/file.dart';
 import 'package:game/explorer/ilp_file.dart';
 import 'package:game/game/game_mode.dart';
 import 'package:game/game/page_game_entry.dart';
+import 'package:game/global_progress_indicator_dialog.dart';
 import 'package:get/get.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:oktoast/oktoast.dart';
@@ -109,16 +110,20 @@ class ILPEditorController extends GetxController {
 
   Future<Uint8List> toBytes() async {
     for (var config in _configs) {
+      await config.load(force: true);
+      if (config.exception != null) {
+        throw config.exception!;
+      }
       if (config.config == null) {
         throw ILPConfigException(
-          message: '${config.file} ${UI.ilpEditorFilesNotExist.tr}',
+          message: UI.ilpEditorFilesNotExist.tr,
           file: config.file,
         );
       }
       final validate = await config.config!.validate();
       if (!validate) {
         throw ILPConfigException(
-          message: '${config.config!.name} ${UI.ilpEditorFilesNotExist.tr}',
+          message: UI.ilpEditorFilesNotExist.tr,
           file: config.file,
         );
       }
@@ -145,6 +150,16 @@ class ILPEditorController extends GetxController {
   }
 
   saveToLocalFile() async {
+    GlobalProgressIndicatorDialog.show(UI.wait.tr);
+    Uint8List? bytes;
+    try {
+      bytes = await toBytes();
+    } on ILPConfigException catch (e) {
+      showToast('${e.file != null ? '${e.file}\n' : ''}${e.message}');
+      Get.back();
+      return;
+    }
+
     late String savePath;
     if (_file is ILPFile) {
       final file = _file as ILPFile;
@@ -182,18 +197,6 @@ class ILPEditorController extends GetxController {
       ]);
       if (file == null) return;
       savePath = file.path;
-    }
-    Get.dialog(
-      AlertDialog(title: Text(UI.saving.tr)),
-      barrierDismissible: false,
-    );
-    Uint8List? bytes;
-    try {
-      bytes = await toBytes();
-    } catch (e) {
-      showToast(e.toString());
-      Get.back();
-      return;
     }
     await File(savePath).writeAsBytes(bytes);
     _check(bytes, savePath);
@@ -484,6 +487,13 @@ class ILPEditorController extends GetxController {
   }
 
   Future<SubmitResult?> uploadToSteam() async {
+    Uint8List? bytes;
+    try {
+      bytes = await toBytes();
+    } on ILPConfigException catch (e) {
+      showToast('${e.file != null ? '${e.file}\n' : ''}${e.message}');
+      return null;
+    }
     TagAgeRating? age;
     TagShape? shape;
     TagStyle? style;
@@ -502,7 +512,6 @@ class ILPEditorController extends GetxController {
       shape: shape,
     );
     if (tags == null) return null;
-    final bytes = await toBytes();
 
     final temp = await getTemporaryDirectory();
     final contentFolder = await temp.createTemp();
