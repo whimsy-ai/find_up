@@ -97,6 +97,7 @@ abstract class Level {
 
   /// 点击错误，返回罚时
   /// 返回为null代表点击了正确位置
+  /// 点击空白位置，可以返回Duration.zero，代表不做处理
   Future<Duration?> onTap(LayerLayout layout, Offset position);
 
   void onUpdate(Duration frame) {
