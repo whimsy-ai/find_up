@@ -62,6 +62,7 @@ class LevelPuzzle extends Level with LevelLoader {
           for (var element in layers) {
             element.tapped = true;
           }
+          return null;
         }
 
         /// 点击错误图层
@@ -71,7 +72,7 @@ class LevelPuzzle extends Level with LevelLoader {
       }
     }
 
-    return null;
+    return Duration.zero;
   }
 
   double _colorTween = 0;

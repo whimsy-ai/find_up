@@ -23,6 +23,7 @@ enum LevelState {
 
 abstract class Tapped {
   bool get tapped;
+
   bool get isTarget;
 }
 
@@ -94,6 +95,8 @@ abstract class Level {
 
   List<String> unlockedLayersId();
 
+  /// 点击错误，返回罚时
+  /// 返回为null代表点击了正确位置
   Future<Duration?> onTap(LayerLayout layout, Offset position);
 
   void onUpdate(Duration frame) {

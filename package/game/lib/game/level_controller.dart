@@ -133,7 +133,7 @@ abstract class LevelController extends GetxController
         currentLevel!.onCompleted();
         onLevelFinish();
       }
-    } else {
+    } else if(duration.inMilliseconds > 0) {
       showToast(UI.tapWrong.tr.replaceFirst('%s', duration.toSemanticString()));
       currentLevel!.time -= duration;
       playDuckAudio();
