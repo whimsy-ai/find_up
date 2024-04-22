@@ -267,6 +267,7 @@ class ILPEditorController extends GetxController {
           TextButton(
             onPressed: () => PageGameEntry.play(
               [ILPFile(File(filePath))],
+              id:1,
               mode: GameMode.test,
             ),
             child: Text(UI.test.tr),

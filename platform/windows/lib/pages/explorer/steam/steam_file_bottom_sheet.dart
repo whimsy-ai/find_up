@@ -139,6 +139,7 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                         widget.file.type == TagType.file
                             ? [widget.file]
                             : widget.file.children,
+                        id: 1,
                         mode: GameMode.gallery,
                       );
                       controller.update([widget.file.id, 'bottomSheet']);
@@ -201,8 +202,10 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                       child: Wrap(
                         spacing: 10,
                         children: [
-                          ...widget.file.styles.map((e)=>Chip(label: Text(e.value.tr))),
-                          ...widget.file.shapes.map((e)=>Chip(label: Text(e.value.tr))),
+                          ...widget.file.styles
+                              .map((e) => Chip(label: Text(e.value.tr))),
+                          ...widget.file.shapes
+                              .map((e) => Chip(label: Text(e.value.tr))),
                           Chip(label: Text(widget.file.ageRating!.value.tr)),
                         ],
                       ),
@@ -412,6 +415,7 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                         TextButton(
                           onPressed: () => PageGameEntry.play(
                             [widget.file],
+                            id: 1,
                             mode: GameMode.gallery,
                             ilpIndex: i,
                           ),
@@ -420,7 +424,7 @@ class _SteamFileBottomSheetState<T extends SteamFilterController>
                         TextButton(
                           child: Icon(Icons.save_outlined),
                           onPressed: () {
-                            PageSaveImageEntry.open(widget.file, i);
+                            PageSaveImageEntry.open(widget.file, i, id: 1);
                           },
                         ),
                       ],

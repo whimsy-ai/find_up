@@ -16,6 +16,7 @@ dependencies:
   vdf: ^1.1.0
   crypto: ^3.0.3
   get: ^4.6.6
+  intl: any
   # path: ^1.8.0
 
 dev_dependencies:

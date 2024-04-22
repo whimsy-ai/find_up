@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:desktop_drop/desktop_drop.dart';
@@ -7,10 +6,8 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:game/build_flavor.dart';
-import 'package:game/bundle_files.dart';
 import 'package:game/data.dart';
 import 'package:game/discord_link.dart';
 import 'package:game/explorer/ilp_file.dart';
@@ -19,13 +16,14 @@ import 'package:game/game/page_game_entry.dart';
 import 'package:game/game/resources.dart';
 import 'package:game/http/http.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:ilp_file_codec/ilp_codec.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:steamworks/steamworks.dart';
 import 'package:ui/ui.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:windows/pages/challenge/random_challenge.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
 
 import 'pages/challenge/challenge_editor_controller.dart';
@@ -45,6 +43,7 @@ import 'pages/save_image/page_save_image.dart';
 import 'pages/save_image/pc_save_image_controller.dart';
 import 'utils/asset_path.dart';
 import 'utils/update_window_title.dart';
+import 'utils/window_frame.dart';
 
 const steamAppId = 2550370;
 
@@ -57,6 +56,7 @@ Future runMain(List<String> args) async {
   }
   print('启动参数 $args');
   WidgetsFlutterBinding.ensureInitialized();
+  packageInfo = await PackageInfo.fromPlatform();
   await hotKeyManager.unregisterAll();
   await WindowsSingleInstance.ensureSingleInstance(
     args,
@@ -70,6 +70,7 @@ Future runMain(List<String> args) async {
     minimumSize: Size(800, 600),
     center: true,
     skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.hidden,
     title: 'Find Up!',
   );
   await windowManager.setIcon(assetPath(paths: ['assets', 'icon.ico']));
@@ -111,8 +112,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Widget? _home;
+
   @override
   Widget build(BuildContext context) {
+    _home ??= MyHomePage(args: widget.args);
     return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
       return OKToast(
         position: ToastPosition.bottom,
@@ -148,73 +152,14 @@ class _MyAppState extends State<MyApp> {
             ),
           ).useSystemChineseFont(Brightness.dark),
           transitionDuration: Duration.zero,
-          initialRoute: '/',
-          getPages: [
-            GetPage(name: '/', page: () => MyHomePage(args: widget.args)),
-            GetPage(
-              name: '/explorer',
-              page: () => PageILPExplorer(),
-              binding: BindingsBuilder(() {
-                Get.put(ILPExplorerController(ExplorerMode.openFile));
-              }),
-            ),
-            GetPage(
-              name: '/editor',
-              page: () => PageILPEditor(),
-              binding: BindingsBuilder(() {
-                Get.put(ILPEditorController());
-              }),
-            ),
-            GetPage(
-              name: '/save',
-              page: () => PageSaveImage(),
-              binding: BindingsBuilder(() {
-                Get.put(PCSaveImageController(
-                  file: Get.arguments['file'],
-                  index: Get.arguments['index'],
-                ));
-              }),
-              preventDuplicates: true,
-            ),
-            GetPage(name: '/about', page: () => PageAbout()),
-            GetPage(name: '/settings', page: () => PageSettings()),
-            GetPage(name: '/test', page: () => PageTest()),
-            GetPage(name: '/test2', page: () => PageTest2()),
-
-            /// for steam
-            GetPage(
-              name: '/create_challenge',
-              page: () => PageCreateChallenge(),
-              binding: BindingsBuilder(() {
-                Get.put(ChallengeEditorController());
-              }),
-            ),
-            GetPage(
-              name: '/challenge_explorer',
-              page: () => PageChallengeExplorer(),
-              binding: BindingsBuilder(() {
-                Get.put(SteamExplorerController(multipleSelect: true));
-              }),
-            ),
-            GetPage(
-              name: '/play_challenge',
-              page: () => PagePlayChallenge<PCGameController>(),
-              binding: BindingsBuilder(() {
-                Get.put(PCGameController(
-                  files: Get.arguments['files'],
-                  mode: Get.arguments['mode'],
-                  ilpIndex: Get.arguments['ilpIndex'],
-                ));
-              }),
-            ),
-          ],
+          home: _home,
         ),
       );
     });
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   final List<String> args;
 
   MyHomePage({super.key, required this.args}) {
@@ -222,9 +167,93 @@ class MyHomePage extends StatelessWidget {
   }
 
   @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constrains) {
-      return Scaffold(
+    return Scaffold(
+      body: VirtualWindowFrame(
+          child: Navigator(
+        key: Get.nestedKey(1),
+        initialRoute: '/',
+        onGenerateRoute: (settings) {
+          final arguments = settings.arguments as dynamic;
+          var route = switch (settings.name) {
+            '/explorer' => GetPageRoute(
+                page: () => PageILPExplorer(),
+                binding: BindingsBuilder(() {
+                  Get.put(ILPExplorerController(ExplorerMode.openFile));
+                }),
+              ),
+            '/editor' => GetPageRoute(
+                page: () => PageILPEditor(),
+                binding: BindingsBuilder(() {
+                  Get.put(ILPEditorController());
+                }),
+              ),
+            '/save' => GetPageRoute(
+                page: () => PageSaveImage(),
+                binding: BindingsBuilder(() {
+                  Get.put(PCSaveImageController(
+                    file: arguments['file'],
+                    index: arguments['index'],
+                  ));
+                }),
+              ),
+            '/about' => GetPageRoute(page: () => PageAbout()),
+            '/settings' => GetPageRoute(page: () => PageSettings()),
+            '/test' => GetPageRoute(page: () => PageTest()),
+            '/test2' => GetPageRoute(page: () => PageTest2()),
+
+            /// for steam
+            '/create_challenge' => GetPageRoute(
+                page: () => PageCreateChallenge(),
+                binding: BindingsBuilder(() {
+                  Get.put(ChallengeEditorController());
+                }),
+              ),
+            '/challenge_explorer' => GetPageRoute(
+                page: () => PageChallengeExplorer(),
+                binding: BindingsBuilder(() {
+                  Get.put(SteamExplorerController(multipleSelect: true));
+                }),
+              ),
+            '/play_challenge' => GetPageRoute(
+                settings: settings,
+                page: () => PagePlayChallenge<PCGameController>(),
+                binding: BindingsBuilder(() {
+                  Get.put(PCGameController(
+                    files: arguments['files'],
+                    mode: arguments['mode'],
+                    ilpIndex: arguments['ilpIndex'],
+                  ));
+                }),
+              ),
+            _ => GetPageRoute(
+                page: () => _HomeWidget(),
+              ),
+          };
+          return GetPageRoute(
+            settings: settings,
+            page: route.page,
+            binding: route.binding,
+            transitionDuration: Duration.zero,
+          );
+        },
+      )),
+    );
+  }
+}
+
+class _HomeWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return WindowFrame(
+      backIcon: false,
+      title: '${UI.findUp.tr} v${packageInfo.version}',
+      child: Scaffold(
         body: Stack(
           alignment: Alignment.center,
           children: [
@@ -245,19 +274,6 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
             ),
-
-            /// translate error info
-            Positioned(
-              child: Container(
-                constraints: BoxConstraints(maxWidth: 380),
-                child: Card(child: DiscordLink()),
-              ),
-            ).animate(onPlay: (c) => c.repeat(reverse: true)).moveY(
-                  duration: Duration(seconds: 1),
-                  begin: 180,
-                  end: 200,
-                  curve: Curves.easeInOutCubic,
-                ),
             DropTarget(
               onDragEntered: (_) {
                 Get.dialog(
@@ -293,53 +309,52 @@ class MyHomePage extends StatelessWidget {
                     child: ListView(
                       shrinkWrap: true,
                       children: [
-                        ListTile(
-                          title: Text.rich(TextSpan(
-                            text: UI.steamChallenge.tr,
-                            children: [
-                              TextSpan(
-                                text: ' New',
-                                style: GoogleFonts.lilitaOne(color: Colors.red),
-                              ),
-                            ],
-                          )),
-                          onTap: () async {
-                            if (env.isSteam) {
-                              Get.toNamed('/challenge_explorer');
-                              return;
-                            }
-                            final files = await getBundleFiles();
-                            files.shuffle();
-                            print('files length: ${files.length}');
-                            PageGameEntry.play(
-                              files.sublist(
-                                0,
-                                math.min(files.length, 5),
-                              ),
-                              mode: GameMode.challenge,
-                            );
-                          },
-                        ),
+                        /// 挑战
+                        if (env.isSteam)
+                          ListTile(
+                            title: Text(UI.steamChallenge.tr),
+                            onTap: () => Get.toNamed(
+                              '/challenge_explorer',
+                              id: 1,
+                            ),
+                          ),
+                        if (kDebugMode || !env.isSteam)
+                          ListTile(
+                            title: Text(UI.randomChallenge.tr),
+                            onTap: RandomChallengeDialog.show,
+                          ),
                         ListTile(
                           title: Text(UI.gallery.tr),
-                          onTap: () => Get.toNamed('/explorer'),
+                          onTap: () => Get.toNamed(
+                            '/explorer',
+                            id: 1,
+                          ),
                         ),
                         ListTile(
                           title: Text(UI.ilpEditor.tr),
-                          onTap: () => Get.toNamed('/editor'),
+                          onTap: () => Get.toNamed(
+                            '/editor',
+                            id: 1,
+                          ),
                         ),
                         ListTile(
                           title: Text(UI.settings.tr +
                               (Data.locale.languageCode == 'en'
                                   ? ''
                                   : ' / Settings')),
-                          onTap: () => Get.toNamed('/settings'),
+                          onTap: () => Get.toNamed(
+                            '/settings',
+                            id: 1,
+                          ),
                         ),
                         ListTile(
                           title: Text(
                             UI.about.tr,
                           ),
-                          onTap: () => Get.toNamed('/about'),
+                          onTap: () => Get.toNamed(
+                            '/about',
+                            id: 1,
+                          ),
                         ),
                         ListTile(
                           title: Text(UI.exit.tr),
@@ -355,8 +370,7 @@ class MyHomePage extends StatelessWidget {
               left: 10,
               bottom: 10,
               child: Text(
-                '${env.isSteam ? 'Steam' : 'MS store'} version\n'
-                'window size: ${constrains.maxWidth} x ${constrains.maxHeight}',
+                '${env.isSteam ? 'Steam' : 'MS store'} version\n',
                 style: TextStyle(
                   color: Theme.of(context).highlightColor,
                   fontSize: 12,
@@ -365,27 +379,34 @@ class MyHomePage extends StatelessWidget {
             ),
           ],
         ),
-        floatingActionButton: kDebugMode
-            ? Wrap(
-                spacing: 10,
-                children: [
-                  FloatingActionButton(
-                    onPressed: () async {
-                      Get.toNamed('/test');
-                    },
-                    child: Text('test1'),
-                  ),
-                  FloatingActionButton(
-                    onPressed: () async {
-                      Get.toNamed('/test2');
-                    },
-                    child: Text('test2'),
-                  ),
-                ],
-              )
-            : null,
-      );
-    });
+        floatingActionButton: Wrap(
+          spacing: 10,
+          children: [
+            DiscordLink(),
+            if (kDebugMode) ...[
+              FloatingActionButton(
+                onPressed: () async {
+                  Get.toNamed(
+                    '/test',
+                    id: 1,
+                  );
+                },
+                child: Text('test1'),
+              ),
+              FloatingActionButton(
+                onPressed: () async {
+                  Get.toNamed(
+                    '/test2',
+                    id: 1,
+                  );
+                },
+                child: Text('test2'),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -398,7 +419,7 @@ _openILP(String path) async {
   final ilp = await ILP.fromFile(path);
   try {
     if (await ilp.isILP) {
-      PageGameEntry.play([ILPFile(File(path))], mode: GameMode.gallery);
+      PageGameEntry.play([ILPFile(File(path))], id: 1, mode: GameMode.gallery);
     } else {
       showToast('只支持ilp格式文件');
     }

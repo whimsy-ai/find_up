@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 
 import '../../utils/game_helper_dialog.dart';
+import '../../utils/window_frame.dart';
 import 'pc_game_controller.dart';
 
 class PagePlayChallenge<T extends PCGameController> extends GetView<T> {
@@ -44,8 +45,11 @@ class PagePlayChallenge<T extends PCGameController> extends GetView<T> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
+    return WindowFrame(
+      pinTopBar: false,
+      backIcon: false,
+      settings: false,
+      child: Stack(
         children: [
           Positioned.fill(
             child: RepaintBoundary(
@@ -102,7 +106,9 @@ class PagePlayChallenge<T extends PCGameController> extends GetView<T> {
             child: LayoutBuilder(
               builder: (context, constrains) => GetBuilder<T>(
                 id: 'ui',
-                builder: (context) => NewGameUI<T>(),
+                builder: (context) => NewGameUI<T>(
+                  topSaleMargin: kTopBarHeight,
+                ),
               ),
             ),
           ),

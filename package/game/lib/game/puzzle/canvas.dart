@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -103,7 +104,7 @@ class _Painter extends CustomPainter {
   void _drawLeft(Canvas canvas, Size size) {
     for (var row in level.pieces) {
       for (var piece in row) {
-        if (!piece.rightSide) {
+        if (piece.leftSide) {
           canvas
             ..drawImage(
               piece.image,
@@ -116,7 +117,8 @@ class _Painter extends CustomPainter {
                 ..color = level.lineColor
                 ..style = PaintingStyle.stroke
                 ..strokeWidth = 2 / controller.scale,
-            );
+            )
+          ;
         }
         canvas.translate(level.pieceWidth, 0);
       }

@@ -5,11 +5,13 @@ import 'package:game/game/page_game_entry.dart';
 import 'package:get/get.dart';
 import 'package:steamworks/steamworks.dart';
 import 'package:ui/ui.dart';
+import 'package:windows/pages/challenge/random_challenge.dart';
 
 import '../../utils/empty_list_widget.dart';
 import '../../utils/steam_file_ex.dart';
 import '../../utils/steam_filter.dart';
 import '../../utils/steam_tags.dart';
+import '../../utils/window_frame.dart';
 import '../explorer/steam/steam_file.dart';
 import '../explorer/steam/steam_file_list_tile.dart';
 
@@ -49,69 +51,61 @@ class PageChallengeExplorer extends GetView<SteamExplorerController> {
   @override
   Widget build(BuildContext context) {
     controller.load();
-    return Scaffold(
-      body: Row(
-        children: [
-          SizedBox(
-            width: 300,
-            child: Column(
-              children: [
-                AppBar(
-                  title: Text(UI.challenge.tr),
-                  actions: [
-                    IconButton(
-                      tooltip: UI.reload.tr,
-                      onPressed: () => controller.load(),
-                      icon: Icon(Icons.refresh_outlined),
-                    ),
-                  ],
+    return WindowFrame(
+      title: UI.challenge.tr,
+      child: Scaffold(
+        body: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 300,
+              child: SingleChildScrollView(
+                child: controller.filterForum<SteamExplorerController>(
+                  enabledExpand: false,
                 ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: controller.filterForum<SteamExplorerController>(
-                      enabledExpand: false,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          VerticalDivider(),
-          Flexible(
-            flex: 3,
-            child: GetBuilder<SteamExplorerController>(
-              id: 'list',
-              builder: (_) {
-                if (controller.loading) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                return controller.files.files.isEmpty
-                    ? EmptyListWidget()
-                    : _fileList();
-              },
+            VerticalDivider(),
+            Flexible(
+              flex: 3,
+              child: GetBuilder<SteamExplorerController>(
+                id: 'list',
+                builder: (_) {
+                  if (controller.loading) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return controller.files.files.isEmpty
+                      ? EmptyListWidget()
+                      : _fileList();
+                },
+              ),
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: UI.createChallenge.tr,
-        child: Icon(Icons.add_rounded),
-        onPressed: () async {
-          final collection = await Get.toNamed('/create_challenge');
-        },
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () {
+            Get.toNamed('/create_challenge', id: 1);
+          },
+        ),
       ),
     );
   }
 
   Widget _fileList() => MasonryGridView.extent(
-        itemCount: controller.files.current,
+        itemCount: controller.page == 1
+            ? controller.files.current + 1
+            : controller.files.current,
         maxCrossAxisExtent: 200,
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
         itemBuilder: (context, i) {
-          final file = controller.files.files[i];
+          if (controller.page <= 1 && i == 0) {
+            return RandomChallengeDialog.rgbDiceCard();
+          }
+          final file = controller.files.files[i - 1];
           // print('${file.name} ${file.type}');
           return Card(
             clipBehavior: Clip.antiAlias,
@@ -119,6 +113,7 @@ class PageChallengeExplorer extends GetView<SteamExplorerController> {
               child: SteamFileGirdTile<SteamExplorerController>(file: file),
               onTap: () {
                 PageGameEntry.play(
+                  id: 1,
                   file.children,
                   mode: GameMode.challenge,
                 );

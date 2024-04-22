@@ -6,7 +6,6 @@ import 'package:window_manager/window_manager.dart';
 late PackageInfo packageInfo;
 
 updateWindowTitle() async {
-  packageInfo = await PackageInfo.fromPlatform();
   // print('设置窗口标题 ${UI.findUp.tr} v${packageInfo.version}');
   windowManager.setTitle('${UI.findUp.tr} v${packageInfo.version}');
 }

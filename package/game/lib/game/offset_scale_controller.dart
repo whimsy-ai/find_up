@@ -29,7 +29,7 @@ mixin OffsetScaleController on GetxController {
 
   double minScale = 1;
 
-  double maxScale = 1;
+  double maxScale = 2;
 
   void resetScaleAndOffset();
 

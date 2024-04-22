@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:dynamic_parallel_queue/dynamic_parallel_queue.dart';
+import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 
 import 'bin/caches.dart';
 import 'bin/core.dart';
@@ -224,7 +225,7 @@ void main(List<String> args) async {
         }
         final md5 = toMD5('$targetLanguage-${rawText}');
         if (caches.containsKey(md5)) {
-          data[key] = caches[md5]!;
+          data[key] = toBeginningOfSentenceCase(caches[md5]!);
         } else {
           String text;
           try {
@@ -232,7 +233,8 @@ void main(List<String> args) async {
               rawText,
               sourceLanguage: sourceLanguage,
               targetLanguage: targetLanguage,
-            ).then((value) => value.replaceAll('"', ''));
+            ).then((value) =>
+                toBeginningOfSentenceCase(value.replaceAll('"', '')));
 
             if (text.isNotEmpty) {
               caches[md5] = text;

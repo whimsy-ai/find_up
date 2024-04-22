@@ -80,7 +80,7 @@ class PCGameController extends LevelController with MouseController {
     if (env.isSteam) {
       SteamClient.instance.steamUgc.suspendDownloads(true);
     }
-    Get.back();
+    Get.back(id: 1);
   }
 
   @override

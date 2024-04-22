@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'data.dart';
 
 class BrightnessWidget extends StatelessWidget {
-  final isDark = Get.isDarkMode.obs;
+  static final isDark = Get.isDarkMode.obs;
   final Widget Function(bool isDark, void Function() switcher) builder;
 
   BrightnessWidget({super.key, required this.builder});

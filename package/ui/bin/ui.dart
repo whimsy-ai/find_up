@@ -236,6 +236,13 @@ final zh = {
   'steamResetAchievementsSuccess': '成功清空Steam成就',
   'themeSwitch': '切换浅色或深色主题',
   'errorNoEnoughLayers': '缺少足够的图层',
+  'randomChallenge': '随机挑战',
+  'randomChallengeDesc': '在游戏自带的游戏内容中随机选择多张图片组合为一个挑战',
+  'steam_randomChallengeDesc': '在本地图库中（已下载的）随机选择多张图片组合为一个挑战',
+  'steam_randomChallengeDir': '本地图库文件夹目录: %s',
+  'steam_randomChallengeEmpty': '文件夹没有文件，请从图库订阅一些内容后再挑战',
+  'randomChallengeImages': '当前有 %s 张图片',
+  'randomChallengeSelected':'已选择 %s 个文件',
 };
 
 final fix = {

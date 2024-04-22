@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:ui/ui.dart';
 
 import '../../utils/empty_list_widget.dart';
+import '../../utils/window_frame.dart';
 import 'folder_list_tile.dart';
 import 'ilp_explorer_controller.dart';
 import 'steam/steam_file.dart';
@@ -17,8 +18,9 @@ import 'steam/steam_folder_list_tile.dart';
 class PageILPExplorer<T extends ILPExplorerController> extends GetView<T> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
+    return WindowFrame(
+      title: UI.explorer.tr,
+      child: Row(
         children: [
           /// 文件夹列表
           SizedBox(
@@ -34,6 +36,8 @@ class PageILPExplorer<T extends ILPExplorerController> extends GetView<T> {
                       tooltip: UI.addFolder.tr,
                     ),
                   ],
+                  leading: SizedBox.shrink(),
+                  leadingWidth: 0,
                 ),
                 Expanded(
                   child: GetBuilder<T>(
@@ -143,13 +147,13 @@ class PageILPExplorer<T extends ILPExplorerController> extends GetView<T> {
       );
 
   _play(ILPFile file) async {
-    await PageGameEntry.play([file], mode: GameMode.gallery);
+    await PageGameEntry.play([file], id: 1, mode: GameMode.gallery);
     await file.load(force: true);
     controller.update(['files']);
   }
 
   _steamFile(SteamFile file) async {
-    await PageGameEntry.play([file], mode: GameMode.gallery);
+    await PageGameEntry.play([file], id: 1, mode: GameMode.gallery);
     await file.load(force: true);
     controller.update(['files']);
   }

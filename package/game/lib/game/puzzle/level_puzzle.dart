@@ -42,7 +42,7 @@ class LevelPuzzle extends Level with LevelLoader {
   bool hint() {
     for (var target in layers.toList()) {
       if (target.isTarget) continue;
-      pieces[target.row][target.column].rightSide = false;
+      pieces[target.row][target.column].leftSide = true;
       layers.remove(target);
       return true;
     }
@@ -171,7 +171,7 @@ class LevelPuzzle extends Level with LevelLoader {
       randomList.shuffle(random);
       randomList.shuffle(random);
       for (var i = 0; i < targetsCount; i++) {
-        var piece = randomList[i]..rightSide = true;
+        var piece = randomList[i]..leftSide = false;
         piece = piece.copyWith(
           pieceWidth: pieceWidth,
           pieceHeight: pieceHeight,
@@ -186,6 +186,7 @@ class LevelPuzzle extends Level with LevelLoader {
         layers.add(piece);
       }
 
+      /// 选择一个目标
       final target = layers[random.nextInt(layers.length)];
 
       /// 虚假拼图块需要改变的边
@@ -214,6 +215,7 @@ class LevelPuzzle extends Level with LevelLoader {
         bottom: bottom,
       )
         ..isTarget = true
+        ..leftSide = false
         ..rightSide = true
         ..rotate = _randomAngle(random);
 

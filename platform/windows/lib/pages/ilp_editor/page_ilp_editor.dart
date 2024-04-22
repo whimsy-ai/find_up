@@ -20,6 +20,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../utils/steam_achievement.dart';
 import '../../utils/steam_ex.dart';
+import '../../utils/window_frame.dart';
 import '../challenge/gallery_dialog.dart';
 import '../explorer/steam/steam_file.dart';
 import 'ilp_editor_controller.dart';
@@ -40,17 +41,19 @@ class PageILPEditor extends GetView<ILPEditorController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(UI.ilpEditor.tr),
-        actions: [
-          TextButton(
-            onPressed: () => ilpEditorTipsDialog(force: true),
-            child: Text(UI.help.tr),
+    return WindowFrame(
+      title: UI.ilpEditor.tr,
+      icons: [
+        IconButton(
+          tooltip: UI.help.tr,
+          onPressed: () => ilpEditorTipsDialog(force: true),
+          icon: Icon(
+            Icons.help,
+            color: Colors.pink,
           ),
-        ],
-      ),
-      body: Row(
+        ),
+      ],
+      child: Row(
         children: [
           /// 文件信息
           Flexible(

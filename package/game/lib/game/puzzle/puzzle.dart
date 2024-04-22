@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../extension_path.dart';
@@ -12,7 +13,9 @@ class PuzzlePiece extends Tapped {
   late ui.Image image;
   late double width, height;
   static double peakHeight = 0;
-  bool rightSide = false, highlight = false;
+  bool leftSide = true;
+  bool rightSide = false;
+  bool highlight = false;
   @override
   bool isTarget = false;
   @override
@@ -170,10 +173,12 @@ class PuzzlePiece extends Tapped {
       // );
 
       /// 旋转原始path
-      piece._path = piece.path.transform(canvas.getTransform());
+      piece._path = piece._path.transform(canvas.getTransform());
 
       /// 原点
-      // canvas.drawCircle(Offset.zero, 24, Paint()..color = Colors.red);
+      if (kDebugMode) {
+        canvas.drawCircle(Offset.zero, 24, Paint()..color = Colors.red);
+      }
     } else {
       x = piece.offsetX;
       y = piece.offsetY;
