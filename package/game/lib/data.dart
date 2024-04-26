@@ -110,12 +110,15 @@ abstract class Data {
   }
 
   static Locale get locale {
-    final locale = Data.core.getString(_localeKey);
-    print('语言 $locale');
-    if (locale != null && UI.languages.keys.contains(locale)) {
-      return Locale(locale);
+    var str = Data.core.getString(_localeKey);
+    Locale locale;
+    if (str != null && UI.languages.keys.contains(str)) {
+      locale = stringToLocale(str);
+    } else {
+      locale = Get.deviceLocale!;
     }
-    return Get.deviceLocale!;
+    print('语言 $str => ${locale.toLanguageTag()}');
+    return locale;
   }
 
   static set localeString(String locale) =>
@@ -141,4 +144,9 @@ abstract class Data {
     _isDark = val;
     _signAndSave();
   }
+}
+
+Locale stringToLocale(String str) {
+  final list = str.split('-');
+  return Locale(list.first, list.elementAtOrNull(1));
 }

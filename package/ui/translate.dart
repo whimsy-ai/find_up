@@ -203,11 +203,10 @@ void main(List<String> args) async {
   print('完成 翻译语言名词');
 
   int failedCount = 0;
-  final languages = {'zh-CN': zh};
+  final languages = {'zh_CN': zh};
   for (var targetLanguage in rankedLanguages.keys) {
     if (targetLanguage.toLowerCase() == 'zh-cn') continue;
     final data = <String, String>{};
-    languages[targetLanguage] = data;
     for (var key in zh.keys) {
       final rawText = zh[key]!;
       if (key == 'findUp') {
@@ -254,6 +253,8 @@ void main(List<String> args) async {
         }
       });
     }
+
+    languages[targetLanguage.replaceAll('-', '_')] = data;
   }
   await queue.whenComplete();
   print('翻译失败次数 $failedCount');

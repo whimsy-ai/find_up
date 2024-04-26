@@ -106,7 +106,7 @@ class LevelPuzzle extends Level with LevelLoader {
       height,
       math.min(width, height) / ([3, 4, 5]..shuffle(random)).first,
     );
-    print('random layer $width, $height, $row, $column');
+    // print('random layer $width, $height, $row, $column');
     rows = row;
     columns = column;
     pieceWidth = width / columns;

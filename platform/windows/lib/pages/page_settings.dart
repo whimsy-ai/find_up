@@ -16,7 +16,7 @@ import '../utils/update_window_title.dart';
 import '../utils/window_frame.dart';
 
 class PageSettings extends StatelessWidget {
-  late final _language = Data.locale.languageCode.obs
+  late final _language = Data.locale.toLanguageTag().obs
     ..listen((p0) {
       Data.localeString = p0;
     });

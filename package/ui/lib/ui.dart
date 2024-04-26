@@ -370,7 +370,7 @@ class UI implements Translations {
 };
 @override
   Map<String, Map<String, String>> get keys => {
-  "zh-CN": {
+  "zh_CN": {
     "findUp": "找起来！",
     "add": "添加",
     "addLink": "添加链接",
@@ -844,7 +844,7 @@ class UI implements Translations {
     "unlockedLayers": "%s new layers unlocked",
     "shareToSteam": "Share to Steam Workshop"
   },
-  "zh-TW": {
+  "zh_TW": {
     "findUp": "Find Up!",
     "add": "添加",
     "modifyLink": "修改連結",
@@ -18619,7 +18619,7 @@ class UI implements Translations {
     "steam_randomChallengeDir": "Whaiaronga kōpaki taiwhanga paetata: %s",
     "randomChallengeImages": "I tenei wa %s nga whakaahua"
   },
-  "mni-Mtei": {
+  "mni_Mtei": {
     "findUp": "Find Up!",
     "add": "ꯍꯥꯄꯆꯤꯜꯂꯨ꯫",
     "addLink": "ꯂꯤꯉ꯭ꯛ ꯑꯃꯥ ꯍꯥꯄꯆꯤꯜꯂꯨ꯫",
@@ -24464,6 +24464,7 @@ class UI implements Translations {
     "randomChallengeDesc": "Si aan kala sooc lahayn u dooro sawiro badan oo ka kooban nuxurka ciyaarta kuna dar tartan",
     "steam_randomChallengeDesc": "Si aan kala sooc lahayn u dooro sawiro badan oo ka mid ah gallery maxaliga ah (la soo degay) oo ku dar iyaga tartan",
     "steam_randomChallengeEmpty": "Ma jiraan wax faylal ah oo ku jira galka Fadlan rukunso qayb ka mid ah nuxurka gallery ka hor inta aanad mar kale tartamin.",
+    "randomChallengeSelected": "%s faylasha la doortay",
     "modify": "Dib u eegis",
     "edit": "Wax ka beddel",
     "loading": "Akhriska",
@@ -24541,8 +24542,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "Guulaha Steam la nadiifiyey si guul leh",
     "errorNoEnoughLayers": "Ma jiraan lakabyo ku filan",
     "steam_randomChallengeDir": "Hagaha galalka gudaha: %s",
-    "randomChallengeImages": "Hadda waxaa jira sawirro %s",
-    "randomChallengeSelected": "%s faylasha la doortay"
+    "randomChallengeImages": "Hadda waxaa jira sawirro %s"
   },
   "tg": {
     "findUp": "Find Up!",
@@ -28493,6 +28493,7 @@ class UI implements Translations {
     "randomChallengeDesc": "Պատահականորեն ընտրեք մի քանի նկարներ խաղի բովանդակությունից և միավորեք դրանք մարտահրավերի մեջ",
     "steam_randomChallengeDesc": "Պատահականորեն ընտրեք բազմաթիվ նկարներ տեղական պատկերասրահից (ներբեռնված) և միավորեք դրանք մարտահրավերի մեջ",
     "steam_randomChallengeEmpty": "Թղթապանակում ֆայլեր չկան:",
+    "randomChallengeSelected": "Ընտրված է %s ֆայլ",
     "modify": "Վերանայել",
     "edit": "Խմբագրել",
     "loading": "Ընթերցանություն",
@@ -28570,8 +28571,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "Steam-ի ձեռքբերումները հաջողությամբ մաքրվեցին",
     "errorNoEnoughLayers": "Բավարար շերտեր չկան",
     "steam_randomChallengeDir": "Տեղական պատկերասրահի թղթապանակի գրացուցակ՝ %s",
-    "randomChallengeImages": "Ներկայումս կան %s պատկերներ",
-    "randomChallengeSelected": "Ընտրված է %s ֆայլ"
+    "randomChallengeImages": "Ներկայումս կան %s պատկերներ"
   },
   "ig": {
     "findUp": "Find Up!",
@@ -28730,6 +28730,7 @@ class UI implements Translations {
     "randomChallengeDesc": "Họrọ ọtụtụ foto na-akpaghị aka site na ọdịnaya egwuregwu wee jikọta ha ka ọ bụrụ ihe ịma aka",
     "steam_randomChallengeDesc": "Họrọ ọtụtụ foto na-akpaghị aka site na gallery mpaghara (ebudatara) wee jikọta ha ka ọ bụrụ ihe ịma aka",
     "steam_randomChallengeEmpty": "Enweghị faịlụ na nchekwa, biko denye aha na ụfọdụ ọdịnaya sitere na gallery tupu ị na-ama aka ọzọ.",
+    "randomChallengeSelected": "%s faịlụ ahọpụtara",
     "modify": "Megharia",
     "edit": "Dezie",
     "loading": "Ọgụgụ",
@@ -28807,8 +28808,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "Kpochapụ mmezu Steam nke ọma",
     "errorNoEnoughLayers": "Ezughị oke n'ígwé",
     "steam_randomChallengeDir": "Akwụkwọ ndekọ nchekwa gallery mpaghara: %s",
-    "randomChallengeImages": "Enwere foto %s ugbu a",
-    "randomChallengeSelected": "%s faịlụ ahọpụtara"
+    "randomChallengeImages": "Enwere foto %s ugbu a"
   },
   "ilo": {
     "findUp": "Find Up!",
@@ -28967,6 +28967,7 @@ class UI implements Translations {
     "randomChallengeDesc": "Random a mangpili iti adu a ladawan manipud iti linaon ti ay-ayam ken pagtitiponen dagitoy iti maysa a karit",
     "steam_randomChallengeDesc": "Random a mangpili iti adu a ladawan manipud iti lokal a galeria (nai-download) ken pagtitiponen dagitoy iti maysa a karit",
     "steam_randomChallengeEmpty": "Awan dagiti file iti folder Pangngaasiyo ta agsuskribirkayo iti sumagmamano a linaon manipud iti galeria sakbay a makakaritkayo manen.",
+    "randomChallengeSelected": "%s dagiti file ti napili",
     "modify": "Pabaroen",
     "edit": "Sabalian",
     "loading": "Panagbasa",
@@ -29044,8 +29045,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "Naballigi a naikkat dagiti nagapuanan ti Steam",
     "errorNoEnoughLayers": "Saan nga umdas ti layers",
     "steam_randomChallengeDir": "Lokal a direktorio ti folder ti galeria: %s",
-    "randomChallengeImages": "Adda dagiti agdama a %s a ladawan",
-    "randomChallengeSelected": "%s dagiti file ti napili"
+    "randomChallengeImages": "Adda dagiti agdama a %s a ladawan"
   },
   "it": {
     "findUp": "Find Up!",
@@ -29204,6 +29204,7 @@ class UI implements Translations {
     "randomChallengeDesc": "Seleziona casualmente più immagini dal contenuto del gioco e combinale in una sfida",
     "steam_randomChallengeDesc": "Seleziona casualmente più immagini dalla galleria locale (scaricata) e combinale in una sfida",
     "steam_randomChallengeEmpty": "Non sono presenti file nella cartella. Iscriviti ad alcuni contenuti della galleria prima di riprovare.",
+    "randomChallengeSelected": "%s file selezionati",
     "modify": "Rivedere",
     "edit": "Modificare",
     "loading": "Lettura",
@@ -29281,8 +29282,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "Hai completato con successo gli obiettivi di Steam",
     "errorNoEnoughLayers": "Strati insufficienti",
     "steam_randomChallengeDir": "Directory della cartella della galleria locale: %s",
-    "randomChallengeImages": "Attualmente ci sono %s immagini",
-    "randomChallengeSelected": "%s file selezionati"
+    "randomChallengeImages": "Attualmente ci sono %s immagini"
   },
   "yi": {
     "findUp": "Find Up!",
@@ -29441,6 +29441,7 @@ class UI implements Translations {
     "randomChallengeDesc": "ןפורסיורַא ַא ןיא ייז ןדניברַאפ ןוא טלַאהניא ליּפש יד ןופ רעדליב לפייק ןריטקעלעס ילמַאדנַאר",
     "steam_randomChallengeDesc": "ןפורסיורַא ַא ןיא ייז ןדניברַאפ ןוא )דידוָאלנוַאד( עירעלַאג עגיה יד ןופ רעדליב לפייק ןריטקעלעס ילמַאדנַאר",
     "steam_randomChallengeEmpty": ".רעדיוו גנישזדנַאלַאשט רעדייא עירעלַאג רעד ןופ טלַאהניא עכעלטע וצ ןרינָאבַא עטיב עקעט רעד ןיא סעקעט ןייק ןענעז סע",
+    "randomChallengeSelected": "ןבילקעגסיוא סעקעט s%",
     "modify": "עסיווער",
     "edit": "ןריגַאדער",
     "loading": "ןענעייל",
@@ -29518,8 +29519,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "החלצה ןעגנוכיירגרעד maetS דרילק",
     "errorNoEnoughLayers": "סרעַייל גונעג טינ",
     "steam_randomChallengeDir": "S% :רעזַייווגעוו עקעט עירעלַאג עלאקאל",
-    "randomChallengeImages": "רעדליב s% לַייוורעד ןענעז סע",
-    "randomChallengeSelected": "ןבילקעגסיוא סעקעט s%"
+    "randomChallengeImages": "רעדליב s% לַייוורעד ןענעז סע"
   },
   "hi": {
     "findUp": "Find Up!",
@@ -29678,6 +29678,7 @@ class UI implements Translations {
     "randomChallengeDesc": "खेल सामग्री से बेतरतीब ढंग से कई चित्रों का चयन करें और उन्हें एक चुनौती में संयोजित करें",
     "steam_randomChallengeDesc": "स्थानीय गैलरी (डाउनलोड) से बेतरतीब ढंग से एकाधिक चित्रों का चयन करें और उन्हें एक चुनौती में संयोजित करें",
     "steam_randomChallengeEmpty": "फ़ोल्डर में कोई फ़ाइल नहीं है। कृपया दोबारा चुनौती देने से पहले गैलरी से कुछ सामग्री की सदस्यता लें।",
+    "randomChallengeSelected": "%s फ़ाइलें चयनित",
     "modify": "दोहराना",
     "edit": "संपादन करना",
     "loading": "पढ़ना",
@@ -29755,8 +29756,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "स्टीम उपलब्धियों को सफलतापूर्वक साफ़ किया गया",
     "errorNoEnoughLayers": "पर्याप्त परतें नहीं",
     "steam_randomChallengeDir": "स्थानीय गैलरी फ़ोल्डर निर्देशिका: %s",
-    "randomChallengeImages": "वर्तमान में %s छवियाँ हैं",
-    "randomChallengeSelected": "%s फ़ाइलें चयनित"
+    "randomChallengeImages": "वर्तमान में %s छवियाँ हैं"
   },
   "su": {
     "findUp": "Find Up!",
@@ -29915,6 +29915,7 @@ class UI implements Translations {
     "randomChallengeDesc": "Pilih sababaraha gambar sacara acak tina eusi kaulinan sareng gabungkeun kana tantangan",
     "steam_randomChallengeDesc": "Pilih sababaraha gambar sacara acak tina galeri lokal (diunduh) sareng gabungkeun kana tantangan",
     "steam_randomChallengeEmpty": "Henteu aya file dina folder Mangga ngalanggan sababaraha eusi ti galeri sateuacan nantang deui.",
+    "randomChallengeSelected": "%s file dipilih",
     "modify": "Ngarévisi",
     "edit": "Édit",
     "loading": "Bacaan",
@@ -29992,8 +29993,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "Ngabersihkeun prestasi Steam suksés",
     "errorNoEnoughLayers": "Teu cukup lapisan",
     "steam_randomChallengeDir": "Diréktori folder galeri lokal: %s",
-    "randomChallengeImages": "Ayeuna aya %s gambar",
-    "randomChallengeSelected": "%s file dipilih"
+    "randomChallengeImages": "Ayeuna aya %s gambar"
   },
   "yo": {
     "findUp": "Find Up!",
@@ -30152,6 +30152,7 @@ class UI implements Translations {
     "randomChallengeDesc": "Laileto yan ọpọ awọn aworan lati awọn ere akoonu ati ki o darapọ wọn sinu kan ipenija",
     "steam_randomChallengeDesc": "Laileto yan awọn aworan lọpọlọpọ lati ibi iṣafihan agbegbe (ṣe igbasilẹ) ki o darapọ wọn sinu ipenija kan",
     "steam_randomChallengeEmpty": "Ko si awọn faili ninu folda Jọwọ ṣe alabapin si diẹ ninu akoonu lati ibi iṣafihan ṣaaju ki o to nija lẹẹkansi.",
+    "randomChallengeSelected": "%s ti yan awọn faili",
     "modify": "Atunwo",
     "edit": "Satunkọ",
     "loading": "Kika",
@@ -30229,8 +30230,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "Pa awọn aṣeyọri Steam kuro ni aṣeyọri",
     "errorNoEnoughLayers": "Ko ti to fẹlẹfẹlẹ",
     "steam_randomChallengeDir": "Ilana folda gallery: %s",
-    "randomChallengeImages": "Awọn aworan %s wa lọwọlọwọ",
-    "randomChallengeSelected": "%s ti yan awọn faili"
+    "randomChallengeImages": "Awọn aworan %s wa lọwọlọwọ"
   },
   "vi": {
     "findUp": "Find Up!",
@@ -30389,6 +30389,7 @@ class UI implements Translations {
     "randomChallengeDesc": "Chọn ngẫu nhiên nhiều hình ảnh từ nội dung trò chơi và kết hợp chúng thành một thử thách",
     "steam_randomChallengeDesc": "Chọn ngẫu nhiên nhiều ảnh từ thư viện cục bộ (đã tải xuống) và kết hợp chúng thành một thử thách",
     "steam_randomChallengeEmpty": "Không có tệp nào trong thư mục. Vui lòng đăng ký một số nội dung từ thư viện trước khi thử thách lại.",
+    "randomChallengeSelected": "Đã chọn tệp %s",
     "modify": "Ôn lại",
     "edit": "Biên tập",
     "loading": "Đọc",
@@ -30466,8 +30467,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "Xóa thành tích Steam thành công",
     "errorNoEnoughLayers": "Không đủ lớp",
     "steam_randomChallengeDir": "Thư mục thư mục thư viện cục bộ: %s",
-    "randomChallengeImages": "Hiện có %s hình ảnh",
-    "randomChallengeSelected": "Đã chọn tệp %s"
+    "randomChallengeImages": "Hiện có %s hình ảnh"
   },
   "ts": {
     "findUp": "Find Up!",
@@ -30626,6 +30626,7 @@ class UI implements Translations {
     "randomChallengeDesc": "Hlawula swifaniso swo tala hi ku landzelelana eka leswi nga endzeni ka ntlangu ivi u swi hlanganisa swi va ntlhontlho",
     "steam_randomChallengeDesc": "Hlawula swifaniso swo tala hi ku landzelelana eka galari ya laha kaya (leswi dawunilodiweke) ivi u swi hlanganisa swi va ntlhontlho",
     "steam_randomChallengeEmpty": "A ku na tifayela eka folda Hi kombela u tsarisa eka swin’wana leswi nga endzeni ka galari u nga si tlhela u tlhontlha.",
+    "randomChallengeSelected": "%s tifayela ti hlawuriwile",
     "modify": "Pfuxeta",
     "edit": "Hlela",
     "loading": "Ku hlaya",
@@ -30703,8 +30704,7 @@ class UI implements Translations {
     "steamResetAchievementsSuccess": "Ku basisile ku humelela ka Steam hi ndlela leyi humelelaka",
     "errorNoEnoughLayers": "A hi ti layers leti eneleke",
     "steam_randomChallengeDir": "Xikombo xa folda ya galari ya laha kaya: %s",
-    "randomChallengeImages": "Sweswi ku na swifaniso swa %s",
-    "randomChallengeSelected": "%s tifayela ti hlawuriwile"
+    "randomChallengeImages": "Sweswi ku na swifaniso swa %s"
   }
 };
 }

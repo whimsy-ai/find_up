@@ -165,7 +165,7 @@ class SteamFile extends SteamSimpleFile {
     this.ageRating,
     this.levelCount,
   }) {
-    unlock = infos.map((e) => getIlpInfoUnlock(e)).toList().sum / infos.length;
+    _updateUnlock();
   }
 
   @override
@@ -184,5 +184,14 @@ class SteamFile extends SteamSimpleFile {
 
   Future unSubscribe() async {
     await SteamClient.instance.unsubscribe(id);
+  }
+
+  @override
+  Future<void> load({force = false}) {
+    return super.load(force: force).then((v) => _updateUnlock());
+  }
+
+  _updateUnlock() {
+    unlock = infos.map((e) => getIlpInfoUnlock(e)).toList().sum / infos.length;
   }
 }

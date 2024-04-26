@@ -85,7 +85,7 @@ class PCGameController extends LevelController with MouseController {
 
   @override
   void onCompleted() {
-    print('测试模式: $isTest');
+    print('是否测试模式: $isTest');
     print('level controller onCompleted, id层数量${Data.layersId.length}');
     super.onCompleted();
     print('pc game controller onCompleted, id层数量${Data.layersId.length}');
@@ -107,7 +107,8 @@ class PCGameController extends LevelController with MouseController {
     /// 检查是否满足 强迫症玩家 成就
     for (var file in files) {
       await file.load(force: true);
-      if (file.unlock == 1.0) {
+      // print('${file.runtimeType.toString()} 解锁进度 ${file.unlock}');
+      if (file.unlock >= 1.0) {
         SteamAchievement.ocdGamer.achieved();
         break;
       }
