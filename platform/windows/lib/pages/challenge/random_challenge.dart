@@ -168,11 +168,7 @@ class RandomChallengeDialog extends StatelessWidget {
                     _value.value,
                   );
                   if (files.isEmpty) return;
-                  PageGameEntry.play(
-                    files,
-                    id: 1,
-                    mode: GameMode.challenge,
-                  );
+                  PageGameEntry.play(files, mode: GameMode.challenge);
                 },
         ),
       ],

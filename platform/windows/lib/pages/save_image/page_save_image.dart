@@ -5,6 +5,7 @@ import 'pc_save_image_controller.dart';
 
 class PageSaveImage extends StatelessWidget {
   @override
-  Widget build(BuildContext context) =>
-      Scaffold(body: SaveImageEditor<PCSaveImageController>());
+  Widget build(BuildContext context) => Scaffold(
+        body: SaveImageEditor<PCSaveImageController>(),
+      );
 }

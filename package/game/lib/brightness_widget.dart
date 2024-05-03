@@ -7,7 +7,7 @@ class BrightnessWidget extends StatelessWidget {
   static final isDark = Get.isDarkMode.obs;
   final Widget Function(bool isDark, void Function() switcher) builder;
 
-  BrightnessWidget({super.key, required this.builder});
+  const BrightnessWidget({super.key, required this.builder});
 
   void switcher() {
     isDark.toggle();

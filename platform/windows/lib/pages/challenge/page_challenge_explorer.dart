@@ -113,7 +113,6 @@ class PageChallengeExplorer extends GetView<SteamExplorerController> {
               child: SteamFileGirdTile<SteamExplorerController>(file: file),
               onTap: () {
                 PageGameEntry.play(
-                  id: 1,
                   file.children,
                   mode: GameMode.challenge,
                 );

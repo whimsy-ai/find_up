@@ -13,7 +13,6 @@ import 'folder_list_tile.dart';
 import 'ilp_explorer_controller.dart';
 import 'steam/steam_file.dart';
 import 'steam/steam_file_list_tile.dart';
-import 'steam/steam_folder_list_tile.dart';
 
 class PageILPExplorer<T extends ILPExplorerController> extends GetView<T> {
   @override
@@ -52,7 +51,6 @@ class PageILPExplorer<T extends ILPExplorerController> extends GetView<T> {
                               return controller.filterForum<T>(
                                 showPageWidget: false,
                               );
-                              return SteamFolderListTile();
                             }
                             return FolderListTile(
                               folder: folder,
@@ -147,13 +145,13 @@ class PageILPExplorer<T extends ILPExplorerController> extends GetView<T> {
       );
 
   _play(ILPFile file) async {
-    await PageGameEntry.play([file], id: 1, mode: GameMode.gallery);
+    await PageGameEntry.play([file], mode: GameMode.gallery);
     await file.load(force: true);
     controller.update(['files']);
   }
 
   _steamFile(SteamFile file) async {
-    await PageGameEntry.play([file], id: 1, mode: GameMode.gallery);
+    await PageGameEntry.play([file], mode: GameMode.gallery);
     await file.load(force: true);
     controller.update(['files']);
   }

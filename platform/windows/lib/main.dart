@@ -23,7 +23,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:steamworks/steamworks.dart';
 import 'package:ui/ui.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:windows/pages/challenge/random_challenge.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
 
 import 'pages/challenge/challenge_editor_controller.dart';
@@ -31,6 +30,7 @@ import 'pages/challenge/page_challenge_editor.dart';
 import 'pages/challenge/page_challenge_explorer.dart';
 import 'pages/challenge/page_play_challenge.dart';
 import 'pages/challenge/pc_game_controller.dart';
+import 'pages/challenge/random_challenge.dart';
 import 'pages/explorer/ilp_explorer_controller.dart';
 import 'pages/explorer/page_ilp_explorer.dart';
 import 'pages/ilp_editor/ilp_editor_controller.dart';
@@ -419,7 +419,7 @@ _openILP(String path) async {
   final ilp = await ILP.fromFile(path);
   try {
     if (await ilp.isILP) {
-      PageGameEntry.play([ILPFile(File(path))], id: 1, mode: GameMode.gallery);
+      PageGameEntry.play([ILPFile(File(path))], mode: GameMode.gallery);
     } else {
       showToast('只支持ilp格式文件');
     }

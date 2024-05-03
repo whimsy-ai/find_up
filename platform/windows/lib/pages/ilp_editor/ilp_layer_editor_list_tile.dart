@@ -107,7 +107,6 @@ class ILPEditorInfoListTile extends GetView<ILPEditorController> {
                         Get.back();
                         PageGameEntry.play(
                           [TestILPFile(ilp: ilp)],
-                          id:1,
                           mode: GameMode.test,
                           ilpIndex: controller.configs.indexOf(file),
                         );
