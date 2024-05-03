@@ -1,15 +1,10 @@
-import 'dart:math' as math;
-
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:game/bundle_files.dart';
 import 'package:game/data.dart';
-import 'package:game/game/game_mode.dart';
-import 'package:game/game/page_game_entry.dart';
 import 'package:game/game/resources.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,6 +18,7 @@ import 'pages/explorer/gallery_controller.dart';
 import 'pages/explorer/page_ilp_explorer.dart';
 import 'pages/game/mobile_game_controller.dart';
 import 'pages/game/page_play_challenge.dart';
+import 'pages/game/random_challenge.dart';
 import 'pages/page_about.dart';
 import 'pages/save/mobile_save_image_controller.dart';
 import 'pages/save/page_save_image.dart';
@@ -101,6 +97,7 @@ class HomePage extends StatelessWidget {
                 Get.put(MobileGameController(
                   mode: Get.arguments['mode'],
                   files: Get.arguments['files'],
+                  ilpIndex: Get.arguments['ilpIndex'],
                 ));
               }),
             ),
@@ -202,18 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ],
                           ),
                         ),
-                        onTap: () async {
-                          final files = await getBundleFiles();
-                          files.shuffle();
-                          print('files length: ${files.length}');
-                          PageGameEntry.play(
-                            files.sublist(
-                              0,
-                              math.min(files.length, 5),
-                            ),
-                            mode: GameMode.challenge,
-                          );
-                        },
+                        onTap: RandomChallengeDialog.show,
                       ),
                       ListTile(
                         title: Text(UI.gallery.tr),

@@ -65,6 +65,7 @@ void main() async {
     [
       'build',
       'appbundle',
+      '--release',
       '--verbose',
     ],
     runInShell: true,

@@ -19,6 +19,8 @@ import 'levels_indicator.dart';
 class PausedWidget<T extends LevelController> extends GetView<T> {
   final String? title;
   final double height;
+  static final double _iconSize = GetPlatform.isDesktop ? 80 : 60;
+  static final double _iconSpacing = GetPlatform.isDesktop ? 40 : 20;
 
   const PausedWidget({super.key, this.title, required this.height});
 
@@ -63,15 +65,15 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
               ),
             ),
           Wrap(
-            spacing: 40,
+            spacing: _iconSpacing,
             children: [
               /// 继续游戏
               if (controller.isPaused)
                 Tooltip(
                   message: UI.resume.tr,
                   child: SizedBox(
-                    width: 80,
-                    height: 80,
+                    width: _iconSize,
+                    height: _iconSize,
                     child: FloatingActionButton(
                       backgroundColor: ColorScheme.light().tertiaryContainer,
                       elevation: 0,
@@ -89,8 +91,8 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
                 Tooltip(
                   message: UI.retry.tr,
                   child: SizedBox(
-                    width: 80,
-                    height: 80,
+                    width: _iconSize,
+                    height: _iconSize,
                     child: FloatingActionButton(
                       backgroundColor: ColorScheme.light().tertiaryContainer,
                       elevation: 0,
@@ -105,8 +107,8 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
 
               /// 随机种子，重新开始
               SizedBox(
-                width: 80,
-                height: 80,
+                width: _iconSize,
+                height: _iconSize,
                 child: Tooltip(
                   message: UI.gameBarRestart.tr,
                   child: FloatingActionButton(
@@ -143,8 +145,8 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
 
               /// 手动输入种子
               SizedBox(
-                width: 80,
-                height: 80,
+                width: _iconSize,
+                height: _iconSize,
                 child: Tooltip(
                   message: UI.gameBarChangeSeed.tr,
                   child: FloatingActionButton(
@@ -191,8 +193,8 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
               /// 保存图片
               if (!isTestFile)
                 SizedBox(
-                  width: 80,
-                  height: 80,
+                  width: _iconSize,
+                  height: _iconSize,
                   child: Tooltip(
                     message: UI.saveImage.tr,
                     child: FloatingActionButton(
@@ -213,8 +215,8 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
               /// 图片信息
               if (!isTestFile)
                 SizedBox(
-                  width: 80,
-                  height: 80,
+                  width: _iconSize,
+                  height: _iconSize,
                   child: Tooltip(
                     message: UI.fileInfo.tr,
                     child: FloatingActionButton(
@@ -237,8 +239,8 @@ class PausedWidget<T extends LevelController> extends GetView<T> {
 
               /// 切换光暗主题
               SizedBox(
-                width: 80,
-                height: 80,
+                width: _iconSize,
+                height: _iconSize,
                 child: Tooltip(
                   message: UI.themeSwitch.tr,
                   child: BrightnessWidget(
